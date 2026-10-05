@@ -676,6 +676,10 @@ a.btn{text-decoration:none;display:inline-block}
 #anmeldung .an-fehler{background:var(--err-soft);color:var(--err);border-radius:12px;padding:11px 14px;font-size:14px;margin-bottom:14px}
 #anmeldung .an-fuss{color:var(--muted);font-size:12.5px;margin:16px 0 0;line-height:1.5}
 .an-leiste{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pw-reihe{display:flex;gap:8px;align-items:stretch}
+.pw-reihe input{flex:1;min-width:0}
+.pw-auge{background:var(--field);border:1px solid var(--line);border-radius:12px;padding:0 12px;font:inherit;font-size:13px;color:var(--muted);cursor:pointer;white-space:nowrap}
+.pw-auge[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent);border-color:transparent}
 .an-wer{color:var(--muted);font-size:13px}
 </style>
 </head>
@@ -1022,7 +1026,7 @@ const Objekte = (() => {
   const $ = s => document.querySelector(s);
   const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const tel = t => String(t || "").replace(/[^\d+]/g, "");
-  const S = { hwTab: "stamm", rgStapel: [], rgEntwurf: null, rgZu: {}, rahmen: [], rahmenOffen: "", kkAuf: {}, kkDetail: false, krProtAuf: false, krVorher: null, sitzung: "", anFehler: "", anMail: "", pwWechsel: false, wpJahr: "", wpDatum: "", wpTop: "",
+  const S = { hwTab: "stamm", rgStapel: [], rgEntwurf: null, rgZu: {}, rahmen: [], rahmenOffen: "", kkAuf: {}, kkDetail: false, krProtAuf: false, krVorher: null, bank: null, lsMonat: "", lsDatum: "", sitzung: "", anFehler: "", anMail: "", pwWechsel: false, pwMeldung: "", pwMeldungOk: false, wpJahr: "", wpDatum: "", wpTop: "",
     sollOffen: "", zaNeu: "", zaEntwurf: null, bhFrei: "", bhGrund: "", infoAlle: false, vmtTab: "miete", vkOffen: null, vkWahl: false, vkSuche: "", bonOffen: null, bonHinweis: "", tObjSuche: "", anruferTreffer: null, tdTab: "vorgang", briefAnzeige: null, datFilter: { suche: "", quelle: "" }, eTab: "stamm", pTab: "stamm", pBearbeiten: false, eaHinweis: "", vermTab: "frei", vermOffen: null, vermFeedback: null, kiLaeuft: false, kiHinweis: "", kiStop: null, mails: [], mailTab: "eingang", mailFilter: { suche: "" }, mailImport: null, mailOffenId: null, mailRichtung: "ein",
     objTab: "stammdaten", ueEinheit: null, tickets: [], tAnsicht: "liste", kalDatum: "", kalModus: "monat", tEntwurfTicket: null, ticketOffen: null, ticketBearbeiten: false, ticketVorher: null, mailNeuFuer: null, mailOffen: null, mailVerschieben: null, mailRichtung: "ein", ichBin: "", einst: { ichBin: "", zeitraum: "woche", nurMeine: true, ansicht: "liste", kalModus: "monat" }, tFilter: { status: "", suche: "", nurMeine: true, zeitraum: "woche" }, bearbeiten: false, uOffen: null, anlageOffen: null, team: [], tEntwurf: null, eigNeuFuer: null, mieterNeuFuer: null, pObjekte: {}, pDirty: new Set(), tab: "vertraege", liste: [], handwerker: [], personen: [], pEntwurf: null, pFilter: { rolle: "", suche: "", ehemalige: false }, ansicht: "liste", entwurf: null, istNeu: false, hwEntwurf: null, hwNeuFuer: null,
     filter: { art: "", suche: "", beendete: false }, loeschen: false };
@@ -1040,6 +1044,9 @@ const Objekte = (() => {
     const setz = (feld, wert) => {
       if (t.dataset.pf) { const pid = t.dataset.pf.split("|")[0]; const pn = S.personen.find(x => x.id === pid);
         if (pn) { pn[feld] = wert; S.pDirty.add(pid); } const el = app.querySelector("[data-pf='" + pid + "|" + feld + "']"); if (el) el.value = wert; return; }
+      if (t.dataset.bz) { bankzugang()[feld] = wert; bankSichern(); const el = app.querySelector("[data-bz='" + feld + "']"); if (el) el.value = wert; return; }
+      if (t.dataset.obbank) { const o = S.entwurf; if (!o) return; if (!o.bank || typeof o.bank !== "object") o.bank = {};
+        o.bank[feld] = wert; objektSichern(o); const el = app.querySelector("[data-obbank='" + feld + "']"); if (el) el.value = wert; return; }
       if (box) { const el = box.querySelector("[data-hwneu='" + feld + "']"); if (el) el.value = wert; } else if (t.dataset.p && S.pEntwurf) { S.pEntwurf[feld] = wert; const el = $("#p-" + feld); if (el) el.value = wert; } else if (S.hwEntwurf) { S.hwEntwurf[feld] = wert; const el = $("#h-" + feld); if (el) el.value = wert; } };
     const zeig = (text, art) => { status.textContent = text; status.className = "iban-status" + (art ? " " + art : ""); };
     if (roh.length < 15) return zeig("");
@@ -1405,6 +1412,10 @@ const Objekte = (() => {
       pfFeld(pn, "bic", "BIC", "text", "autocomplete='off' spellcheck='false'") + pfFeld(pn, "bank", "Bank") + "</div><div class='iban-status'></div>" +
       "<div class='schalter-zeile' style='margin-top:12px'><div>SEPA-Lastschriftmandat liegt vor<small>" + (eigen ? "Hausgeld" : "Miete") + " darf eingezogen werden.</small></div>" +
       "<button type='button' class='schalter' role='switch' aria-checked='" + !!pn.mandat + "' aria-label='SEPA-Lastschriftmandat' data-act='u-mandat' data-id='" + esc(pn.id) + "'></button></div>" +
+      (pn.mandat ? "<div class='felder' style='margin-top:12px'>" +
+        pfFeld(pn, "mandatRef", "Mandatsreferenz", "text", "", "Eindeutig je Zahler. Lassen Sie das Feld leer, schlägt das Programm beim Erzeugen der Datei eine vor.") +
+        pfFeld(pn, "mandatDatum", "Unterschrieben am", "date", "", "Steht so auf dem Mandat und gehört in jede Lastschrift.") + "</div>" +
+        (pn.mandatDatum ? "" : "<ul class='meldungen' style='margin-top:10px'><li class='m-hinweis'>Ohne Unterschriftsdatum darf nicht eingezogen werden.</li></ul>") : "") +
       "<div id='pm-" + esc(pn.id) + "'></div><div class='leiste' style='padding-bottom:0'><div><button class='btn haupt klein' data-act='u-person-speichern' data-id='" + esc(pn.id) + "'>" +
       (eigen ? "Eigentümer speichern" : "Mieter speichern") + "</button>" +
       (eigen ? "" : "<button class='btn klein' data-act='wgb-brief' data-o='" + esc(o.id) + "' data-e='" + esc(e.id) + "'>Wohnungsgeberbestätigung</button>" +
@@ -1523,7 +1534,7 @@ const Objekte = (() => {
   const ROLLE = { eigentuemer: "Eigentümer", mieter: "Mieter" };
   const leerePerson = (extra = {}) => ({ id: Objekte.neueId(), rolle: "mieter", anrede: "", vorname: "", nachname: "", firma: "", objektId: "", einheit: "", einheitId: "", eigentumSeit: "", eigentumBis: "",
     kaltmiete: "", bkVoraus: "", hkVoraus: "", kaution: "",
-    strasse: "", plz: "", ort: "", telefon: "", email: "", mietbeginn: "", mietende: "", mea: "", kontoinhaber: "", iban: "", bic: "", bank: "", mandat: false, mandatDatum: "", notizen: "", ...extra });
+    strasse: "", plz: "", ort: "", telefon: "", email: "", mietbeginn: "", mietende: "", mea: "", kontoinhaber: "", iban: "", bic: "", bank: "", mandat: false, mandatDatum: "", mandatRef: "", notizen: "", ...extra });
   /* Kopien der Objekte, solange im Personenformular Einheiten-Daten bearbeitet werden. */
   function objDraft(objektId) {
     if (!S.pObjekte[objektId]) { const o = S.liste.find(x => x.id === objektId); if (!o) return null; S.pObjekte[objektId] = Objekte.listeSicherstellen(JSON.parse(JSON.stringify(o))); }
@@ -1740,10 +1751,26 @@ const Objekte = (() => {
      und der Vorname; beim ersten Anmelden muss es geändert werden. Kennwörter werden
      nie im Klartext gespeichert, sondern nur als Prüfsumme mit eigenem Zufallswert
      (Stand der Technik nach Art. 32 DSGVO). */
+  /* Notzugang für die Verwaltung: Benutzername „Admin“. Das Kennwort steht nicht im
+     Programm, nur seine Prüfsumme. Es lässt sich im Programm ändern – danach gilt nur
+     noch das neue. Dieser Zugang ist die Rückfalltür, wenn sich jemand ausgesperrt hat. */
+  const ADMIN_ID = "admin";
+  const ADMIN_SALT = "verwaltung-notzugang";
+  const ADMIN_START = "088483baccb99adfddf861b6fa654edc7a9e75037620feca3bd8455c2ccbfb8a";
+  const adminGespeichert = () => { try { return JSON.parse(localStorage.getItem("ov_admin") || "null"); } catch (e) { return null; } };
+  const adminSichern = d => { try { localStorage.setItem("ov_admin", JSON.stringify(d)); } catch (e) {} };
+  const adminStandardNochAktiv = () => { const d = adminGespeichert(); return !d || !d.geaendert || d.hash === ADMIN_START; };
+  const adminKonto = () => {
+    const d = adminGespeichert();
+    return { id: ADMIN_ID, vorname: "Admin", nachname: "", email: "Admin", funktion: "Notzugang",
+      rolle: "verwalter", zugang: true, pwStart: false,
+      salt: d ? d.salt : ADMIN_SALT, pwHash: d ? d.hash : ADMIN_START,
+      pwGeaendert: d ? d.geaendert : "", letzteAnmeldung: d ? d.letzteAnmeldung : "" };
+  };
   const startKennwort = m => "Willkommen" + String((m && m.vorname) || "").replace(/\s+/g, "");
   const hatZugang = m => !!(m && m.zugang && m.pwHash && !m.ausgeschieden);
   const zugaenge = () => S.team.filter(hatZugang);
-  const angemeldet = () => S.team.find(m => m.id === S.sitzung && hatZugang(m)) || null;
+  const angemeldet = () => S.sitzung === ADMIN_ID ? adminKonto() : (S.team.find(m => m.id === S.sitzung && hatZugang(m)) || null);
   /* Solange niemand einen Zugang hat, ist das Programm offen – sonst sperrt man sich aus. */
   const anmeldungNoetig = () => !!zugaenge().length && !angemeldet();
   /* Gibt es gar keinen Verwalter mehr, darf jeder verwalten – sonst sperrt man sich aus. */
@@ -1768,6 +1795,12 @@ const Objekte = (() => {
     m.pwGeaendert = new Date().toISOString();
   }
   const sitzungSetzen = id => { S.sitzung = id || ""; try { id ? sessionStorage.setItem("ov_sitzung", id) : sessionStorage.removeItem("ov_sitzung"); } catch (e) {} };
+  /* Kennwortfeld mit Auge zum Sichtbarmachen – damit man Tippfehler sieht. */
+  function pwFeldHtml(id, label) {
+    return "<div class='feld'><label for='" + id + "'>" + esc(label) + "</label>" +
+      "<div class='pw-reihe'><input type='password' id='" + id + "' autocomplete='off'>" +
+      "<button type='button' class='pw-auge' data-act='pw-sicht' data-ziel='" + id + "' aria-label='Kennwort anzeigen'>anzeigen</button></div></div>";
+  }
   function anmeldungHtml() {
     const el = $("#anmeldung");
     const m = angemeldet();
@@ -1783,10 +1816,12 @@ const Objekte = (() => {
         "<button class='btn' data-act='an-abmelden'>Abmelden</button></div>"
       : "<h1>Anmelden</h1>" +
         "<p class='an-text'>Hausverwaltung – bitte melden Sie sich mit Ihrer dienstlichen E-Mail-Adresse an.</p>" + fehler +
-        "<div class='feld'><label for='an-mail'>E-Mail-Adresse</label><input type='email' id='an-mail' autocomplete='username' value='" + esc(S.anMail || "") + "'></div>" +
-        "<div class='feld'><label for='an-pw'>Kennwort</label><input type='password' id='an-pw' autocomplete='current-password'></div>" +
+        "<div class='feld'><label for='an-mail'>E-Mail-Adresse oder Benutzername</label><input type='text' id='an-mail' autocomplete='username' value='" + esc(S.anMail || "") + "'></div>" +
+        "<div class='feld'><label for='an-pw'>Kennwort</label><div class='pw-reihe'><input type='password' id='an-pw' autocomplete='current-password'>" +
+        "<button type='button' class='pw-auge' data-act='pw-sicht' data-ziel='an-pw' aria-label='Kennwort anzeigen'>anzeigen</button></div></div>" +
         "<div class='an-leiste'><button class='btn haupt' data-act='an-login'>Anmelden</button></div>" +
-        "<p class='an-fuss'>Ihr Startkennwort bekommen Sie von der Verwaltung. Kennwort vergessen? Die Verwaltung setzt es zurück.</p>") +
+        "<p class='an-fuss'>Ihr Startkennwort bekommen Sie von der Verwaltung. Kennwort vergessen? Die Verwaltung setzt es zurück. " +
+        "Die Verwaltung selbst kommt über den Benutzernamen <strong>Admin</strong> herein.</p>") +
       "</div>";
     el.hidden = false;
     const f = el.querySelector("input"); if (f) f.focus({ preventScroll: true });
@@ -3894,7 +3929,7 @@ const Objekte = (() => {
       "</select><small>Ersetzt die Konten dieses Objekts. Gebuchte Beträge bleiben erhalten.</small></div>" +
       "<div class='feld'><label for='ob-sollab'>Sollstellungen ab</label><input type='month' id='ob-sollab' data-obsollab='1' value='" + esc(start) + "'>" +
       "<small>Ab diesem Monat erzeugt das Programm Sollstellungen.</small></div></div>";
-    h += "</section>" + wirtschaftsplanHtml(o) + rueckstandHtml(o) + berichtigungHtml(o) + "<section class='gruppe voll'><h2>Konten dieses Objekts</h2>";
+    h += "</section>" + objektBankHtml(o) + wirtschaftsplanHtml(o) + rueckstandHtml(o) + lastschriftHtml(o) + berichtigungHtml(o) + "<section class='gruppe voll'><h2>Konten dieses Objekts</h2>";
     const gruppen = [["einnahme", "Einnahmen"], ["ausgabe", "Ausgaben"], ["bestand", "Bestandskonten"]];
     h += gruppen.map(([art, titel]) => {
       const teil = konten.filter(k => k.art === art);
@@ -4160,14 +4195,231 @@ const Objekte = (() => {
         (S.loeschen === "kr" + r.id ? "Wirklich löschen?" : "Vorlage löschen") + "</button>" : "") + "</div></div>";
     return h + "</section>";
   }
+  /* ---------- SEPA-Lastschriften ----------
+     Aus den offenen Sollstellungen eines Monats wird eine Einreichungsdatei im Format
+     pain.008 erzeugt. Sie laden sie in Ihrem Online-Banking hoch; der direkte Weg über
+     EBICS kommt später auf dem Server. Eine Basislastschrift muss mindestens einen
+     Geschäftstag vor Fälligkeit bei der Bank sein. */
+  const xmlText = t => String(t == null ? "" : t).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  /* SEPA lässt nur einen eingeschränkten Zeichenvorrat zu. */
+  const sepaText = (t, max) => String(t || "")
+    .replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/Ä/g, "Ae").replace(/Ö/g, "Oe").replace(/Ü/g, "Ue").replace(/ß/g, "ss")
+    .replace(/[^A-Za-z0-9/?:().,'+\- ]/g, " ").replace(/\s+/g, " ").trim().slice(0, max || 70);
+  const mandatRefVon = (o, e, pn) => sepaText(String(pn.mandatRef || "").trim() ||
+    [(o.nummer || "OBJ"), (e && (e.nr || e.art)) || "", (pn.nachname || pn.firma || "").slice(0, 10)].filter(Boolean).join("-"), 35)
+    .replace(/\s/g, "-");
+  const naechsterGeschaeftstag = d => { const x = new Date(d); const fest = feiertageBund(x.getFullYear());
+    for (let i = 0; i < 20; i++) { const t = x.getDay(); if (t !== 0 && t !== 6 && !fest.has(isoTag(x))) return isoTag(x); x.setDate(x.getDate() + 1); } return isoTag(x); };
+  function geschaeftstagePlus(iso, n) { const x = new Date(iso); const fest = feiertageBund(x.getFullYear());
+    let offen = n; while (offen > 0) { x.setDate(x.getDate() + 1); const t = x.getDay(); if (t !== 0 && t !== 6 && !fest.has(isoTag(x))) offen--; }
+    return isoTag(x); }
+  /* Alle einziehbaren Posten eines Monats mit Prüfung, was noch fehlt. */
+  function lastschriftPosten(o, monat) {
+    const aus = [];
+    sollListe(o).filter(s => s.monat === monat && !s.storniert).forEach(s => {
+      const e = (o.einheitenListe || []).find(x => x.id === s.einheitId);
+      const pn = personVon(s.mieterId) || (e ? zahlerVon(o, e) : null);
+      const offen = Math.round((s.summe - gezahltAuf(o, s.id)) * 100) / 100;
+      const maengel = [];
+      if (!pn) maengel.push("kein Zahler hinterlegt");
+      else {
+        if (!pn.mandat) maengel.push("kein Lastschriftmandat");
+        if (!pn.mandatDatum) maengel.push("Unterschriftsdatum des Mandats fehlt");
+        if (!Objekte.ibanGueltig(pn.iban)) maengel.push("IBAN fehlt oder ist ungültig");
+      }
+      if (offen <= 0) maengel.push("nichts mehr offen");
+      aus.push({ s, e, pn, offen, maengel, einziehbar: !maengel.length });
+    });
+    return aus.sort((a, b) => String((a.e && a.e.nr) || "").localeCompare(String((b.e && b.e.nr) || ""), "de", { numeric: true }));
+  }
+  function lastschriftXml(o, monat, posten, faellig) {
+    const b = objektBank(o);
+    const acht = b.painVersion !== "02";
+    const ns = acht ? "pain.008.001.08" : "pain.008.001.02";
+    const bicTag = acht ? "BICFI" : "BIC";
+    const jetzt = new Date().toISOString().slice(0, 19);
+    const msgId = sepaText("LS-" + (o.nummer || "OBJ") + "-" + monat + "-" + Date.now().toString(36), 35).replace(/\s/g, "-");
+    const summe = posten.reduce((a, x) => a + x.offen, 0);
+    const z = n => n.toFixed(2);
+    const kopf = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+      "<Document xmlns=\"urn:iso:std:iso:20022:tech:xsd:" + ns + "\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n" +
+      "<CstmrDrctDbtInitn>\n<GrpHdr><MsgId>" + msgId + "</MsgId><CreDtTm>" + jetzt + "</CreDtTm>" +
+      "<NbOfTxs>" + posten.length + "</NbOfTxs><CtrlSum>" + z(summe) + "</CtrlSum>" +
+      "<InitgPty><Nm>" + xmlText(sepaText(b.inhaber, 70)) + "</Nm></InitgPty></GrpHdr>\n" +
+      "<PmtInf><PmtInfId>" + msgId + "-1</PmtInfId><PmtMtd>DD</PmtMtd><BtchBookg>true</BtchBookg>" +
+      "<NbOfTxs>" + posten.length + "</NbOfTxs><CtrlSum>" + z(summe) + "</CtrlSum>" +
+      "<PmtTpInf><SvcLvl><Cd>SEPA</Cd></SvcLvl><LclInstrm><Cd>CORE</Cd></LclInstrm><SeqTp>RCUR</SeqTp></PmtTpInf>" +
+      "<ReqdColltnDt>" + faellig + "</ReqdColltnDt>" +
+      "<Cdtr><Nm>" + xmlText(sepaText(b.inhaber, 70)) + "</Nm></Cdtr>" +
+      "<CdtrAcct><Id><IBAN>" + Objekte.ibanRoh(b.iban) + "</IBAN></Id></CdtrAcct>" +
+      (b.bic ? "<CdtrAgt><FinInstnId><" + bicTag + ">" + xmlText(String(b.bic).trim()) + "</" + bicTag + "></FinInstnId></CdtrAgt>" : "") +
+      "<ChrgBr>SLEV</ChrgBr>" +
+      "<CdtrSchmeId><Id><PrvtId><Othr><Id>" + xmlText(String(b.glaeubigerId).replace(/\s+/g, "")) + "</Id>" +
+      "<SchmeNm><Prtry>SEPA</Prtry></SchmeNm></Othr></PrvtId></Id></CdtrSchmeId>\n";
+    const zeilen = posten.map((x, i) => {
+      const zweck = sepaText((istWeg(o) ? "Hausgeld " : "Miete ") + monatText(x.s.monat) + " " +
+        ((x.e && (x.e.nr || x.e.art)) || "") + " " + (objName(o) || ""), 140);
+      return "<DrctDbtTxInf><PmtId><EndToEndId>" + sepaText(msgId + "-" + (i + 1), 35).replace(/\s/g, "-") + "</EndToEndId></PmtId>" +
+        "<InstdAmt Ccy=\"EUR\">" + z(x.offen) + "</InstdAmt>" +
+        "<DrctDbtTx><MndtRltdInf><MndtId>" + xmlText(mandatRefVon(o, x.e, x.pn)) + "</MndtId>" +
+        "<DtOfSgntr>" + xmlText(String(x.pn.mandatDatum).slice(0, 10)) + "</DtOfSgntr></MndtRltdInf></DrctDbtTx>" +
+        (x.pn.bic ? "<DbtrAgt><FinInstnId><" + bicTag + ">" + xmlText(String(x.pn.bic).trim()) + "</" + bicTag + "></FinInstnId></DbtrAgt>" : "") +
+        "<Dbtr><Nm>" + xmlText(sepaText(x.pn.kontoinhaber || Objekte.personName(x.pn), 70)) + "</Nm></Dbtr>" +
+        "<DbtrAcct><Id><IBAN>" + Objekte.ibanRoh(x.pn.iban) + "</IBAN></Id></DbtrAcct>" +
+        "<RmtInf><Ustrd>" + xmlText(zweck) + "</Ustrd></RmtInf></DrctDbtTxInf>\n";
+    }).join("");
+    return kopf + zeilen + "</PmtInf>\n</CstmrDrctDbtInitn>\n</Document>\n";
+  }
+  function lastschriftHtml(o) {
+    if (!["miet", "garantie", "weg"].includes(o.art)) return "";
+    const monat = S.lsMonat || heuteMonat();
+    const posten = lastschriftPosten(o, monat);
+    const gut = posten.filter(x => x.einziehbar);
+    const summe = gut.reduce((a, x) => a + x.offen, 0);
+    const konto = objektBank(o);
+    const frueh = geschaeftstagePlus(naechsterGeschaeftstag(new Date()), Number(konto.vorlauf || 2));
+    const faellig = S.lsDatum && S.lsDatum >= frueh ? S.lsDatum : frueh;
+    let h = "<section class='gruppe voll'><h2>Lastschriften einziehen</h2>" +
+      "<p class='unter'>Das Programm sammelt die offenen " + (istWeg(o) ? "Hausgelder" : "Mieten") + " eines Monats und erzeugt daraus die SEPA-Datei, " +
+      "die Sie in Ihrem Online-Banking hochladen. Der direkte Weg über EBICS kommt mit dem Server.</p>";
+    if (!kontoVollstaendig(konto)) return h + "<ul class='meldungen'><li class='m-hinweis'>Für dieses Objekt ist noch kein vollständiges Bankkonto hinterlegt. " +
+      "Tragen Sie es oben unter „Bankkonto dieses Objekts“ ein – oder, wenn alles über ein Konto läuft, in den Einstellungen unter „Bankzugang der Verwaltung“.</li></ul></section>";
+    h += "<p class='unter'>Eingezogen wird auf: <strong>" + esc(konto.inhaber) + "</strong>, " + esc(Objekte.ibanFormat(konto.iban)) +
+      " · Gläubiger-ID " + esc(konto.glaeubigerId) +
+      " <span class='fuer'>(" + (konto.eigen ? "Konto dieses Objekts" : "Konto der Verwaltung") + ")</span></p>";
+    h += "<div class='felder'>" +
+      "<div class='feld'><label for='ls-monat'>Monat</label><input type='month' id='ls-monat' data-ls='monat' value='" + esc(monat) + "'></div>" +
+      "<div class='feld'><label for='ls-faellig'>Einzug am</label><input type='date' id='ls-faellig' data-ls='datum' value='" + esc(faellig) + "' min='" + esc(frueh) + "'>" +
+      "<small>Frühestens " + esc(Objekte.datum(frueh)) + " – vorher ist die Datei nicht rechtzeitig bei der Bank.</small></div></div>";
+    if (!posten.length) return h + "<p class='unter'>Für " + esc(monatText(monat)) + " gibt es keine Sollstellungen.</p></section>";
+    h += "<div class='op-kopf' style='grid-template-columns:110px 1fr 130px 1fr'><span>Einheit</span><span>Zahler</span><span>Offen</span><span>Hinweis</span></div>" +
+      posten.map(x => "<div class='op-zeile' style='grid-template-columns:110px 1fr 130px 1fr'>" +
+        "<span><strong>" + esc((x.e && (x.e.nr || x.e.art)) || "–") + "</strong></span>" +
+        "<span>" + esc(x.pn ? Objekte.personName(x.pn) : "–") + "</span>" +
+        "<span class='so-betrag'>" + eur(x.offen) + "</span>" +
+        "<span>" + (x.einziehbar ? "<span class='marke s-erledigt'>wird eingezogen</span>"
+          : "<span class='fuer'>" + esc(x.maengel.join(" · ")) + "</span>") + "</span></div>").join("") +
+      "<div class='op-zeile op-summe' style='grid-template-columns:110px 1fr 130px 1fr'><span><strong>Summe</strong></span>" +
+      "<span class='fuer'>" + gut.length + " von " + posten.length + " Posten</span>" +
+      "<span class='so-betrag'><strong>" + eur(summe) + "</strong></span><span></span></div>";
+    h += "<div class='leiste'><div><button class='btn haupt' data-act='ls-datei'" + (gut.length ? "" : " disabled") + ">SEPA-Datei erzeugen</button>" +
+      "<span class='fuer'>" + (gut.length ? "Lädt die Datei herunter; einreichen müssen Sie sie selbst." : "Nichts einziehbar – bitte die Hinweise oben beheben.") + "</span></div></div>" +
+      "<ul class='meldungen' style='margin-top:12px'><li class='m-hinweis'>Das Erzeugen der Datei ist noch keine Zahlung. " +
+      "Erst wenn das Geld eingeht, erfassen Sie es als Zahlung – oder künftig automatisch über den Kontoauszug.</li></ul>";
+    return h + "</section>";
+  }
+  /* ---------- Bankzugang der Verwaltung ----------
+     Eigenes Konto und Gläubiger-Identifikationsnummer für SEPA-Lastschriften.
+     Die EBICS-Angaben stehen hier nur als Notiz für den Serverbetrieb – Schlüssel und
+     Kennwörter gehören niemals in den Browser. */
+  const BANK_LEER = { inhaber: "", iban: "", bic: "", bank: "", glaeubigerId: "",
+    ebicsBank: "", ebicsUrl: "", hostId: "", partnerId: "", userId: "", ebicsVersion: "H005",
+    painVersion: "08", vorlauf: "2" };
+  function bankzugang() {
+    if (!S.bank) { try { S.bank = { ...BANK_LEER, ...JSON.parse(localStorage.getItem("ov_bankzugang") || "{}") }; }
+      catch (e) { S.bank = { ...BANK_LEER }; } }
+    return S.bank;
+  }
+  const bankSichern = () => { try { localStorage.setItem("ov_bankzugang", JSON.stringify(bankzugang())); } catch (e) {} };
+  /* Gläubiger-ID: Länderkennung, Prüfziffer, ZZZ-Geschäftsbereich, dann die Kennung. */
+  const glaeubigerGueltig = t => /^[A-Z]{2}\d{2}[A-Za-z0-9]{3}[A-Za-z0-9]{1,28}$/.test(String(t || "").replace(/\s+/g, ""));
+  const kontoVollstaendig = b => !!b && Objekte.ibanGueltig(b.iban) && !!String(b.inhaber || "").trim() && glaeubigerGueltig(b.glaeubigerId);
+  const bankBereit = () => kontoVollstaendig(bankzugang());
+  /* Jede WEG und jede Mietverwaltung hat ihr eigenes Konto: Hausgelder gehören auf das
+     Konto der Gemeinschaft (§ 9a WEG), Mieten auf das Konto des jeweiligen Eigentümers.
+     Nur wenn beim Objekt nichts eingetragen ist, gilt ersatzweise das Konto der Verwaltung. */
+  const objektBankEigen = o => (o && o.bank && typeof o.bank === "object") ? o.bank : null;
+  const objektBank = o => { const e = objektBankEigen(o);
+    return kontoVollstaendig(e) ? { ...bankzugang(), ...e, eigen: true } : { ...bankzugang(), eigen: false }; };
+  function objektBankFeld(o, name) { if (!o.bank || typeof o.bank !== "object") o.bank = {}; return o.bank[name] || ""; }
+  function objektBankHtml(o) {
+    if (!["miet", "garantie", "weg"].includes(o.art)) return "";
+    const e = objektBankEigen(o) || {};
+    const fertig = kontoVollstaendig(e);
+    const weg = istWeg(o);
+    const f = (n, l, hilfe, extra) => "<div class='feld'><label for='ob-bk-" + n + "'>" + esc(l) + "</label>" +
+      "<input type='text' id='ob-bk-" + n + "' data-obbank='" + n + "' value='" + esc(e[n] || "") + "'" + (extra || "") + ">" +
+      (hilfe ? "<small>" + hilfe + "</small>" : "") + "</div>";
+    return "<section class='gruppe voll'><h2>Bankkonto dieses Objekts</h2>" +
+      "<p class='unter'>" + (weg
+        ? "Das Konto der Gemeinschaft. Hausgelder gehören auf ein eigenes Konto der Gemeinschaft (§ 9a WEG) – ein Sammelkonto des Verwalters ist nicht zulässig. Auch die Gläubiger-Identifikationsnummer ist die der Gemeinschaft."
+        : "Das Konto, über das dieses Objekt läuft – in der Regel das Treuhandkonto für den Eigentümer. Lassen Sie es leer, wird das Konto der Verwaltung aus den Einstellungen genommen.") + "</p>" +
+      "<div class='felder'>" +
+      f("inhaber", weg ? "Kontoinhaber (Gemeinschaft)" : "Kontoinhaber") +
+      f("iban", "IBAN", "", " autocomplete='off' spellcheck='false' placeholder='DE00 0000 0000 0000 0000 00'") +
+      f("bic", "BIC") + f("bank", "Bank") +
+      f("glaeubigerId", "Gläubiger-Identifikationsnummer", "Form: DE00ZZZ00000000000", " placeholder='DE98ZZZ09999999999'") +
+      "</div><div class='iban-status'></div>" +
+      (fertig ? "<ul class='meldungen' style='margin-top:12px'><li class='m-ok'>Lastschriften laufen über dieses Konto.</li></ul>"
+        : Object.values(e).some(x => String(x || "").trim())
+          ? "<ul class='meldungen' style='margin-top:12px'><li class='m-hinweis'>Die Angaben sind noch nicht vollständig – solange wird das Konto der Verwaltung genommen. " +
+            "Für Lastschriften brauchen Sie Kontoinhaber, gültige IBAN und die Gläubiger-Identifikationsnummer.</li></ul>"
+          : "<ul class='meldungen' style='margin-top:12px'><li class='m-hinweis'>Kein eigenes Konto hinterlegt – es gilt das Konto der Verwaltung aus den Einstellungen" +
+            (bankBereit() ? ": " + esc(bankzugang().inhaber) + ", " + esc(Objekte.ibanFormat(bankzugang().iban)) : ", das dort aber noch nicht vollständig ist") + ".</li></ul>") +
+      "</section>";
+  }
+  function bankzugangHtml() {
+    const b = bankzugang();
+    const f = (n, l, hilfe, extra) => "<div class='feld'><label for='bz-" + n + "'>" + esc(l) + "</label>" +
+      "<input type='text' id='bz-" + n + "' data-bz='" + n + "' value='" + esc(b[n] || "") + "'" + (extra || "") + ">" +
+      (hilfe ? "<small>" + hilfe + "</small>" : "") + "</div>";
+    return "<section class='gruppe voll'><h2>Bankzugang der Verwaltung</h2>" +
+      "<p class='unter'>Das Konto, auf das die Lastschriften eingezogen werden, und Ihre Gläubiger-Identifikationsnummer. " +
+      "Die bekommen Sie kostenlos bei der Deutschen Bundesbank.</p>" +
+      "<div class='felder'>" + f("inhaber", "Kontoinhaber", "Genau so, wie er bei der Bank geführt wird – dieser Name erscheint auf dem Kontoauszug Ihrer Mieter.") +
+      f("iban", "IBAN", "", " autocomplete='off' spellcheck='false' placeholder='DE00 0000 0000 0000 0000 00'") +
+      f("bic", "BIC") + f("bank", "Bank") + "</div><div class='iban-status'></div><div class='felder'>" +
+      f("glaeubigerId", "Gläubiger-Identifikationsnummer", "Form: DE00ZZZ00000000000", " placeholder='DE98ZZZ09999999999'") + "</div>" +
+      (bankBereit() ? "" : "<ul class='meldungen' style='margin-top:12px'><li class='m-hinweis'>" +
+        (String(b.inhaber || "").trim() ? "" : "Kontoinhaber fehlt. ") +
+        (Objekte.ibanGueltig(b.iban) ? "" : "IBAN fehlt oder ist nicht gültig. ") +
+        (glaeubigerGueltig(b.glaeubigerId) ? "" : "Gläubiger-Identifikationsnummer fehlt oder hat nicht die richtige Form. ") +
+        "Ohne diese Angaben lässt sich keine Lastschriftdatei erzeugen.</li></ul>") +
+      "<div class='felder' style='margin-top:16px'>" +
+      "<div class='feld'><label for='bz-pain'>Format der Lastschriftdatei</label><select id='bz-pain' data-bz='painVersion'>" +
+      [["08", "pain.008.001.08 (aktuell)"], ["02", "pain.008.001.02 (ältere Banken)"]].map(([w, l]) =>
+        "<option value='" + w + "'" + (b.painVersion === w ? " selected" : "") + ">" + l + "</option>").join("") +
+      "</select><small>Weist Ihre Bank die Datei ab, stellen Sie hier auf das ältere Format um.</small></div>" +
+      "<div class='feld'><label for='bz-vor'>Vorlauf bis zur Fälligkeit</label><select id='bz-vor' data-bz='vorlauf'>" +
+      [["1", "1 Geschäftstag"], ["2", "2 Geschäftstage"], ["3", "3 Geschäftstage"]].map(([w, l]) =>
+        "<option value='" + w + "'" + (String(b.vorlauf) === w ? " selected" : "") + ">" + l + "</option>").join("") +
+      "</select><small>Eine Basislastschrift muss mindestens einen Geschäftstag vorher bei der Bank sein.</small></div></div>" +
+      "<h3 style='margin-top:22px'>EBICS – für den späteren Serverbetrieb</h3>" +
+      "<p class='unter'>Ein direkter Bankzugang läuft nicht im Browser, sondern erst auf Ihrem Server. " +
+      "Tragen Sie hier die Angaben ein, die Sie von Ihrer Bank bekommen – Ihr IT-Betreuer braucht genau diese. " +
+      "<strong>Kennwörter und Schlüsseldateien gehören nicht hierher</strong>, die bleiben auf dem Server.</p>" +
+      "<div class='felder'>" + f("ebicsBank", "Bank / Rechenzentrum") +
+      f("ebicsUrl", "EBICS-Adresse (URL)", "", " placeholder='https://…'") +
+      f("hostId", "Host-ID") + f("partnerId", "Kunden-ID (Partner-ID)") + f("userId", "Teilnehmer-ID (User-ID)") +
+      "<div class='feld'><label for='bz-ev'>EBICS-Version</label><select id='bz-ev' data-bz='ebicsVersion'>" +
+      [["H005", "EBICS 3.0 (H005)"], ["H004", "EBICS 2.5 (H004)"]].map(([w, l]) =>
+        "<option value='" + w + "'" + (b.ebicsVersion === w ? " selected" : "") + ">" + l + "</option>").join("") + "</select></div></div>" +
+      "<ul class='meldungen' style='margin-top:14px'><li class='m-hinweis'>So läuft die Einrichtung: Sie schließen mit Ihrer Bank einen EBICS-Vertrag, " +
+      "bekommen die Angaben oben, der Server erzeugt die Schlüssel und Sie schicken der Bank den unterschriebenen Initialisierungsbrief. " +
+      "Erst danach kann der Server Umsätze abholen und Lastschriften einreichen.</li></ul>" +
+      "<p class='unter'>Diese Angaben werden in diesem Browser gespeichert – wie Ihre Firmendaten.</p></section>";
+  }
   function einstellungenHtml() {
     const ich = angemeldet();
     return "<div class='seite'><div class='hero'><h1>Einstellungen</h1><p>Diese Einstellungen gelten nur für Sie an diesem Gerät. Jeder Mitarbeiter stellt sich seine Ansicht selbst ein.</p></div>" +
       (ich ? "<section class='gruppe'><h2>Mein Zugang</h2>" +
         "<p class='unter'>Angemeldet als <strong>" + esc(Objekte.mitarbeiterName(ich)) + "</strong> (" + esc(ich.email || "") + ") · " +
-        esc(ich.rolle === "team" ? "Mitarbeiter" : "Verwalter") + "</p>" +
-        "<div class='leiste'><div><button class='btn klein' data-act='an-pw-neu'>Kennwort ändern</button>" +
-        "<button class='btn klein' data-act='an-abmelden'>Abmelden</button></div></div></section>" : "") +
+        esc(ich.id === ADMIN_ID ? "Notzugang der Verwaltung" : ich.rolle === "team" ? "Mitarbeiter" : "Verwalter") + "</p>" +
+        (ich.id === ADMIN_ID && adminStandardNochAktiv()
+          ? "<ul class='meldungen'><li class='m-hinweis'>Dieser Notzugang hat noch das mitgelieferte Kennwort. " +
+            "Ändern Sie es hier, bevor das Programm öffentlich erreichbar ist – sonst kommt jeder herein, der die Datei liest.</li></ul>" : "") +
+        "<p class='unter'>Benutzername: <strong>" + esc(ich.email || "") + "</strong>. " +
+        "Ihr Kennwort kann Ihnen niemand anzeigen – es wird nicht gespeichert, sondern nur eine Prüfsumme davon. " +
+        "Das ist Absicht: So kann es auch niemand bei uns oder aus der Datei auslesen. Wenn Sie es nicht mehr wissen, vergeben Sie hier einfach ein neues." +
+        (ich.pwGeaendert ? " Zuletzt geändert am " + esc(Objekte.datum(String(ich.pwGeaendert).slice(0, 10))) + "." : "") + "</p>" +
+        "<h3 style='margin-top:18px'>Kennwort ändern</h3>" + (S.pwMeldung ? "<ul class='meldungen'><li class='" +
+          (S.pwMeldungOk ? "m-ok" : "m-fehler") + "'>" + esc(S.pwMeldung) + "</li></ul>" : "") +
+        "<div class='felder'>" +
+        pwFeldHtml("mz-alt", "Jetziges Kennwort") + pwFeldHtml("mz-neu", "Neues Kennwort") + pwFeldHtml("mz-neu2", "Neues Kennwort wiederholen") +
+        "</div>" +
+        "<div class='leiste'><div><button class='btn klein haupt' data-act='an-pw-inline'>Kennwort speichern</button>" +
+        "<span class='fuer'>Mindestens 10 Zeichen.</span></div>" +
+        "<button class='btn klein' data-act='an-abmelden'>Abmelden</button></div></section>" : "") +
       "<section class='gruppe'><h2>Ich bin</h2><p class='unter'>Damit weiß das Programm, welche Vorgänge Ihre sind.</p><div class='felder'>" +
       "<div class='feld'><label for='e-ich'>Mitarbeiter</label><select id='e-ich' data-e='ichBin'><option value=''>– nicht festgelegt –</option>" +
       teamAktiv().map(m => "<option value='" + esc(m.id) + "'" + (S.einst.ichBin === m.id ? " selected" : "") + ">" + esc(Objekte.mitarbeiterName(m)) + "</option>").join("") + "</select></div></div>" +
@@ -4188,7 +4440,7 @@ const Objekte = (() => {
       "<li><strong>Dateien:</strong> In Outlook ausgewählte Mails als .eml oder .txt speichern und im selben Fenster auswählen.</li>" +
       "<li><strong>Automatische Zuordnung:</strong> Steht die Ticketnummer im Betreff, zum Beispiel [#2026-001], landet die Mail sofort beim richtigen Ticket.</li></ol>" +
       "<p class='unter'>Eine dauerhafte Verbindung, die Ihr Postfach von selbst abruft, ist aus dem Browser heraus nicht möglich. Dafür braucht es einen Server, der sich per Microsoft 365 anmeldet – das gehört zum selben Schritt wie die Zugangsdaten für Mitarbeiter.</p></section>" +
-      (istVerwalter() ? kontenrahmenHtml() : "") +
+      (istVerwalter() ? bankzugangHtml() + kontenrahmenHtml() : "") +
       "<div class='hero' style='padding-bottom:4px'><h1 style='font-size:28px'>Dokumente</h1><p>Briefkopf und Fußzeile für Verträge und Schreiben. Diese Angaben gelten für das ganze Unternehmen, nicht nur für Sie.</p></div></div>";
   }
   /* Alle Vorgänge, in denen dieser Handwerker beauftragt oder angefragt wurde. */
@@ -4665,7 +4917,7 @@ const Objekte = (() => {
     const ich = angemeldet();
     if (anmeldungNoetig() || (ich && (ich.pwStart || S.pwWechsel))) { anmeldungHtml(); return; }
     $("#anmeldung").hidden = true;
-    if (ich) S.ichBin = ich.id;
+    if (ich && ich.id !== ADMIN_ID) S.ichBin = ich.id;
     /* Mitarbeiterverwaltung und Kontenrahmen sind der Verwalterrolle vorbehalten. */
     const verwalter = istVerwalter();
     const teamKnopf = document.querySelector("header .reiter button[data-tab='team']");
@@ -4810,6 +5062,25 @@ const Objekte = (() => {
       return;
     }
     /* Art der Vorlage umstellen – Verwendungen, die es dort nicht gibt, werden gelöst. */
+    if (t.dataset.obbank) {
+      const o = S.entwurf; if (!o) return;
+      if (!o.bank || typeof o.bank !== "object") o.bank = {};
+      o.bank[t.dataset.obbank] = t.dataset.obbank === "iban" ? Objekte.ibanFormat(t.value) : t.value;
+      if (t.dataset.obbank === "iban") ibanAuswerten(t);
+      objektSichern(o); return;
+    }
+    if (t.dataset.ls) {
+      if (t.dataset.ls === "monat") { S.lsMonat = t.value; S.lsDatum = ""; } else S.lsDatum = t.value;
+      render(true); return;
+    }
+    if (t.dataset.bz) {
+      const b = bankzugang();
+      b[t.dataset.bz] = t.dataset.bz === "iban" ? Objekte.ibanFormat(t.value) : t.value;
+      if (t.dataset.bz === "iban") ibanAuswerten(t);
+      bankSichern();
+      if (["painVersion", "vorlauf", "ebicsVersion"].includes(t.dataset.bz)) render(true);
+      return;
+    }
     if (t.dataset.krart) {
       const r = rahmenVon(S.rahmenOffen) || rahmenListe()[0];
       const vorher = istWeg(r) ? "WEG-Verwaltung" : "Mietverwaltung";
@@ -4950,6 +5221,8 @@ const Objekte = (() => {
     /* Kontonummer geändert: Reihenfolge und die Prüfung auf doppelte Nummern auffrischen. */
     /* Betrag im Wirtschaftsplan fertig eingegeben: Verteilung neu rechnen. */
     if (e.target.dataset && (e.target.dataset.wp || e.target.dataset.wprl)) { render(true); return; }
+    /* Bankkonto des Objekts fertig eingegeben: Hinweise und Lastschriftteil auffrischen. */
+    if (e.target.dataset && (e.target.dataset.obbank || e.target.dataset.bz)) { render(true); return; }
     /* Konto fertig bearbeitet: doppelte Nummer verhindern und die Änderung festhalten. */
     if (e.target.dataset && e.target.dataset.kk) {
       const [iT, feld] = e.target.dataset.kk.split("|");
@@ -5226,15 +5499,43 @@ const Objekte = (() => {
         const mail = String(($("#an-mail") || {}).value || "").trim().toLowerCase();
         const pw = String(($("#an-pw") || {}).value || "");
         S.anMail = mail;
-        const m = zugaenge().find(x => String(x.email || "").trim().toLowerCase() === mail);
-        if (!m || !pw) { S.anFehler = "E-Mail-Adresse oder Kennwort stimmt nicht."; render(true); return; }
+        const m = mail === ADMIN_ID ? adminKonto() : zugaenge().find(x => String(x.email || "").trim().toLowerCase() === mail);
+        if (!m || !pw) { S.anFehler = "Benutzername oder Kennwort stimmt nicht."; render(true); return; }
         const pruef = await kennwortHash(m.salt, pw);
-        if (pruef !== m.pwHash) { S.anFehler = "E-Mail-Adresse oder Kennwort stimmt nicht."; render(true); return; }
+        if (pruef !== m.pwHash) { S.anFehler = "Benutzername oder Kennwort stimmt nicht."; render(true); return; }
         S.anFehler = ""; S.anMail = ""; sitzungSetzen(m.id);
-        m.letzteAnmeldung = new Date().toISOString(); await teamSichern(m);
-        S.ichBin = m.id; render(); if (!m.pwStart) toast("Angemeldet als " + Objekte.mitarbeiterName(m)); break;
+        if (m.id === ADMIN_ID) { const d = adminGespeichert() || { salt: ADMIN_SALT, hash: ADMIN_START, geaendert: "" };
+          d.letzteAnmeldung = new Date().toISOString(); adminSichern(d); }
+        else { m.letzteAnmeldung = new Date().toISOString(); await teamSichern(m); }
+        S.ichBin = m.id === ADMIN_ID ? S.ichBin : m.id;
+        render(); if (!m.pwStart) toast("Angemeldet als " + Objekte.mitarbeiterName(m)); break;
       }
-      case "an-abmelden": { sitzungSetzen(""); S.pwWechsel = false; S.anFehler = ""; render(); break; }
+      case "an-abmelden": { sitzungSetzen(""); S.pwWechsel = false; S.anFehler = ""; S.pwMeldung = ""; render(); break; }
+      case "pw-sicht": {
+        const f = document.getElementById(b.dataset.ziel); if (!f) return;
+        const zeigen = f.type === "password";
+        f.type = zeigen ? "text" : "password";
+        b.setAttribute("aria-pressed", zeigen); b.textContent = zeigen ? "verbergen" : "anzeigen";
+        f.focus({ preventScroll: true }); break;
+      }
+      /* Kennwort direkt in den Einstellungen ändern – mit dem jetzigen zur Sicherheit. */
+      case "an-pw-inline": {
+        const m = angemeldet(); if (!m) return;
+        const alt = String(($("#mz-alt") || {}).value || "");
+        const n1 = String(($("#mz-neu") || {}).value || ""), n2 = String(($("#mz-neu2") || {}).value || "");
+        S.pwMeldungOk = false;
+        if (!alt || await kennwortHash(m.salt, alt) !== m.pwHash) { S.pwMeldung = "Das jetzige Kennwort stimmt nicht."; render(true); return; }
+        if (n1.length < 10) { S.pwMeldung = "Bitte mindestens 10 Zeichen verwenden."; render(true); return; }
+        if (n1 !== n2) { S.pwMeldung = "Die beiden neuen Eingaben sind nicht gleich."; render(true); return; }
+        if (n1 === alt) { S.pwMeldung = "Bitte ein anderes als das bisherige Kennwort wählen."; render(true); return; }
+        if (m.id === ADMIN_ID) {
+          const salt = Math.random().toString(36).slice(2) + Date.now().toString(36);
+          adminSichern({ salt, hash: await kennwortHash(salt, n1), geaendert: new Date().toISOString(),
+            letzteAnmeldung: (adminGespeichert() || {}).letzteAnmeldung || "" });
+        } else { await kennwortSetzen(m, n1, false); await teamSichern(m); }
+        S.pwMeldung = "Kennwort geändert."; S.pwMeldungOk = true;
+        render(true); toast("Kennwort geändert"); break;
+      }
       case "an-pw-neu": { S.pwWechsel = true; S.anFehler = ""; render(); break; }
       case "an-pw-ok": {
         const m = angemeldet(); if (!m) return;
@@ -5242,6 +5543,12 @@ const Objekte = (() => {
         if (a1.length < 10) { S.anFehler = "Bitte mindestens 10 Zeichen verwenden."; render(true); return; }
         if (a1 !== a2) { S.anFehler = "Die beiden Eingaben sind nicht gleich."; render(true); return; }
         if (a1 === startKennwort(m)) { S.anFehler = "Bitte ein anderes als das Startkennwort wählen."; render(true); return; }
+        if (m.id === ADMIN_ID) {
+          const salt = Math.random().toString(36).slice(2) + Date.now().toString(36);
+          adminSichern({ salt, hash: await kennwortHash(salt, a1), geaendert: new Date().toISOString(),
+            letzteAnmeldung: (adminGespeichert() || {}).letzteAnmeldung || "" });
+          S.pwWechsel = false; S.anFehler = ""; render(); toast("Kennwort des Notzugangs gespeichert"); break;
+        }
         await kennwortSetzen(m, a1, false); S.pwWechsel = false; S.anFehler = "";
         await teamSichern(m); render(); toast("Kennwort gespeichert"); break;
       }
@@ -5260,6 +5567,26 @@ const Objekte = (() => {
         const m = S.tEntwurf; if (!m || !m.email) return;
         await kennwortSetzen(m, startKennwort(m), true);
         render(true); toast("Startkennwort gesetzt: " + startKennwort(m)); break;
+      }
+      /* Einreichungsdatei erzeugen und herunterladen. */
+      case "ls-datei": {
+        const o = S.entwurf; if (!o) return;
+        const monat = S.lsMonat || heuteMonat();
+        const gut = lastschriftPosten(o, monat).filter(x => x.einziehbar);
+        if (!gut.length) { toast("Es ist nichts einziehbar."); return; }
+        const frueh = geschaeftstagePlus(naechsterGeschaeftstag(new Date()), Number(objektBank(o).vorlauf || 2));
+        const faellig = S.lsDatum && S.lsDatum >= frueh ? S.lsDatum : frueh;
+        /* Fehlende Mandatsreferenzen jetzt dauerhaft festhalten – sie gehören zur Buchführung. */
+        for (const x of gut) { if (!String(x.pn.mandatRef || "").trim()) {
+          x.pn.mandatRef = mandatRefVon(o, x.e, x.pn);
+          S.pDirty.add(x.pn.id); try { await Speicher.speichern("personen", x.pn, S.personen); } catch (e) {} } }
+        const xml = lastschriftXml(o, monat, gut, faellig);
+        const name = "Lastschrift-" + (o.nummer || "Objekt") + "-" + monat + ".xml";
+        const a2 = document.createElement("a"); a2.href = URL.createObjectURL(new Blob([xml], { type: "application/xml" }));
+        a2.download = name; a2.click(); setTimeout(() => URL.revokeObjectURL(a2.href), 2000);
+        bhProtokoll(o, "Lastschriftdatei erzeugt für " + monatText(monat), gut.length + " Posten", "", "Einzug am " + Objekte.datum(faellig));
+        await objektSichern(o); render(true);
+        toast(gut.length + " Lastschriften erzeugt – jetzt im Online-Banking einreichen"); break;
       }
       case "kr-prot": S.krProtAuf = !S.krProtAuf; render(true); break;
       /* Eine fertige Vorlage als Ausgangspunkt für die nächste nehmen. */
