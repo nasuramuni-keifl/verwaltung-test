@@ -387,10 +387,41 @@ a.btn{text-decoration:none;display:inline-block}
 .ob-konto{display:grid;grid-template-columns:70px 1fr auto;gap:12px;align-items:baseline;padding:8px 10px;border-radius:10px;background:var(--field)}
 .ob-konto .ob-nr{font-variant-numeric:tabular-nums;color:var(--muted);font-size:13.5px}
 @media(max-width:700px){.ob-konto{grid-template-columns:70px 1fr}.ob-konto .fuer{grid-column:2}}
-.kr-kopf,.kr-zeile{display:grid;grid-template-columns:200px 80px 1fr 125px 66px 135px 160px 30px;gap:8px;align-items:center}
+.kr-kopf,.kr-zeile{display:grid;grid-template-columns:96px 1fr 150px 104px 32px;gap:8px;align-items:center}
 .kr-kopf{font-size:12px;color:var(--muted);padding:12px 2px 6px;border-bottom:1px solid var(--line)}
 .kr-zeile{padding:6px 0;border-bottom:1px solid var(--line)}
 .kr-zeile input,.kr-zeile select{width:100%;min-width:0}
+/* Feinheiten eines Kontos erscheinen erst auf Wunsch – die Zeile bleibt dadurch ruhig. */
+.kr-mehr{background:none;border:1px solid var(--line);border-radius:9px;padding:6px 8px;font:inherit;font-size:13px;color:var(--muted);cursor:pointer;white-space:nowrap}
+.kr-mehr[aria-expanded="true"]{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.kr-det{padding:12px 14px 14px;background:var(--field);border-bottom:1px solid var(--line);border-left:3px solid var(--accent)}
+.kr-det .felder{margin:0}
+.kr-klassefeld{padding:12px 14px 14px;border-bottom:1px solid var(--line)}
+.kr-zeile.kr-still input,.kr-zeile.kr-still select{opacity:.55}
+.wp-kopf,.wp-zeile{display:grid;grid-template-columns:70px 1fr 190px 140px 32px;gap:10px;align-items:center}
+.wp-erg-kopf,.wp-erg-zeile{display:grid;grid-template-columns:1fr 1fr 150px 130px 160px;gap:10px;align-items:center}
+.wp-kopf,.wp-erg-kopf{font-size:12px;color:var(--muted);padding:10px 2px 6px;border-bottom:1px solid var(--line)}
+.wp-zeile,.wp-erg-zeile{padding:8px 2px;border-bottom:1px solid var(--line)}
+.wp-zeile input,.wp-zeile select{width:100%;min-width:0}
+.wp-summe{border-bottom:0;border-top:2px solid var(--line);padding-top:12px}
+@media(max-width:850px){.wp-kopf,.wp-erg-kopf{display:none}
+  .wp-zeile{grid-template-columns:70px 1fr;row-gap:6px}.wp-zeile select,.wp-zeile input{grid-column:1/-1}
+  .wp-erg-zeile{grid-template-columns:1fr auto;row-gap:2px}}
+.kr-prot{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface)}
+.kr-prot-zeile{display:grid;grid-template-columns:230px 1fr;gap:12px;padding:10px 14px;border-bottom:1px solid var(--line);font-size:14px}
+.kr-prot-zeile:last-child{border-bottom:0}
+@media(max-width:700px){.kr-prot-zeile{grid-template-columns:1fr;gap:2px}}
+.kr-klassefeld .felder{margin:0}
+.kr-det .schalter-zeile{margin-top:12px}
+.kr-schritte{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 14px}
+.kr-schritt{display:flex;align-items:baseline;gap:8px;padding:8px 13px;border-radius:999px;background:var(--field);font-size:13.5px;color:var(--muted)}
+.kr-schritt b{color:var(--ink);font-size:14px}
+.kr-schritt.offen{background:var(--warn-soft);color:var(--warn)}
+.kr-schritt.offen b{color:var(--warn)}
+.kr-schritt.fertig{background:var(--weg-soft);color:var(--weg)}
+.kr-schritt.fertig b{color:var(--weg)}
+#app h3.kr-h{font-size:15px;margin:22px 0 4px}
+#app p.kr-p{margin:0 0 12px;color:var(--muted);font-size:14px}
 .kr-klasse{border:1px solid var(--line);border-radius:12px;margin-bottom:10px;overflow:hidden;background:var(--surface)}
 .kr-klasse .kr-kopf,.kr-klasse .kr-zeile{padding-left:14px;padding-right:14px}
 .kr-klasse .kr-zeile:last-of-type{border-bottom:0}
@@ -402,8 +433,9 @@ a.btn{text-decoration:none;display:inline-block}
 .schalter.klein::after{width:16px;height:16px;top:3px;left:3px}
 .schalter.klein[aria-checked="true"]::after{transform:translateX(16px)}
 @media(max-width:1000px){.kr-kopf{display:none}
-  .kr-zeile{grid-template-columns:1fr 1fr;gap:6px;padding:12px 0}
-  .kr-zeile select:first-child,.kr-zeile input:nth-child(3){grid-column:1/-1}}
+  .kr-zeile{grid-template-columns:96px 1fr;gap:6px;padding:12px 0}
+  .kr-zeile input:nth-child(2){grid-column:2/-1}
+  .kr-zeile select{grid-column:1/-1}}
 .rg-jahr{border:1px solid var(--line);border-radius:12px;margin-bottom:10px;overflow:hidden}
 .rg-jahr-kopf{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;background:var(--field);border:0;cursor:pointer;text-align:left;font:inherit;color:inherit}
 .rg-jahr-kopf strong{font-size:16px}
@@ -632,6 +664,19 @@ a.btn{text-decoration:none;display:inline-block}
 #vv .seite{width:100%;max-width:none;margin:0}
 #vv .papier{max-width:900px;margin:0 auto}
 #vv .ergebnis-kopf,#vv .meldungen,#vv .ergebnis .leise{max-width:900px;margin-left:auto;margin-right:auto}
+/* ---------- Anmeldung ---------- */
+#anmeldung{position:fixed;inset:0;z-index:400;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px;overflow:auto}
+#anmeldung[hidden]{display:none}
+#anmeldung .an-karte{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:28px;max-width:430px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,.08)}
+#anmeldung h1{font-size:22px;margin:0 0 6px}
+#anmeldung p.an-text{color:var(--muted);font-size:14.5px;margin:0 0 18px;line-height:1.5}
+#anmeldung .feld{margin-bottom:14px}
+#anmeldung label{display:block;font-size:13px;color:var(--muted);margin-bottom:5px}
+#anmeldung input{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--field);color:var(--ink);font:inherit}
+#anmeldung .an-fehler{background:var(--err-soft);color:var(--err);border-radius:12px;padding:11px 14px;font-size:14px;margin-bottom:14px}
+#anmeldung .an-fuss{color:var(--muted);font-size:12.5px;margin:16px 0 0;line-height:1.5}
+.an-leiste{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.an-wer{color:var(--muted);font-size:13px}
 </style>
 </head>
 <body>
@@ -640,6 +685,7 @@ a.btn{text-decoration:none;display:inline-block}
   <nav class="reiter" aria-label="Bereiche"><button data-act="tab" data-tab="vertraege">Verträge</button><button data-act="tab" data-tab="objekte">Objekte</button><button data-act="tab" data-tab="etv">ETV</button><button data-act="tab" data-tab="vermietung">Vermittlung</button><button data-act="tab" data-tab="zeit">Zeiterfassung</button><button data-act="tab" data-tab="tickets">Tickets</button><button data-act="tab" data-tab="mails">E-Mail</button><button data-act="tab" data-tab="handwerker">Handwerker</button><button data-act="tab" data-tab="personen">Eigentümer/Mieter</button><button data-act="tab" data-tab="team">Mitarbeiter</button><button data-act="tab" data-tab="einstellungen">Einstellungen</button></nav>
   <button class="btn haupt" data-act="neu" id="neu-knopf">+ Neues Objekt</button>
 </header>
+<div id="anmeldung" hidden></div>
 <main id="app"></main>
 <p class="status" id="status"></p>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -976,7 +1022,7 @@ const Objekte = (() => {
   const $ = s => document.querySelector(s);
   const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const tel = t => String(t || "").replace(/[^\d+]/g, "");
-  const S = { hwTab: "stamm", rgStapel: [], rgEntwurf: null, rgZu: {}, rahmen: [], rahmenOffen: "", kkAuf: {},
+  const S = { hwTab: "stamm", rgStapel: [], rgEntwurf: null, rgZu: {}, rahmen: [], rahmenOffen: "", kkAuf: {}, kkDetail: false, krProtAuf: false, krVorher: null, sitzung: "", anFehler: "", anMail: "", pwWechsel: false, wpJahr: "", wpDatum: "", wpTop: "",
     sollOffen: "", zaNeu: "", zaEntwurf: null, bhFrei: "", bhGrund: "", infoAlle: false, vmtTab: "miete", vkOffen: null, vkWahl: false, vkSuche: "", bonOffen: null, bonHinweis: "", tObjSuche: "", anruferTreffer: null, tdTab: "vorgang", briefAnzeige: null, datFilter: { suche: "", quelle: "" }, eTab: "stamm", pTab: "stamm", pBearbeiten: false, eaHinweis: "", vermTab: "frei", vermOffen: null, vermFeedback: null, kiLaeuft: false, kiHinweis: "", kiStop: null, mails: [], mailTab: "eingang", mailFilter: { suche: "" }, mailImport: null, mailOffenId: null, mailRichtung: "ein",
     objTab: "stammdaten", ueEinheit: null, tickets: [], tAnsicht: "liste", kalDatum: "", kalModus: "monat", tEntwurfTicket: null, ticketOffen: null, ticketBearbeiten: false, ticketVorher: null, mailNeuFuer: null, mailOffen: null, mailVerschieben: null, mailRichtung: "ein", ichBin: "", einst: { ichBin: "", zeitraum: "woche", nurMeine: true, ansicht: "liste", kalModus: "monat" }, tFilter: { status: "", suche: "", nurMeine: true, zeitraum: "woche" }, bearbeiten: false, uOffen: null, anlageOffen: null, team: [], tEntwurf: null, eigNeuFuer: null, mieterNeuFuer: null, pObjekte: {}, pDirty: new Set(), tab: "vertraege", liste: [], handwerker: [], personen: [], pEntwurf: null, pFilter: { rolle: "", suche: "", ehemalige: false }, ansicht: "liste", entwurf: null, istNeu: false, hwEntwurf: null, hwNeuFuer: null,
     filter: { art: "", suche: "", beendete: false }, loeschen: false };
@@ -1689,9 +1735,90 @@ const Objekte = (() => {
   }
 
   /* ---------- Mitarbeiter im eigenen Unternehmen ---------- */
+  /* ---------- Zugänge der Mitarbeiter ----------
+     Benutzername ist immer die E-Mail-Adresse. Das Startkennwort lautet „Willkommen“
+     und der Vorname; beim ersten Anmelden muss es geändert werden. Kennwörter werden
+     nie im Klartext gespeichert, sondern nur als Prüfsumme mit eigenem Zufallswert
+     (Stand der Technik nach Art. 32 DSGVO). */
+  const startKennwort = m => "Willkommen" + String((m && m.vorname) || "").replace(/\s+/g, "");
+  const hatZugang = m => !!(m && m.zugang && m.pwHash && !m.ausgeschieden);
+  const zugaenge = () => S.team.filter(hatZugang);
+  const angemeldet = () => S.team.find(m => m.id === S.sitzung && hatZugang(m)) || null;
+  /* Solange niemand einen Zugang hat, ist das Programm offen – sonst sperrt man sich aus. */
+  const anmeldungNoetig = () => !!zugaenge().length && !angemeldet();
+  /* Gibt es gar keinen Verwalter mehr, darf jeder verwalten – sonst sperrt man sich aus. */
+  const verwalterDa = () => zugaenge().some(x => x.rolle !== "team");
+  const istVerwalter = () => { const m = angemeldet(); return !zugaenge().length || !verwalterDa() || !m || m.rolle !== "team"; };
+  const ROLLEN = [["verwalter", "Verwalter – darf alles, auch Mitarbeiter und Kontenrahmen"], ["team", "Mitarbeiter – ohne Mitarbeiter- und Kontenrahmenverwaltung"]];
+  async function kennwortHash(salt, pw) {
+    const txt = String(salt) + "|" + String(pw);
+    if (window.crypto && crypto.subtle && crypto.subtle.digest) {
+      const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(txt));
+      return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+    /* Notlösung, wenn der Browser keine Verschlüsselung anbietet (etwa beim Öffnen als Datei). */
+    let h = 0; for (let i = 0; i < txt.length; i++) h = (Math.imul(h, 31) + txt.charCodeAt(i)) >>> 0;
+    return "einfach-" + h.toString(16);
+  }
+  async function kennwortSetzen(m, pw, istStart) {
+    m.salt = Math.random().toString(36).slice(2) + Date.now().toString(36);
+    m.pwHash = await kennwortHash(m.salt, pw);
+    m.pwStart = !!istStart; m.zugang = true;
+    if (!m.rolle) m.rolle = zugaenge().filter(x => x.id !== m.id).length ? "team" : "verwalter";
+    m.pwGeaendert = new Date().toISOString();
+  }
+  const sitzungSetzen = id => { S.sitzung = id || ""; try { id ? sessionStorage.setItem("ov_sitzung", id) : sessionStorage.removeItem("ov_sitzung"); } catch (e) {} };
+  function anmeldungHtml() {
+    const el = $("#anmeldung");
+    const m = angemeldet();
+    const wechsel = m && (m.pwStart || S.pwWechsel);
+    const fehler = S.anFehler ? "<div class='an-fehler'>" + esc(S.anFehler) + "</div>" : "";
+    el.innerHTML = "<div class='an-karte'>" + (wechsel
+      ? "<h1>Neues Kennwort vergeben</h1>" +
+        "<p class='an-text'>Angemeldet als <strong>" + esc(Objekte.mitarbeiterName(m)) + "</strong>. " +
+        "Bitte ersetzen Sie das Startkennwort durch ein eigenes – mindestens 10 Zeichen.</p>" + fehler +
+        "<div class='feld'><label for='an-neu'>Neues Kennwort</label><input type='password' id='an-neu' autocomplete='new-password'></div>" +
+        "<div class='feld'><label for='an-neu2'>Noch einmal zur Sicherheit</label><input type='password' id='an-neu2' autocomplete='new-password'></div>" +
+        "<div class='an-leiste'><button class='btn haupt' data-act='an-pw-ok'>Kennwort speichern</button>" +
+        "<button class='btn' data-act='an-abmelden'>Abmelden</button></div>"
+      : "<h1>Anmelden</h1>" +
+        "<p class='an-text'>Hausverwaltung – bitte melden Sie sich mit Ihrer dienstlichen E-Mail-Adresse an.</p>" + fehler +
+        "<div class='feld'><label for='an-mail'>E-Mail-Adresse</label><input type='email' id='an-mail' autocomplete='username' value='" + esc(S.anMail || "") + "'></div>" +
+        "<div class='feld'><label for='an-pw'>Kennwort</label><input type='password' id='an-pw' autocomplete='current-password'></div>" +
+        "<div class='an-leiste'><button class='btn haupt' data-act='an-login'>Anmelden</button></div>" +
+        "<p class='an-fuss'>Ihr Startkennwort bekommen Sie von der Verwaltung. Kennwort vergessen? Die Verwaltung setzt es zurück.</p>") +
+      "</div>";
+    el.hidden = false;
+    const f = el.querySelector("input"); if (f) f.focus({ preventScroll: true });
+  }
   const teamAktiv = () => S.team.filter(m => !m.ausgeschieden);
   const betreuerNamen = o => ((o.betreuerIds && o.betreuerIds.length ? o.betreuerIds : [o.betreuerId]).map(id => teamName(id)).filter(Boolean)).join(", ");
   const teamName = id => { const m = S.team.find(x => x.id === id); return m ? Objekte.mitarbeiterName(m) : ""; };
+  /* Zugang eines Mitarbeiters: Benutzername ist die E-Mail, Startkennwort „Willkommen“ + Vorname. */
+  function zugangBlockHtml(m) {
+    const mail = String(m.email || "").trim();
+    const an = hatZugang(m);
+    return "<h3 style='margin-top:22px'>Zugang zum Programm</h3>" +
+      "<p class='unter'>Benutzername ist die E-Mail-Adresse. Das Startkennwort lautet „Willkommen“ und der Vorname; " +
+      "beim ersten Anmelden muss der Mitarbeiter es durch ein eigenes ersetzen. Gespeichert wird nur eine Prüfsumme, nie das Kennwort selbst.</p>" +
+      (mail ? "" : "<ul class='meldungen'><li class='m-hinweis'>Tragen Sie oben zuerst die E-Mail-Adresse ein – sie ist der Benutzername.</li></ul>") +
+      "<div class='schalter-zeile'><div>Zugang erlauben" +
+        "<small>" + (an ? "Benutzername: " + esc(mail) : "Noch kein Zugang eingerichtet.") + "</small></div>" +
+      "<button type='button' class='schalter' role='switch' aria-checked='" + an + "' aria-label='Zugang' data-act='m-zugang'></button></div>" +
+      (an ? "<div class='felder' style='margin-top:14px'><div class='feld breit'><label for='m-rolle'>Rolle</label>" +
+        "<select id='m-rolle' data-m='rolle'>" + ROLLEN.map(([w, l]) => "<option value='" + w + "'" + ((m.rolle || "team") === w ? " selected" : "") + ">" + esc(l) + "</option>").join("") +
+        "</select></div></div>" +
+        (m.pwStart ? "<ul class='meldungen' style='margin-top:12px'><li class='m-hinweis'>Startkennwort ist gesetzt: <strong>" + esc(startKennwort(m)) +
+          "</strong> – bitte dem Mitarbeiter persönlich mitteilen, nicht per E-Mail.</li></ul>"
+          : "<p class='unter' style='margin-top:12px'>Eigenes Kennwort gesetzt" +
+            (m.pwGeaendert ? " am " + esc(Objekte.datum(String(m.pwGeaendert).slice(0, 10))) : "") + "." +
+            (m.letzteAnmeldung ? " Zuletzt angemeldet am " + esc(Objekte.datum(String(m.letzteAnmeldung).slice(0, 10))) + "." : "") + "</p>") +
+        "<div class='leiste'><div><button class='btn klein' data-act='m-pw-reset'>Startkennwort neu setzen</button>" +
+        "<span class='fuer'>Für den Fall, dass jemand sein Kennwort vergessen hat.</span></div></div>" : "") +
+      "<ul class='meldungen' style='margin-top:14px'><li class='m-hinweis'>Diese Anmeldung schützt die Ansicht an einem gemeinsam genutzten Gerät. " +
+      "Solange das Programm allein im Browser läuft, ist sie kein vollwertiger Schutz und die Daten liegen auf dem jeweiligen Gerät. " +
+      "Echte Benutzertrennung mit gemeinsamen Daten bekommen Sie erst mit dem Server.</li></ul>";
+  }
   function teamHtml() {
     let h = "<div class='seite'><div class='hero'><h1>Mitarbeiter</h1><p>Ihr Team. Jedem Objekt können Sie danach eine Betreuung, die Buchhaltung und die Technik zuordnen.</p></div>";
     if (S.tEntwurf) {
@@ -1700,6 +1827,7 @@ const Objekte = (() => {
         f("vorname", "Vorname") + f("nachname", "Nachname") + f("funktion", "Funktion", "text", "list='funktionen'") + f("telefon", "Telefon / Durchwahl", "tel") + f("email", "E-Mail", "email") + "</div>" +
         "<div class='schalter-zeile' style='margin-top:16px'><div>Ausgeschieden<small>Wird dann nicht mehr zur Auswahl angeboten.</small></div>" +
         "<button type='button' class='schalter' role='switch' aria-checked='" + !!m.ausgeschieden + "' aria-label='Ausgeschieden' data-act='m-aus'></button></div>" +
+        zugangBlockHtml(m) +
         "<div id='m-meldung'></div><div class='leiste'><div><button class='btn haupt' data-act='m-speichern'>Speichern</button><button class='btn' data-act='m-abbrechen'>Abbrechen</button></div></div></section>";
     }
     if (!S.team.length && !S.tEntwurf) return h + "<div class='leer'><h2>Noch keine Mitarbeiter</h2><p>Legen Sie Ihr Team an, damit Sie Objekte zuordnen können.</p><button class='btn haupt' data-act='neu'>+ Mitarbeiter</button></div></div>";
@@ -3357,23 +3485,99 @@ const Objekte = (() => {
     }
     return isoTag(new Date(j, m - 1, 3));
   }
-  /* Die Positionen einer Sollstellung aus dem Mietverhältnis. */
-  const SOLL_POSTEN = [["kaltmiete", "Nettokaltmiete"], ["bkVoraus", "Nebenkostenvorauszahlung"], ["hkVoraus", "Heizkostenvorauszahlung"]];
-  function sollPositionen(o, mie, ym) {
+  /* Welche Zahlungen monatlich entstehen, hängt an der Art der Verwaltung.
+     Miete: § 556b BGB. WEG: Hausgeld nach beschlossenem Wirtschaftsplan (§ 28 Abs. 1 WEG),
+     getrennt nach Bewirtschaftung und Zuführung zur Erhaltungsrücklage (§ 19 Abs. 2 Nr. 4 WEG). */
+  const SOLL_MIET = [["kaltmiete", "Nettokaltmiete"], ["bkVoraus", "Nebenkostenvorauszahlung"], ["hkVoraus", "Heizkostenvorauszahlung"]];
+  const SOLL_WEG = [["hgBewirt", "Hausgeld – Bewirtschaftung"], ["hgRuecklage", "Zuführung zur Erhaltungsrücklage"]];
+  const istWeg = x => (typeof x === "string" ? x : (x && x.art)) === "weg";
+  const sollPosten = x => istWeg(x) ? SOLL_WEG : SOLL_MIET;
+  /* ---------- Wirtschaftsplan (§ 28 Abs. 1 WEG) ----------
+     Geplante Kosten je Konto und die Zuführung zur Erhaltungsrücklage, verteilt auf die
+     Einheiten. Beschlossen werden die Vorschüsse; der Plan gilt fort, bis ein neuer
+     beschlossen ist (§ 28 Abs. 1 Satz 2 WEG). Die Zuführung zur Erhaltungsrücklage ist
+     keine Kosten, sondern Vermögensbildung (§ 19 Abs. 2 Nr. 4 WEG). */
+  const WP_SCHLUESSEL = [["mea", "Miteigentumsanteile"], ["flaeche", "Wohnfläche"], ["einheiten", "nach Einheiten"], ["personen", "Personen"]];
+  const wplanAlle = o => { if (!o.wplan || typeof o.wplan !== "object") o.wplan = {}; return o.wplan; };
+  const wplanVon = (o, jahr) => wplanAlle(o)[jahr] || null;
+  const wplanFest = wp => !!(wp && wp.beschlossenAm);
+  function wplanAnlegen(o, jahr) {
+    const wp = { jahr, positionen: [], ruecklage: "", schluesselRuecklage: "mea", beschlossenAm: "", beschlussTop: "",
+      angelegt: new Date().toISOString() };
+    wplanAlle(o)[jahr] = wp; return wp;
+  }
+  /* Der zuletzt beschlossene Plan bis einschließlich dieses Jahres. */
+  function wplanGueltig(o, jahr) {
+    const alle = wplanAlle(o);
+    const jahre = Object.keys(alle).filter(j => j <= jahr && wplanFest(alle[j])).sort();
+    return jahre.length ? alle[jahre[jahre.length - 1]] : null;
+  }
+  const zahlAus = t => { const m = String(t || "").replace(",", ".").match(/^\s*([\d.]+)/); return m ? Number(m[1]) : null; };
+  /* Anteil jeder Einheit an einem Betrag – Miteigentumsanteile sind der gesetzliche Regelfall (§ 16 Abs. 1 WEG). */
+  function verteilAnteile(o, schluessel) {
+    const liste = o.einheitenListe || [];
+    const wert = e => schluessel === "flaeche" ? zahlAus(e.flaeche)
+      : schluessel === "personen" ? zahlAus(Objekte.personenAktuell(e))
+      : schluessel === "einheiten" ? 1
+      : zahlAus(e.mea);
+    const werte = liste.map(e => ({ id: e.id, w: wert(e) }));
+    const summe = werte.reduce((a, x) => a + (x.w || 0), 0);
+    const aus = {};
+    if (summe > 0) werte.forEach(x => { aus[x.id] = (x.w || 0) / summe; });
+    else liste.forEach(e => { aus[e.id] = liste.length ? 1 / liste.length : 0; });
+    return { anteile: aus, basis: summe, ersatz: !(summe > 0) };
+  }
+  const cent = n => Math.round(n * 100) / 100;
+  /* Der Plan auf die Einheiten gerechnet: Jahresbeträge und daraus das monatliche Hausgeld. */
+  function wplanVerteilung(o, jahr) {
+    const wp = wplanVon(o, jahr); if (!wp) return null;
+    const liste = o.einheitenListe || [];
+    const je = {}; liste.forEach(e => { je[e.id] = { bewirt: 0, ruecklage: 0 }; });
+    let ersatz = false;
+    (wp.positionen || []).forEach(pos => {
+      const betrag = betragZahl(pos.betrag); if (!betrag) return;
+      const v = verteilAnteile(o, pos.schluessel || "mea"); if (v.ersatz) ersatz = true;
+      liste.forEach(e => { je[e.id].bewirt += betrag * (v.anteile[e.id] || 0); });
+    });
+    const rl = betragZahl(wp.ruecklage);
+    if (rl) { const v = verteilAnteile(o, wp.schluesselRuecklage || "mea"); if (v.ersatz) ersatz = true;
+      liste.forEach(e => { je[e.id].ruecklage += rl * (v.anteile[e.id] || 0); }); }
+    liste.forEach(e => { je[e.id].bewirt = cent(je[e.id].bewirt); je[e.id].ruecklage = cent(je[e.id].ruecklage); });
+    return { je, ersatz,
+      summeBewirt: cent((wp.positionen || []).reduce((a, x) => a + betragZahl(x.betrag), 0)),
+      summeRuecklage: cent(rl) };
+  }
+  /* Monatliches Hausgeld einer Einheit: aus dem beschlossenen Plan, sonst aus den Stammdaten. */
+  function hausgeldBetraege(o, e, ym) {
+    const wp = wplanGueltig(o, ym.slice(0, 4));
+    if (wp) {
+      const v = wplanVerteilung(o, wp.jahr); const x = v && v.je[e.id];
+      if (x) return { hgBewirt: cent(x.bewirt / 12), hgRuecklage: cent(x.ruecklage / 12) };
+    }
+    const hg = betragZahl(e.hausgeld), rl = betragZahl(e.ruecklage);
+    return { hgBewirt: cent(hg - rl), hgRuecklage: rl };
+  }
+  /* Die Positionen einer Sollstellung: bei Miete aus dem Mietvertrag,
+     bei WEG aus dem Wirtschaftsplan bzw. dem hinterlegten Hausgeld der Einheit. */
+  function sollPositionen(o, e, partei, ym) {
+    const weg = istWeg(o);
     const tage = tageImMonat(ym);
-    const von = String(mie.mietbeginn || "").slice(0, 10), bis = String(mie.mietende || "").slice(0, 10);
+    const von = String((weg ? partei.eigentumSeit : partei.mietbeginn) || "").slice(0, 10);
+    const bis = String((weg ? partei.eigentumBis : partei.mietende) || "").slice(0, 10);
     const erster = ym + "-01", letzter = ym + "-" + String(tage).padStart(2, "0");
     if (von && von > letzter) return null;
     if (bis && bis < erster) return null;
-    /* Taggenau anteilig, wenn das Mietverhältnis mitten im Monat beginnt oder endet. */
+    /* Taggenau anteilig, wenn Mietverhältnis oder Eigentum mitten im Monat beginnt oder endet. */
     const abTag = von && von > erster ? Number(von.slice(8, 10)) : 1;
     const bisTag = bis && bis < letzter ? Number(bis.slice(8, 10)) : tage;
     const anteil = (bisTag - abTag + 1) / tage;
     if (anteil <= 0) return null;
     const konten = objektKonten(o);
+    const betraege = weg ? hausgeldBetraege(o, e, ym) : {
+      kaltmiete: betragZahl(partei.kaltmiete), bkVoraus: betragZahl(partei.bkVoraus), hkVoraus: betragZahl(partei.hkVoraus) };
     const aus = [];
-    SOLL_POSTEN.forEach(([feld, name]) => {
-      const voll = betragZahl(mie[feld]); if (!voll) return;
+    sollPosten(o).forEach(([feld, name]) => {
+      const voll = betraege[feld]; if (!voll) return;
       const k = kontoFuer(konten, feld); if (!k) return;
       aus.push({ kontoNr: k.nr || "", name: k.name || name, betrag: Math.round(voll * anteil * 100) / 100 });
     });
@@ -3383,24 +3587,28 @@ const Objekte = (() => {
   const sollListe = o => Array.isArray(o.soll) ? o.soll : [];
   const zahlungsListe = o => Array.isArray(o.zahlungen) ? o.zahlungen : [];
   /* Fehlende Sollstellungen bis zum laufenden Monat nachtragen. */
+  /* Wer schuldet die monatliche Zahlung: bei Miete der Mieter, bei WEG der Eigentümer. */
+  const zahlerVon = (o, e) => istWeg(o) ? (personVon(e.eigentuemerId) || null) : mieterVon(e.id, o);
+  /* Miete ist am 3. Werktag fällig (§ 556b BGB), Hausgeld zum 1. des Monats laut Beschluss. */
+  const faelligAm = (o, ym) => istWeg(o) ? ym + "-01" : dritterWerktag(ym);
   function sollstellungenErzeugen(o) {
-    if (o.art !== "miet" && o.art !== "garantie") return 0;
+    if (!["miet", "garantie", "weg"].includes(o.art)) return 0;
     if (!objektKonten(o).length) return 0;
     const start = o.sollAb || heuteMonat();
     const bis = heuteMonat();
     o.soll = sollListe(o);
     let neu = 0;
     (o.einheitenListe || []).forEach(e => {
-      const mie = mieterVon(e.id, o); if (!mie) return;
+      const partei = zahlerVon(o, e); if (!partei) return;
       let ym = start;
       for (let n = 0; n < 240 && ym <= bis; n++) {
         if (periodeFest(o, ym.slice(0, 4))) { ym = monatPlus(ym, 1); continue; }
         const da = o.soll.some(s => s.einheitId === e.id && s.monat === ym);
         if (!da) {
-          const p = sollPositionen(o, mie, ym);
+          const p = sollPositionen(o, e, partei, ym);
           if (p) {
-            o.soll.push({ id: Objekte.neueId(), einheitId: e.id, mieterId: mie.id, monat: ym,
-              faellig: dritterWerktag(ym), positionen: p.positionen, anteilig: p.anteil < 1,
+            o.soll.push({ id: Objekte.neueId(), einheitId: e.id, mieterId: partei.id, monat: ym,
+              faellig: faelligAm(o, ym), positionen: p.positionen, anteilig: p.anteil < 1,
               summe: Math.round(p.positionen.reduce((s, x) => s + x.betrag, 0) * 100) / 100,
               angelegt: new Date().toISOString(), storniert: false });
             neu++;
@@ -3424,7 +3632,7 @@ const Objekte = (() => {
   }
   /* Dem Objekt eine eigene Kopie des Kontenrahmens geben – spätere Änderungen der Vorlage wirken nicht zurück. */
   function rahmenZuweisen(o, rahmenId) {
-    const r = rahmenVon(rahmenId) || rahmenStandard(); if (!r) return false;
+    const r = rahmenVon(rahmenId) || rahmenStandard(o.art === "weg" ? "weg" : "miet"); if (!r) return false;
     o.rahmenId = r.id; o.rahmenName = r.name;
     o.konten = JSON.parse(JSON.stringify(r.konten));
     o.rahmenStand = new Date().toISOString();
@@ -3433,9 +3641,9 @@ const Objekte = (() => {
   const objektKonten = o => Array.isArray(o.konten) ? o.konten : [];
   /* Welches Konto wird für welche Position der Sollstellung verwendet? Maßgeblich ist
      allein die Verwendung, die der Verwalter selbst an einem seiner Konten gesetzt hat. */
-  const kontoFuer = (konten, feld) => konten.find(k => k.rolle === feld) || null;
+  const kontoFuer = (konten, feld) => konten.find(k => k.rolle === feld && !k.inaktiv) || null;
   /* Positionen, für die noch kein Konto bestimmt ist – ohne sie entsteht keine Sollstellung. */
-  const verwendungFehlt = konten => SOLL_POSTEN.filter(([feld]) => !kontoFuer(konten, feld)).map(x => x[1]);
+  const verwendungFehlt = (konten, art) => sollPosten(art).filter(([feld]) => !kontoFuer(konten, feld)).map(x => x[1]);
   const eur = n => (Math.round(n * 100) / 100).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
   /* Jede Änderung an der Buchhaltung wird mitgeschrieben. */
   function bhProtokoll(o, was, grund, vorher, nachher) {
@@ -3449,17 +3657,18 @@ const Objekte = (() => {
   }
   /* Sollstellungen und Zahlungen einer Wohnung, nach Monat absteigend. */
   function sollstellungHtml(o, e) {
-    if (o.art !== "miet" && o.art !== "garantie")
-      return "<div class='we-detail'><p class='unter'>Sollstellungen gibt es bisher nur in der Mietverwaltung.</p></div>";
+    if (!["miet", "garantie", "weg"].includes(o.art))
+      return "<div class='we-detail'><p class='unter'>Sollstellungen gibt es in der Mietverwaltung und in der WEG-Verwaltung.</p></div>";
     if (!objektKonten(o).length)
       return "<div class='we-detail'><p class='unter'>Für dieses Objekt sind noch keine Konten vorhanden. Legen Sie Ihre Konten in den Einstellungen unter „Kontenrahmen“ an und ordnen Sie die Vorlage im Objekt unter „Buchhaltung“ zu.</p></div>";
-    const fehltVerw = verwendungFehlt(objektKonten(o));
-    if (fehltVerw.length === SOLL_POSTEN.length)
-      return "<div class='we-detail'><ul class='meldungen'><li class='m-hinweis'>Es ist noch nicht bestimmt, auf welche Konten die Miete gebucht wird. " +
+    const fehltVerw = verwendungFehlt(objektKonten(o), o.art);
+    if (fehltVerw.length === sollPosten(o).length)
+      return "<div class='we-detail'><ul class='meldungen'><li class='m-hinweis'>Es ist noch nicht bestimmt, auf welche Konten " + (istWeg(o) ? "das Hausgeld" : "die Miete") + " gebucht wird. " +
         "Legen Sie das in den Einstellungen unter „Kontenrahmen“ bei „Verwendung für die Sollstellung“ fest und ordnen Sie die Vorlage dem Objekt unter „Buchhaltung“ erneut zu " +
         "– danach entstehen die Sollstellungen automatisch.</li></ul></div>";
-    const mie = mieterVon(e.id, o);
-    if (!mie) return "<div class='we-detail'><p class='unter'>Für diese Wohnung ist kein Mieter hinterlegt – es entstehen keine Sollstellungen.</p></div>";
+    const mie = zahlerVon(o, e);
+    if (!mie) return "<div class='we-detail'><p class='unter'>Für diese Einheit ist " + (istWeg(o) ? "kein Eigentümer" : "kein Mieter") +
+      " hinterlegt – es entstehen keine Sollstellungen.</p></div>";
     const liste = sollListe(o).filter(s => s.einheitId === e.id).sort((a, b) => b.monat.localeCompare(a.monat));
     const anf = (o.anfangsstand || []).find(a => a.einheitId === e.id);
     const summeSoll = liste.reduce((s, x) => s + (x.storniert ? 0 : x.summe), 0);
@@ -3517,7 +3726,7 @@ const Objekte = (() => {
   /* Rückstände und Guthaben aller Wohnungen des Objekts. */
   function rueckstandHtml(o) {
     const zeilen = (o.einheitenListe || []).map(e => {
-      const mie = mieterVon(e.id, o); if (!mie) return null;
+      const mie = zahlerVon(o, e); if (!mie) return null;
       const teil = sollListe(o).filter(s => s.einheitId === e.id && !s.storniert);
       if (!teil.length) return null;
       const soll = teil.reduce((s, x) => s + x.summe, 0);
@@ -3528,8 +3737,8 @@ const Objekte = (() => {
     if (!zeilen.length) return "";
     const summe = zeilen.reduce((s, x) => s + x.diff, 0);
     return "<section class='gruppe voll'><h2>Offene Posten</h2>" +
-      "<p class='unter'>Stand aller Wohnungen. Jeder Monat wird für sich gerechnet.</p>" +
-      "<div class='op-kopf'><span>Wohnung</span><span>Mieter</span><span>Soll</span><span>Gezahlt</span><span>Differenz</span><span>rückständig</span></div>" +
+      "<p class='unter'>Stand aller Einheiten. Jeder Monat wird für sich gerechnet.</p>" +
+      "<div class='op-kopf'><span>Einheit</span><span>" + (istWeg(o) ? "Eigentümer" : "Mieter") + "</span><span>Soll</span><span>Gezahlt</span><span>Differenz</span><span>rückständig</span></div>" +
       zeilen.map(z => "<div class='op-zeile'><span><strong>" + esc(z.e.nr || z.e.art) + "</strong></span>" +
         "<span>" + esc(Objekte.personName(z.mie)) + "</span>" +
         "<span class='so-betrag'>" + eur(z.soll) + "</span><span class='so-betrag'>" + eur(z.gez) + "</span>" +
@@ -3587,6 +3796,85 @@ const Objekte = (() => {
       "<div class='leiste'><div><button class='btn klein haupt' data-act='za-ok' data-id='" + esc(s.id) + "'>Übernehmen</button>" +
       "<button class='btn klein' data-act='za-abbr'>Abbrechen</button></div></div></div>";
   }
+  /* ---------- Wirtschaftsplan im Objekt ---------- */
+  function wirtschaftsplanHtml(o) {
+    if (!istWeg(o)) return "";
+    const jahre = [...new Set(Object.keys(wplanAlle(o)).concat([String(new Date().getFullYear())]))].sort((a, b) => b.localeCompare(a));
+    const jahr = S.wpJahr && jahre.includes(S.wpJahr) ? S.wpJahr : jahre[0];
+    const wp = wplanVon(o, jahr);
+    const fest = wplanFest(wp);
+    const konten = objektKonten(o).filter(k => k.art === "ausgabe" && !k.inaktiv);
+    let h = "<section class='gruppe voll'><h2>Wirtschaftsplan</h2>" +
+      "<p class='unter'>Die geplanten Kosten eines Jahres und die Zuführung zur Erhaltungsrücklage, verteilt auf die Einheiten. " +
+      "Daraus ergibt sich das monatliche Hausgeld. Beschlossen werden die Vorschüsse (§ 28 Abs. 1 WEG); der Plan gilt fort, bis ein neuer beschlossen ist.</p>" +
+      "<div class='pillen' style='margin-bottom:14px'>" + jahre.map(j =>
+        "<button type='button' class='pille" + (j === jahr ? " an" : "") + "' data-act='wp-jahr' data-wert='" + esc(j) + "'>" + esc(j) +
+        (wplanFest(wplanVon(o, j)) ? " · beschlossen" : wplanVon(o, j) ? " · Entwurf" : "") + "</button>").join("") +
+      "<button type='button' class='pille' data-act='wp-jahr-neu'>+ Folgejahr</button></div>";
+    if (!konten.length) return h + "<p class='unter'>Legen Sie zuerst Ihre Ausgabekonten an – in den Einstellungen unter „Kontenrahmen“ und dann hier unter „Kontenrahmen“ dem Objekt zuordnen.</p></section>";
+    if (!wp) return h + "<div class='leiste'><div><button class='btn haupt' data-act='wp-neu' data-wert='" + esc(jahr) + "'>Wirtschaftsplan " + esc(jahr) + " anlegen</button>" +
+      "<span class='fuer'>Sie tragen je Konto den geplanten Jahresbetrag ein.</span></div></div></section>";
+
+    const v = wplanVerteilung(o, jahr) || { je: {}, summeBewirt: 0, summeRuecklage: 0 };
+    h += fest ? "<ul class='meldungen'><li class='m-ok'>Beschlossen am " + esc(Objekte.datum(wp.beschlossenAm)) +
+        (wp.beschlussTop ? " · " + esc(wp.beschlussTop) : "") + " – keine Änderung mehr möglich.</li></ul>"
+      : "<ul class='meldungen'><li class='m-hinweis'>Entwurf. Sobald die Versammlung beschlossen hat, tragen Sie unten das Beschlussdatum ein – danach ist der Plan gesperrt.</li></ul>";
+    if (v.ersatz) h += "<ul class='meldungen'><li class='m-hinweis'>Für mindestens einen Schlüssel fehlen die Werte an den Einheiten (z. B. Miteigentumsanteile). Solange wird gleichmäßig auf alle Einheiten verteilt.</li></ul>";
+
+    h += "<h3 style='margin-top:18px'>Geplante Kosten " + esc(jahr) + "</h3>" +
+      "<div class='wp-kopf'><span>Konto</span><span>Bezeichnung</span><span>Verteilung</span><span>Jahresbetrag €</span><span></span></div>" +
+      (wp.positionen || []).map((pos, i) => {
+        const k = objektKonten(o).find(x => x.id === pos.kontoId) || {};
+        return "<div class='wp-zeile'><span class='ob-nr'>" + esc(k.nr || "–") + "</span>" +
+          "<span>" + esc(k.name || "Konto nicht mehr vorhanden") + "</span>" +
+          "<select aria-label='Verteilung' data-wp='" + i + "|schluessel'" + (fest ? " disabled" : "") + ">" +
+            WP_SCHLUESSEL.map(([w, l]) => "<option value='" + w + "'" + ((pos.schluessel || "mea") === w ? " selected" : "") + ">" + l + "</option>").join("") + "</select>" +
+          "<input type='text' inputmode='decimal' aria-label='Jahresbetrag' data-wp='" + i + "|betrag' value='" + esc(pos.betrag || "") + "'" + (fest ? " disabled" : "") + ">" +
+          (fest ? "<span></span>" : "<button type='button' class='e-weg' data-act='wp-weg' data-i='" + i + "' aria-label='Position entfernen'>×</button>") + "</div>";
+      }).join("");
+    if (!(wp.positionen || []).length) h += "<p class='unter' style='margin:10px 0'>Noch keine Kostenposition.</p>";
+    if (!fest) {
+      const offen = konten.filter(k => !(wp.positionen || []).some(x => x.kontoId === k.id));
+      h += offen.length
+        ? "<div class='leiste'><div><select id='wp-konto' aria-label='Konto wählen' style='max-width:320px'>" +
+          offen.map(k => "<option value='" + esc(k.id) + "'>" + esc((k.nr ? k.nr + " · " : "") + k.name) + "</option>").join("") + "</select>" +
+          "<button class='btn klein haupt' data-act='wp-pos-neu'>+ Konto in den Plan</button></div></div>"
+        : "<p class='unter' style='margin:10px 0 0'>Alle Ausgabekonten dieses Objekts stehen im Plan.</p>";
+    }
+    h += "<h3 style='margin-top:20px'>Zuführung zur Erhaltungsrücklage</h3>" +
+      "<p class='unter'>Keine Kosten, sondern Vermögen der Gemeinschaft (§ 19 Abs. 2 Nr. 4 WEG). Sie erscheint getrennt im Hausgeld und im Vermögensbericht.</p>" +
+      "<div class='felder'><div class='feld'><label for='wp-rl'>Jahresbetrag €</label>" +
+      "<input type='text' id='wp-rl' inputmode='decimal' data-wprl='betrag' value='" + esc(wp.ruecklage || "") + "'" + (fest ? " disabled" : "") + "></div>" +
+      "<div class='feld'><label for='wp-rl-s'>Verteilung</label><select id='wp-rl-s' data-wprl='schluesselRuecklage'" + (fest ? " disabled" : "") + ">" +
+      WP_SCHLUESSEL.map(([w, l]) => "<option value='" + w + "'" + ((wp.schluesselRuecklage || "mea") === w ? " selected" : "") + ">" + l + "</option>").join("") +
+      "</select></div></div>";
+
+    h += "<h3 style='margin-top:20px'>Hausgeld je Einheit</h3>" +
+      "<div class='wp-erg-kopf'><span>Einheit</span><span>Eigentümer</span><span>Bewirtschaftung</span><span>Rücklage</span><span>Hausgeld / Monat</span></div>" +
+      (o.einheitenListe || []).map(e => {
+        const x = v.je[e.id] || { bewirt: 0, ruecklage: 0 };
+        const mon = cent(x.bewirt / 12) + cent(x.ruecklage / 12);
+        const eig = personVon(e.eigentuemerId);
+        return "<div class='wp-erg-zeile'><span><strong>" + esc(e.nr || e.art) + "</strong>" +
+          (e.mea ? "<br><span class='fuer'>MEA " + esc(e.mea) + "</span>" : "") + "</span>" +
+          "<span>" + esc(eig ? Objekte.personName(eig) : "noch kein Eigentümer") + "</span>" +
+          "<span class='so-betrag'>" + eur(cent(x.bewirt / 12)) + "</span>" +
+          "<span class='so-betrag'>" + eur(cent(x.ruecklage / 12)) + "</span>" +
+          "<span class='so-betrag'><strong>" + eur(cent(mon)) + "</strong></span></div>";
+      }).join("") +
+      "<div class='wp-erg-zeile wp-summe'><span><strong>Alle Einheiten</strong><br><span class='fuer'>je Monat</span></span><span></span>" +
+      "<span class='so-betrag'>" + eur(cent(v.summeBewirt / 12)) + "</span><span class='so-betrag'>" + eur(cent(v.summeRuecklage / 12)) + "</span>" +
+      "<span class='so-betrag'><strong>" + eur(cent((v.summeBewirt + v.summeRuecklage) / 12)) + "</strong></span></div>" +
+      "<p class='unter' style='margin:10px 0 0'>Im ganzen Jahr: " + esc(eur(v.summeBewirt)) + " Bewirtschaftung, " +
+      esc(eur(v.summeRuecklage)) + " Zuführung zur Rücklage, zusammen <strong>" + esc(eur(cent(v.summeBewirt + v.summeRuecklage))) + "</strong>.</p>";
+
+    if (!fest) h += "<div class='felder' style='margin-top:18px'>" +
+      "<div class='feld'><label for='wp-datum'>Beschlossen am</label><input type='date' id='wp-datum' value='" + esc(S.wpDatum || "") + "'></div>" +
+      "<div class='feld'><label for='wp-top'>Beschluss (Versammlung, TOP)</label><input type='text' id='wp-top' placeholder='z. B. ETV vom 12.03.2026, TOP 4' value='" + esc(S.wpTop || "") + "'></div></div>" +
+      "<div class='leiste'><div><button class='btn haupt' data-act='wp-fest'>Als beschlossen festhalten</button>" +
+      "<span class='fuer'>Danach ist der Plan gesperrt und die Hausgelder werden daraus gebildet.</span></div></div>";
+    return h + "</section>";
+  }
   function buchhaltungHtml(o) {
     const konten = objektKonten(o);
     const liste = rahmenListe();
@@ -3595,7 +3883,7 @@ const Objekte = (() => {
     if (!konten.length) {
       h += "<p class='unter'>Diesem Objekt ist noch kein Kontenrahmen zugeordnet.</p>" +
         "<div class='leiste'><div><button class='btn haupt' data-act='ob-rahmen-neu'>Standard zuordnen" +
-        (rahmenStandard() ? " · " + esc(rahmenStandard().name) : "") + "</button></div></div></section>";
+        (rahmenStandard(o.art) ? " · " + esc(rahmenStandard(o.art).name) : "") + "</button></div></div></section>";
       return h;
     }
     h += "<p class='unter'>Gilt für dieses Objekt: <strong>" + esc(o.rahmenName || "eigener Rahmen") + "</strong>" +
@@ -3606,7 +3894,7 @@ const Objekte = (() => {
       "</select><small>Ersetzt die Konten dieses Objekts. Gebuchte Beträge bleiben erhalten.</small></div>" +
       "<div class='feld'><label for='ob-sollab'>Sollstellungen ab</label><input type='month' id='ob-sollab' data-obsollab='1' value='" + esc(start) + "'>" +
       "<small>Ab diesem Monat erzeugt das Programm Sollstellungen.</small></div></div>";
-    h += "</section>" + rueckstandHtml(o) + berichtigungHtml(o) + "<section class='gruppe voll'><h2>Konten dieses Objekts</h2>";
+    h += "</section>" + wirtschaftsplanHtml(o) + rueckstandHtml(o) + berichtigungHtml(o) + "<section class='gruppe voll'><h2>Konten dieses Objekts</h2>";
     const gruppen = [["einnahme", "Einnahmen"], ["ausgabe", "Ausgaben"], ["bestand", "Bestandskonten"]];
     h += gruppen.map(([art, titel]) => {
       const teil = konten.filter(k => k.art === art);
@@ -3626,21 +3914,27 @@ const Objekte = (() => {
   const PAR35A = [["", "nicht begünstigt"], ["handwerker", "Handwerkerleistung"], ["haushalt", "haushaltsnahe Dienstleistung"]];
   /* Es gibt keine vorgegebenen Konten und keine Kontenklassen – beides legt der
      Verwalter vollständig selbst an. */
-  const rahmenVorlage = () => ({ id: Objekte.neueId(), name: "Eigene Vorlage", standard: true,
+  const RAHMENARTEN = [["miet", "Mietverwaltung"], ["weg", "WEG-Verwaltung"]];
+  const rahmenVorlage = (art) => ({ id: Objekte.neueId(), name: art === "weg" ? "Eigene WEG-Vorlage" : "Eigene Vorlage",
+    art: art === "weg" ? "weg" : "miet", standard: true,
     klassen: [], konten: [], erstellt: new Date().toISOString() });
   const rahmenListe = () => { if (!Array.isArray(S.rahmen) || !S.rahmen.length) S.rahmen = [rahmenVorlage()];
     S.rahmen.forEach(rahmenMigrieren); return S.rahmen; };
-  const rahmenStandard = () => rahmenListe().find(r => r.standard) || rahmenListe()[0];
+  /* Für jede Art der Verwaltung gibt es eine eigene Standardvorlage. */
+  const rahmenArt = r => (r && r.art === "weg") ? "weg" : "miet";
+  const rahmenStandard = (art) => { const a = art === "weg" ? "weg" : "miet"; const l = rahmenListe();
+    return l.find(r => r.standard && rahmenArt(r) === a) || l.find(r => rahmenArt(r) === a) || null; };
   const rahmenVon = id => rahmenListe().find(r => r.id === id) || null;
   const rahmenSichern = r => { const ziel = r || rahmenVon(S.rahmenOffen) || rahmenListe()[0]; if (!ziel) return;
     Speicher.speichern("kontenrahmen", ziel, S.rahmen).catch(() => {}); };
   const rahmenAlleSichern = () => { rahmenListe().forEach(r => rahmenSichern(r)); };
-  const kontoLeer = () => ({ id: Objekte.neueId(), klasse: "", nr: "", name: "", art: "ausgabe", umlage: false, schluessel: "", par35a: "", steuer: "", rolle: "" });
+  const kontoLeer = () => ({ id: Objekte.neueId(), klasse: "", nr: "", name: "", art: "ausgabe", umlage: false, schluessel: "", par35a: "", steuer: "", rolle: "", inaktiv: false });
   /* Kontenklassen: jedes Konto gehört zu genau einer Klasse. Die Kontonummer ist davon
      unabhängig und frei wählbar. Angelegt und benannt werden beide nur vom Verwalter –
      das Programm schlägt nichts vor und ergänzt nichts von selbst. */
   function rahmenMigrieren(r) {
     if (!r) return r;
+    if (!r.art) r.art = "miet";
     if (!Array.isArray(r.klassen)) r.klassen = [];
     r.klassen.forEach(x => { if (!x.id) x.id = "kl" + Objekte.neueId(); });
     (r.konten || []).forEach(k => { if (k.klasse === undefined) k.klasse = ""; });
@@ -3662,104 +3956,204 @@ const Objekte = (() => {
     gruppen.forEach(g => g.posten.sort((a, b) => String(a.k.nr).localeCompare(String(b.k.nr), "de", { numeric: true })));
     return gruppen.concat(rest.posten.length ? [rest] : []);
   }
-  /* Vorschlag für die nächste Nummer: zehn über der höchsten Nummer dieser Klasse. */
-  function naechsteKontoNr(r, id) {
-    const zahlen = (r.konten || []).filter(k => k.klasse === id && /^\d+$/.test(String(k.nr).trim())).map(k => Number(k.nr));
-    return zahlen.length ? String(Math.floor(Math.max(...zahlen) / 10) * 10 + 10) : "";
+  /* Eine Kontonummer darf es nur einmal geben – sonst ließe sich eine Buchung
+     später nicht mehr eindeutig zuordnen. */
+  const nrText = k => String((k && k.nr) || "").trim();
+  function nummerFrei(r, nr, ausserId) {
+    const n = String(nr || "").trim(); if (!n) return true;
+    return !(r.konten || []).some(k => k.id !== ausserId && nrText(k) === n);
   }
-  /* Doppelt vergebene Kontonummern – sie würden die Zuordnung von Buchungen unsicher machen. */
+  /* Die nächste freie Nummer ab einem Wunsch – damit nie eine doppelte stehen bleibt. */
+  function freieNummer(r, wunsch, ausserId) {
+    const n = String(wunsch || "").trim();
+    if (/^\d+$/.test(n)) {
+      for (let z = Number(n), i = 0; i < 20000; i++, z++) if (nummerFrei(r, String(z), ausserId)) return String(z);
+      return "";
+    }
+    if (n) for (let i = 2; i < 200; i++) { const v = n + "-" + i; if (nummerFrei(r, v, ausserId)) return v; }
+    return "";
+  }
+  /* Vorschlag beim Anlegen: zehn über der höchsten Nummer dieser Klasse. */
+  function naechsteKontoNr(r, id) {
+    const zahlen = (r.konten || []).filter(k => k.klasse === id && /^\d+$/.test(nrText(k))).map(k => Number(k.nr));
+    if (!zahlen.length) return "";
+    return freieNummer(r, String(Math.floor(Math.max(...zahlen) / 10) * 10 + 10));
+  }
+  /* Doppelt vergebene Nummern – sollte nach der Prüfung beim Eintippen nicht mehr vorkommen. */
   function doppelteNummern(r) {
-    const zahl = {}; (r.konten || []).forEach(k => { const n = String(k.nr || "").trim(); if (n) zahl[n] = (zahl[n] || 0) + 1; });
+    const zahl = {}; (r.konten || []).forEach(k => { const n = nrText(k); if (n) zahl[n] = (zahl[n] || 0) + 1; });
     return Object.keys(zahl).filter(n => zahl[n] > 1);
+  }
+  /* Wurde auf dieses Konto in einem Objekt dieser Vorlage schon gebucht? Dann darf es
+     nicht mehr verschwinden (GoBD) – es wird nur stillgelegt. */
+  function kontoBenutzt(r, k) {
+    const nr = nrText(k); if (!nr) return false;
+    return (S.liste || []).some(o => o.rahmenId === r.id &&
+      (sollListe(o).some(s => (s.positionen || []).some(x => String(x.kontoNr) === nr)) ||
+       zahlungsListe(o).some(z => String(z.kontoNr || "") === nr)));
+  }
+  /* Jede Änderung am Kontenrahmen wird mitgeschrieben – für die Verfahrensdokumentation. */
+  function krProtokoll(r, was, vorher, nachher) {
+    if (!r) return;
+    r.protokoll = (r.protokoll || []).concat({ id: Objekte.neueId(), zeit: new Date().toISOString(),
+      person: teamName(S.ichBin) || "nicht angemeldet", was, vorher: vorher || "", nachher: nachher || "" });
+    if (r.protokoll.length > 400) r.protokoll = r.protokoll.slice(-400);
   }
   function kontenrahmenHtml() {
     const liste = rahmenListe();
     const r = rahmenVon(S.rahmenOffen) || liste[0];
+    const klassen = klassenVon(r);
+    const doppelt = doppelteNummern(r);
+    const fehlt = verwendungFehlt(r.konten, r);
+    const leer = !klassen.length && !r.konten.length;
     let h = "<section class='gruppe voll'><h2>Kontenrahmen</h2>" +
-      "<p class='unter'>Vorlagen für die Buchhaltung. Jede neue Mietverwaltung bekommt den Standard automatisch. " +
+      "<p class='unter'>Hier legen Sie fest, auf welche Konten Ihre Buchhaltung läuft. Jede neue Mietverwaltung bekommt die Standard-Vorlage. " +
       "Ändern Sie eine Vorlage, bleiben bestehende Objekte unberührt – sonst würden sich gebuchte Zahlen rückwirkend verschieben.</p>" +
       "<div class='pillen' style='margin-bottom:14px'>" + liste.map(x =>
         "<button type='button' class='pille" + (x.id === r.id ? " an" : "") + "' data-act='kr-waehlen' data-id='" + esc(x.id) + "'>" +
-        esc(x.name) + (x.standard ? " · Standard" : "") + "</button>").join("") +
-      "<button type='button' class='pille' data-act='kr-neu'>+ Neue Vorlage</button></div>";
-    h += "<div class='felder'><div class='feld breit'><label for='kr-name'>Bezeichnung der Vorlage</label>" +
-      "<input type='text' id='kr-name' data-kr='name' value='" + esc(r.name) + "'></div></div>" +
-      "<div class='schalter-zeile' style='margin-top:12px'><div>Standard für neue Mietobjekte<small>Genau eine Vorlage kann Standard sein.</small></div>" +
-      "<button type='button' class='schalter' role='switch' aria-checked='" + !!r.standard + "' aria-label='Standard' data-act='kr-standard'></button></div>";
-    const doppelt = doppelteNummern(r);
-    const zeile = (k, i) => "<div class='kr-zeile'>" +
-        "<select aria-label='Kontenklasse' data-kk='" + i + "|klasse'><option value=''>– ohne Klasse –</option>" +
-          klassenVon(r).map(x => "<option value='" + esc(x.id) + "'" + (k.klasse === x.id ? " selected" : "") + ">" + esc(x.name) + "</option>").join("") + "</select>" +
-        "<input type='text' aria-label='Kontonummer' data-kk='" + i + "|nr' value='" + esc(k.nr) + "'" +
+        esc(x.name) + " · " + esc(Objekte.label(RAHMENARTEN, rahmenArt(x))) +
+        (x.standard ? " · Standard" : "") + "</button>").join("") +
+      "<button type='button' class='pille' data-act='kr-neu' data-wert='miet'>+ Neue Mietvorlage</button>" +
+      "<button type='button' class='pille' data-act='kr-neu' data-wert='weg'>+ Neue WEG-Vorlage</button>" +
+      (r.konten.length || klassen.length ? "<button type='button' class='pille' data-act='kr-kopie'>Diese Vorlage kopieren</button>" : "") + "</div>";
+    const weg = istWeg(r);
+    h += "<div class='felder'><div class='feld'><label for='kr-name'>Bezeichnung der Vorlage</label>" +
+      "<input type='text' id='kr-name' data-kr='name' value='" + esc(r.name) + "'></div>" +
+      "<div class='feld'><label for='kr-art'>Art der Verwaltung</label><select id='kr-art' data-krart='1'>" +
+      RAHMENARTEN.map(([w, l]) => "<option value='" + w + "'" + (rahmenArt(r) === w ? " selected" : "") + ">" + l + "</option>").join("") +
+      "</select><small>Bestimmt, welche monatlichen Zahlungen es gibt: Miete oder Hausgeld.</small></div></div>" +
+      "<div class='schalter-zeile' style='margin-top:12px'><div>Standard für neue " + (weg ? "WEG-Objekte" : "Mietobjekte") +
+      "<small>Je Art der Verwaltung kann genau eine Vorlage Standard sein.</small></div>" +
+      "<button type='button' class='schalter' role='switch' aria-checked='" + !!r.standard + "' aria-label='Standard' data-act='kr-standard'></button></div>" +
+      (weg ? "<ul class='meldungen' style='margin-top:14px'><li class='m-hinweis'>WEG-Vorlage: Kosten werden grundsätzlich nach Miteigentumsanteilen verteilt (§ 16 Abs. 1 WEG), " +
+        "solange die Gemeinschaft nichts anderes beschlossen hat. Heizung und Warmwasser richten sich nach der Heizkostenverordnung.</li></ul>" : "");
+
+    /* Drei Schritte als Wegweiser: was ist erledigt, was fehlt noch. */
+    const chip = (nr, was, wert, fertig) => "<span class='kr-schritt " + (fertig ? "fertig" : "offen") + "'>" +
+      nr + ". " + was + " <b>" + esc(wert) + "</b></span>";
+    h += "<div class='kr-schritte'>" +
+      chip(1, "Klassen", klassen.length ? klassen.length + " angelegt" : "noch keine", !!klassen.length) +
+      chip(2, "Konten", r.konten.length ? r.konten.length + " angelegt" : "noch keine", !!r.konten.length) +
+      chip(3, "Verwendung", fehlt.length ? fehlt.length + " von " + sollPosten(r).length + " offen" : "vollständig", !fehlt.length) +
+      "</div>";
+    if (doppelt.length) h += "<ul class='meldungen'><li class='m-fehler'>Die Nummer " + esc(doppelt.join(", ")) +
+      " ist doppelt vergeben – bitte eindeutige Nummern verwenden, sonst lassen sich Buchungen nicht sicher zuordnen.</li></ul>";
+
+    /* ---------- Schritt 1 und 2: Klassen mit ihren Konten ---------- */
+    h += "<h3 class='kr-h'>1. Kontenklassen &amp; 2. Konten</h3>" +
+      "<p class='kr-p'>Eine Klasse fasst Konten zusammen, die zusammengehören – zum Beispiel alle umlagefähigen Betriebskosten. " +
+      "Klasse antippen, um sie zu öffnen und darin Konten anzulegen.</p>";
+    if (leer) h += "<ul class='meldungen'><li class='m-hinweis'>Diese Vorlage ist noch leer. Fangen Sie mit Ihrer ersten Kontenklasse an.</li></ul>";
+
+    const spalten = "<div class='kr-kopf'><span>Nr.</span><span>Bezeichnung</span><span>Art</span><span></span><span></span></div>";
+    const zeile = (k, i) => {
+      const offen = S.kkDetail === i;
+      const istAus = k.art === "ausgabe";
+      const verw = sollPosten(r).find(x => x[0] === k.rolle);
+      const benutzt = kontoBenutzt(r, k);
+      return "<div class='kr-zeile" + (k.inaktiv ? " kr-still" : "") + "'>" +
+        "<input type='text' aria-label='Kontonummer' placeholder='Nr.' data-kk='" + i + "|nr' value='" + esc(k.nr) + "'" +
           (doppelt.includes(String(k.nr || "").trim()) ? " style='box-shadow:inset 0 0 0 1.5px var(--err)'" : "") + ">" +
-        "<input type='text' aria-label='Bezeichnung' data-kk='" + i + "|name' value='" + esc(k.name) + "'>" +
-        "<select aria-label='Art' data-kk='" + i + "|art'>" + KONTOARTEN.map(([w, l]) =>
+        "<input type='text' aria-label='Bezeichnung des Kontos' placeholder='Bezeichnung, z. B. Grundmiete' data-kk='" + i + "|name' value='" + esc(k.name) + "'>" +
+        "<select aria-label='Art des Kontos' data-kk='" + i + "|art'>" + KONTOARTEN.map(([w, l]) =>
           "<option value='" + w + "'" + (k.art === w ? " selected" : "") + ">" + l + "</option>").join("") + "</select>" +
-        "<button type='button' class='schalter klein' role='switch' aria-checked='" + !!k.umlage + "' aria-label='umlagefähig' data-act='kk-umlage' data-i='" + i + "'></button>" +
-        "<select aria-label='Verteilerschlüssel' data-kk='" + i + "|schluessel'" + (k.art === "ausgabe" ? "" : " disabled") + ">" +
-          SCHLUESSEL.map(([w, l]) => "<option value='" + w + "'" + (k.schluessel === w ? " selected" : "") + ">" + l + "</option>").join("") + "</select>" +
-        "<select aria-label='§ 35a EStG' data-kk='" + i + "|par35a'>" + PAR35A.map(([w, l]) =>
-          "<option value='" + w + "'" + (k.par35a === w ? " selected" : "") + ">" + l + "</option>").join("") + "</select>" +
-        "<button type='button' class='e-weg' data-act='kk-weg' data-i='" + i + "' aria-label='Konto entfernen'>" +
-        (S.loeschen === "kk" + i ? "↺?" : "×") + "</button></div>";
-    const spalten = "<div class='kr-kopf'><span>Kontenklasse</span><span>Nr.</span><span>Bezeichnung</span><span>Art</span><span>Umlage</span><span>Schlüssel</span><span>§ 35a</span><span></span></div>";
-    const klassen = klassenVon(r);
-    const leer = !klassen.length && !r.konten.length;
-    h += "<p class='unter' style='margin:16px 0 10px'>Klassen und Konten legen Sie vollständig selbst an und benennen sie frei. " +
-      "Jedes Konto gehört zu einer Klasse – die wählen Sie in der Zeile ganz links. Die Kontonummer vergeben Sie danach frei. Klasse antippen, um sie zu öffnen.</p>" +
-      (leer ? "<ul class='meldungen'><li class='m-hinweis'>Diese Vorlage ist leer. Legen Sie Ihre erste Kontenklasse an und darin Ihre eigenen Konten.</li></ul>"
-        : klassen.length ? "" : "<ul class='meldungen'><li class='m-hinweis'>Noch keine Kontenklasse angelegt – die Konten liegen unter „Ohne Klasse“.</li></ul>") +
-      (klassen.length && r.konten.length ? "" : "<div class='leiste' style='margin-bottom:12px'><div>" +
-        "<button class='btn klein haupt' data-act='kr-klasse-neu'>+ Eigene Kontenklasse anlegen</button>" +
-        "<button class='btn klein' data-act='kk-neu'>+ Eigenes Konto anlegen</button></div></div>") +
-      (doppelt.length ? "<ul class='meldungen'><li class='m-fehler'>Doppelt vergeben: " + esc(doppelt.join(", ")) +
-        " – bitte eindeutige Nummern verwenden, sonst lassen sich Buchungen nicht sicher zuordnen.</li></ul>" : "");
+        "<button type='button' class='kr-mehr' data-act='kk-detail' data-i='" + i + "' aria-expanded='" + offen + "'>" +
+          (offen ? "Fertig" : "Mehr") + "</button>" +
+        (benutzt
+          ? "<button type='button' class='e-weg' data-act='kk-still' data-i='" + i + "' title='" +
+            (k.inaktiv ? "Konto wieder verwenden" : "Konto stilllegen – gebuchte Konten dürfen nicht gelöscht werden") + "'>" +
+            (k.inaktiv ? "↺" : "⦸") + "</button>"
+          : "<button type='button' class='e-weg' data-act='kk-weg' data-i='" + i + "' aria-label='Konto entfernen'>" +
+            (S.loeschen === "kk" + i ? "↺?" : "×") + "</button>") + "</div>" +
+        (offen ? "<div class='kr-det'>" +
+          (istAus
+            ? "<div class='felder'><div class='feld'><label>Verteilerschlüssel</label>" +
+              "<select aria-label='Verteilerschlüssel' data-kk='" + i + "|schluessel'>" +
+                SCHLUESSEL.map(([w, l]) => "<option value='" + w + "'" + (k.schluessel === w ? " selected" : "") + ">" + l + "</option>").join("") + "</select></div>" +
+              "<div class='feld'><label>Steuerlich begünstigt (§ 35a EStG)</label>" +
+              "<select aria-label='§ 35a EStG' data-kk='" + i + "|par35a'>" + PAR35A.map(([w, l]) =>
+                "<option value='" + w + "'" + (k.par35a === w ? " selected" : "") + ">" + l + "</option>").join("") + "</select></div></div>" +
+              "<div class='schalter-zeile'><div>Umlagefähig auf die Mieter<small>Nur umlagefähige Kosten dürfen in die Betriebskostenabrechnung (§ 2 BetrKV).</small></div>" +
+              "<button type='button' class='schalter klein' role='switch' aria-checked='" + !!k.umlage + "' aria-label='umlagefähig' data-act='kk-umlage' data-i='" + i + "'></button></div>"
+            : "<p class='unter' style='margin:0 0 12px'>" + (verw
+                ? "Dieses Konto trägt in der Sollstellung die <strong>" + esc(verw[1]) + "</strong>."
+                : "Verteilerschlüssel und § 35a gelten nur für Ausgabekonten. Ob dieses Konto einen Teil der Miete trägt, legen Sie unten in Schritt 3 fest.") + "</p>") +
+          (k.inaktiv ? "<p class='unter' style='margin:0 0 12px'><strong>Stillgelegt.</strong> Für neue Buchungen wird dieses Konto nicht mehr angeboten. " +
+              "Gebuchte Beträge bleiben erhalten, damit alte Abrechnungen nachvollziehbar bleiben.</p>"
+            : benutzt ? "<p class='unter' style='margin:0 0 12px'>Auf dieses Konto wurde bereits gebucht – es lässt sich deshalb nur noch stilllegen, nicht löschen.</p>" : "") +
+          "<div class='felder' style='margin-top:12px'><div class='feld'><label>Gehört zur Kontenklasse</label>" +
+          "<select aria-label='Kontenklasse' data-kk='" + i + "|klasse'><option value=''>– ohne Klasse –</option>" +
+            klassen.map(x => "<option value='" + esc(x.id) + "'" + (k.klasse === x.id ? " selected" : "") + ">" + esc(klasseTitel(x)) + "</option>").join("") +
+          "</select></div></div></div>" : "");
+    };
+
     h += kontenNachKlasse(r).map(g => {
       const auf = !!S.kkAuf[g.id || "ohne"];
       const um = g.posten.filter(x => x.k.umlage).length;
-      const nrn = g.posten.map(x => String(x.k.nr || "").trim()).filter(Boolean);
+      const nrn = g.posten.map(x => String(x.k.nr || "").trim()).filter(Boolean).sort((a, b) => a.localeCompare(b, "de", { numeric: true }));
       return "<div class='kr-klasse'>" +
         "<button type='button' class='kr-klasse-kopf' data-act='kk-klasse' data-wert='" + esc(g.id || "ohne") + "' aria-expanded='" + auf + "'>" +
         "<span class='rg-pfeil'>" + (auf ? "▾" : "▸") + "</span>" +
         "<span><strong>" + esc(g.name) + "</strong>" +
-        "<br><span class='fuer'>" + esc(g.text || "") + "</span></span>" +
+        (g.text ? "<br><span class='fuer'>" + esc(g.text) + "</span>" : "") + "</span>" +
         "<span class='fuer'>" + g.posten.length + (g.posten.length === 1 ? " Konto" : " Konten") +
         (nrn.length > 1 ? "<br>Nr. " + esc(nrn[0] + " – " + nrn[nrn.length - 1]) : nrn.length ? "<br>Nr. " + esc(nrn[0]) : "") +
         (um ? "<br>" + um + " umlagefähig" : "") + "</span></button>" +
-        (auf ? (g.posten.length ? spalten + g.posten.map(x => zeile(x.k, x.i)).join("")
-            : "<p class='unter' style='padding:12px 14px;margin:0'>Noch kein Konto in dieser Klasse.</p>") +
-          (!g.id ? "" : "<div class='kr-klasse-fuss'>" +
+        (auf ? (g.id ? "<div class='kr-klassefeld'>" +
             "<div class='felder'><div class='feld'><label>Bezeichnung der Klasse</label>" +
             "<input type='text' placeholder='z. B. Umlagefähige Betriebskosten' data-klasse='" + esc(g.id) + "|name' value='" + esc(g.roh) + "'></div>" +
-            "<div class='feld'><label>Erläuterung</label>" +
-            "<input type='text' placeholder='kurz, wofür diese Klasse steht' data-klasse='" + esc(g.id) + "|text' value='" + esc(g.text || "") + "'></div></div>" +
-            "<div class='leiste' style='padding:10px 0 0'><div><button class='btn klein' data-act='kk-neu' data-wert='" + esc(g.id) + "'>+ Konto in dieser Klasse</button>" +
-            "<span class='fuer'>Die Nummer vergeben Sie selbst.</span></div>" +
-            "<button class='btn gefahr klein' data-act='kr-klasse-weg' data-wert='" + esc(g.id) + "'>" +
+            "<div class='feld'><label>Erläuterung (freiwillig)</label>" +
+            "<input type='text' placeholder='kurz, wofür diese Klasse steht' data-klasse='" + esc(g.id) + "|text' value='" + esc(g.text || "") + "'></div></div></div>" : "") +
+          (g.posten.length ? spalten + g.posten.map(x => zeile(x.k, x.i)).join("")
+            : "<p class='unter' style='padding:14px;margin:0'>Noch kein Konto in dieser Klasse.</p>") +
+          "<div class='kr-klasse-fuss'><div class='leiste' style='margin:0;padding:0'>" +
+            "<div><button class='btn klein haupt' data-act='kk-neu' data-wert='" + esc(g.id || "") + "'>+ Konto hinzufügen</button>" +
+            "<span class='fuer'>Nummer und Bezeichnung vergeben Sie selbst.</span></div>" +
+            (g.id ? "<button class='btn gefahr klein' data-act='kr-klasse-weg' data-wert='" + esc(g.id) + "'>" +
               (S.loeschen === "kl" + g.id
                 ? (g.posten.length ? "Wirklich löschen? Konten bleiben ohne Klasse" : "Wirklich löschen?")
-                : "Klasse löschen") + "</button>" + "</div></div>") : "") + "</div>";
+                : "Klasse löschen") + "</button>" : "") +
+          "</div></div>" : "") + "</div>";
     }).join("");
-    /* Weil Nummern und Namen frei sind, muss der Verwalter sagen, welches Konto die Miete trägt. */
-    if (r.konten.length) {
-      const fehlt = verwendungFehlt(r.konten);
-      h += "<div class='kr-klasse' style='margin-top:16px'><div class='kr-klasse-fuss' style='border-top:0'>" +
-        "<p class='unter' style='margin:0 0 10px'><strong>Verwendung für die Sollstellung</strong><br>" +
-        "Welches Ihrer Konten trägt welchen Teil der Miete? Nur so kann das Programm die monatlichen Sollstellungen selbst anlegen.</p>" +
-        (fehlt.length ? "<ul class='meldungen'><li class='m-hinweis'>Noch nicht bestimmt: " + esc(fehlt.join(", ")) + "</li></ul>" : "") +
-        "<div class='felder'>" + SOLL_POSTEN.map(([feld, name]) => {
-          const akt = kontoFuer(r.konten, feld);
-          return "<div class='feld'><label for='verw-" + feld + "'>" + esc(name) + "</label>" +
-            "<select id='verw-" + feld + "' data-verw='" + feld + "'><option value=''>– noch nicht bestimmt –</option>" +
-            r.konten.map(k => "<option value='" + esc(k.id) + "'" + (akt && akt.id === k.id ? " selected" : "") + ">" +
-              esc((String(k.nr).trim() ? String(k.nr).trim() + " · " : "") + (k.name || "ohne Bezeichnung")) + "</option>").join("") +
-            "</select></div>";
-        }).join("") + "</div></div></div>";
+    h += "<div class='leiste'><div><button class='btn klein" + (klassen.length ? "" : " haupt") + "' data-act='kr-klasse-neu'>+ Neue Kontenklasse</button>" +
+      (klassen.length ? "" : "<button class='btn klein' data-act='kk-neu'>+ Konto ohne Klasse</button>") + "</div></div>";
+
+    /* ---------- Schritt 3: Welches Konto trägt welchen Teil der Miete ---------- */
+    h += "<h3 class='kr-h'>3. Verwendung für die Sollstellung</h3>" +
+      "<p class='kr-p'>Weil Sie Nummern und Bezeichnungen frei wählen, muss das Programm wissen, welches Ihrer Konten welchen Teil " +
+      (weg ? "des Hausgelds" : "der Miete") + " trägt. Erst damit kann es die monatlichen Sollstellungen selbst anlegen." +
+      (weg ? " Die Zuführung zur Erhaltungsrücklage gehört auf ein eigenes Konto – sie ist keine Kosten, sondern Vermögen der Gemeinschaft (§ 19 Abs. 2 Nr. 4 WEG)." : "") + "</p>";
+    if (!r.konten.length) h += "<p class='unter'>Sobald Sie Konten angelegt haben, wählen Sie hier aus.</p>";
+    else {
+      if (fehlt.length) h += "<ul class='meldungen'><li class='m-hinweis'>Noch nicht zugeordnet: " + esc(fehlt.join(", ")) + "</li></ul>";
+      h += "<div class='felder'>" + sollPosten(r).map(([feld, name]) => {
+        const akt = kontoFuer(r.konten, feld);
+        return "<div class='feld'><label for='verw-" + feld + "'>" + esc(name) + "</label>" +
+          "<select id='verw-" + feld + "' data-verw='" + feld + "'><option value=''>– noch nicht zugeordnet –</option>" +
+          r.konten.filter(k => k.art !== "ausgabe" && !k.inaktiv).map(k => "<option value='" + esc(k.id) + "'" + (akt && akt.id === k.id ? " selected" : "") + ">" +
+            esc((String(k.nr).trim() ? String(k.nr).trim() + " · " : "") + (k.name || "ohne Bezeichnung")) + "</option>").join("") +
+          "</select></div>";
+      }).join("") + "</div>";
+      if (!r.konten.some(k => k.art !== "ausgabe"))
+        h += "<p class='unter'>Dafür brauchen Sie mindestens ein Konto der Art „Einnahme“.</p>";
     }
-    h += "<div class='leiste'><div><button class='btn klein haupt' data-act='kr-klasse-neu'>+ Neue Kontenklasse</button>" +
-      "<button class='btn klein' data-act='kk-neu'>+ Konto ohne Klasse</button>" +
-      "<span class='fuer'>" + klassenVon(r).length + " Klassen · " + r.konten.length + " Konten insgesamt</span></div>" +
-      "<div>" +
+
+    /* ---------- Änderungen am Kontenrahmen ---------- */
+    const prot = (r.protokoll || []).slice().reverse();
+    h += "<h3 class='kr-h'>Änderungen an dieser Vorlage</h3>" +
+      "<p class='kr-p'>Jede Änderung wird mit Datum und Person festgehalten. Das gehört zu Ihrer Verfahrensdokumentation.</p>";
+    if (!prot.length) h += "<p class='unter'>Noch keine Änderung aufgezeichnet.</p>";
+    else {
+      const zeigen = S.krProtAuf ? prot : prot.slice(0, 5);
+      h += "<div class='kr-prot'>" + zeigen.map(x =>
+        "<div class='kr-prot-zeile'><span class='fuer'>" + esc(Objekte.datum(x.zeit.slice(0, 10))) + " · " + esc(x.person) + "</span>" +
+        "<span>" + esc(x.was) + (x.vorher || x.nachher
+          ? "<br><span class='fuer'>" + esc(x.vorher || "leer") + " → " + esc(x.nachher || "leer") + "</span>" : "") + "</span></div>").join("") + "</div>";
+      if (prot.length > 5) h += "<div class='leiste'><div><button class='btn klein' data-act='kr-prot'>" +
+        (S.krProtAuf ? "Weniger anzeigen" : "Alle " + prot.length + " Änderungen anzeigen") + "</button></div></div>";
+    }
+    h += "<div class='leiste' style='margin-top:22px;border-top:1px solid var(--line);padding-top:14px'>" +
+      "<span class='fuer'>" + klassen.length + " Klassen · " + r.konten.length + " Konten in dieser Vorlage</span><div>" +
       (leer ? "" : "<button class='btn gefahr klein' data-act='kr-leeren'>" +
         (S.loeschen === "leer" + r.id ? "Wirklich alles löschen?" : "Vorlage leeren") + "</button>") +
       (liste.length > 1 ? "<button class='btn gefahr klein' data-act='kr-weg' data-id='" + esc(r.id) + "'>" +
@@ -3767,7 +4161,13 @@ const Objekte = (() => {
     return h + "</section>";
   }
   function einstellungenHtml() {
+    const ich = angemeldet();
     return "<div class='seite'><div class='hero'><h1>Einstellungen</h1><p>Diese Einstellungen gelten nur für Sie an diesem Gerät. Jeder Mitarbeiter stellt sich seine Ansicht selbst ein.</p></div>" +
+      (ich ? "<section class='gruppe'><h2>Mein Zugang</h2>" +
+        "<p class='unter'>Angemeldet als <strong>" + esc(Objekte.mitarbeiterName(ich)) + "</strong> (" + esc(ich.email || "") + ") · " +
+        esc(ich.rolle === "team" ? "Mitarbeiter" : "Verwalter") + "</p>" +
+        "<div class='leiste'><div><button class='btn klein' data-act='an-pw-neu'>Kennwort ändern</button>" +
+        "<button class='btn klein' data-act='an-abmelden'>Abmelden</button></div></div></section>" : "") +
       "<section class='gruppe'><h2>Ich bin</h2><p class='unter'>Damit weiß das Programm, welche Vorgänge Ihre sind.</p><div class='felder'>" +
       "<div class='feld'><label for='e-ich'>Mitarbeiter</label><select id='e-ich' data-e='ichBin'><option value=''>– nicht festgelegt –</option>" +
       teamAktiv().map(m => "<option value='" + esc(m.id) + "'" + (S.einst.ichBin === m.id ? " selected" : "") + ">" + esc(Objekte.mitarbeiterName(m)) + "</option>").join("") + "</select></div></div>" +
@@ -3788,7 +4188,7 @@ const Objekte = (() => {
       "<li><strong>Dateien:</strong> In Outlook ausgewählte Mails als .eml oder .txt speichern und im selben Fenster auswählen.</li>" +
       "<li><strong>Automatische Zuordnung:</strong> Steht die Ticketnummer im Betreff, zum Beispiel [#2026-001], landet die Mail sofort beim richtigen Ticket.</li></ol>" +
       "<p class='unter'>Eine dauerhafte Verbindung, die Ihr Postfach von selbst abruft, ist aus dem Browser heraus nicht möglich. Dafür braucht es einen Server, der sich per Microsoft 365 anmeldet – das gehört zum selben Schritt wie die Zugangsdaten für Mitarbeiter.</p></section>" +
-      kontenrahmenHtml() +
+      (istVerwalter() ? kontenrahmenHtml() : "") +
       "<div class='hero' style='padding-bottom:4px'><h1 style='font-size:28px'>Dokumente</h1><p>Briefkopf und Fußzeile für Verträge und Schreiben. Diese Angaben gelten für das ganze Unternehmen, nicht nur für Sie.</p></div></div>";
   }
   /* Alle Vorgänge, in denen dieser Handwerker beauftragt oder angefragt wurde. */
@@ -4261,6 +4661,16 @@ const Objekte = (() => {
   /* ---------- Steuerung ---------- */
   function render(behalteScroll) {
     const y = window.scrollY;
+    /* Erst anmelden, dann arbeiten. Wer das Startkennwort hat, muss es zuerst ändern. */
+    const ich = angemeldet();
+    if (anmeldungNoetig() || (ich && (ich.pwStart || S.pwWechsel))) { anmeldungHtml(); return; }
+    $("#anmeldung").hidden = true;
+    if (ich) S.ichBin = ich.id;
+    /* Mitarbeiterverwaltung und Kontenrahmen sind der Verwalterrolle vorbehalten. */
+    const verwalter = istVerwalter();
+    const teamKnopf = document.querySelector("header .reiter button[data-tab='team']");
+    if (teamKnopf) teamKnopf.hidden = !verwalter;
+    if (!verwalter && S.tab === "team") S.tab = "objekte";
     document.querySelectorAll("header .reiter button").forEach(b => { if (b.dataset.tab === S.tab) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
     const vv = S.tab === "vertraege"; const dok = S.tab === "einstellungen";
     const zeitAn = S.tab === "zeit";
@@ -4383,9 +4793,40 @@ const Objekte = (() => {
       return;
     }
     if (t.dataset.kr) { const r = rahmenVon(S.rahmenOffen) || rahmenListe()[0]; r[t.dataset.kr] = t.value; rahmenSichern(); return; }
+    if (t.dataset.wp) {
+      const o = S.entwurf; if (!o) return;
+      const wp = wplanVon(o, S.wpJahr || String(new Date().getFullYear())); if (!wp || wplanFest(wp)) return;
+      const [i, feld] = t.dataset.wp.split("|");
+      const pos = (wp.positionen || [])[Number(i)]; if (!pos) return;
+      pos[feld] = t.value; objektSichern(o);
+      if (feld === "schluessel") render(true);
+      return;
+    }
+    if (t.dataset.wprl) {
+      const o = S.entwurf; if (!o) return;
+      const wp = wplanVon(o, S.wpJahr || String(new Date().getFullYear())); if (!wp || wplanFest(wp)) return;
+      wp[t.dataset.wprl === "betrag" ? "ruecklage" : "schluesselRuecklage"] = t.value; objektSichern(o);
+      if (t.dataset.wprl !== "betrag") render(true);
+      return;
+    }
+    /* Art der Vorlage umstellen – Verwendungen, die es dort nicht gibt, werden gelöst. */
+    if (t.dataset.krart) {
+      const r = rahmenVon(S.rahmenOffen) || rahmenListe()[0];
+      const vorher = istWeg(r) ? "WEG-Verwaltung" : "Mietverwaltung";
+      r.art = t.value === "weg" ? "weg" : "miet";
+      const erlaubt = sollPosten(r).map(x => x[0]);
+      (r.konten || []).forEach(k => { if (k.rolle && !erlaubt.includes(k.rolle)) k.rolle = ""; });
+      if (r.standard) rahmenListe().forEach(x => { if (x.id !== r.id && rahmenArt(x) === rahmenArt(r)) x.standard = false; });
+      krProtokoll(r, "Art der Vorlage geändert", vorher, istWeg(r) ? "WEG-Verwaltung" : "Mietverwaltung");
+      rahmenAlleSichern(); render(true); return;
+    }
     if (t.dataset.verw) {
       const r = rahmenVon(S.rahmenOffen) || rahmenListe()[0];
-      verwendungSetzen(r, t.dataset.verw, t.value); rahmenSichern(); render(true); return;
+      verwendungSetzen(r, t.dataset.verw, t.value);
+      { const k = (r.konten || []).find(x => x.id === t.value);
+        const was = (sollPosten(r).find(x => x[0] === t.dataset.verw) || ["", ""])[1];
+        krProtokoll(r, "Verwendung gesetzt: " + was, "", k ? (nrText(k) || "ohne Nummer") + " " + (k.name || "") : "nicht zugeordnet"); }
+      rahmenSichern(); render(true); return;
     }
     if (t.dataset.klasse) {
       const [d, feld] = t.dataset.klasse.split("|");
@@ -4507,9 +4948,47 @@ const Objekte = (() => {
   app.addEventListener("change", e => {
     if (e.target.tagName === "SELECT") eingabe(e.target);
     /* Kontonummer geändert: Reihenfolge und die Prüfung auf doppelte Nummern auffrischen. */
-    if (e.target.dataset && /\|nr$/.test(e.target.dataset.kk || "")) { render(true); return; }
+    /* Betrag im Wirtschaftsplan fertig eingegeben: Verteilung neu rechnen. */
+    if (e.target.dataset && (e.target.dataset.wp || e.target.dataset.wprl)) { render(true); return; }
+    /* Konto fertig bearbeitet: doppelte Nummer verhindern und die Änderung festhalten. */
+    if (e.target.dataset && e.target.dataset.kk) {
+      const [iT, feld] = e.target.dataset.kk.split("|");
+      const r = rahmenVon(S.rahmenOffen) || rahmenListe()[0];
+      const k = r && r.konten[Number(iT)];
+      if (k) {
+        if (feld === "nr") {
+          const gewuenscht = nrText(k);
+          if (gewuenscht && !nummerFrei(r, gewuenscht, k.id)) {
+            const frei = freieNummer(r, gewuenscht, k.id);
+            k.nr = frei;
+            toast(frei ? "Nummer " + gewuenscht + " ist schon vergeben – " + frei + " eingetragen"
+                       : "Nummer " + gewuenscht + " ist schon vergeben");
+          }
+        }
+        const BEZ = { nr: "Nummer", name: "Bezeichnung", art: "Art", schluessel: "Verteilerschlüssel", par35a: "§ 35a", klasse: "Kontenklasse" };
+        if (BEZ[feld]) {
+          const lesbar = (f, w) => f === "art" ? (KONTOARTEN.find(x => x[0] === w) || ["", ""])[1]
+            : f === "schluessel" ? (SCHLUESSEL.find(x => x[0] === w) || ["", ""])[1]
+            : f === "par35a" ? (PAR35A.find(x => x[0] === w) || ["", ""])[1]
+            : f === "klasse" ? ((klassenVon(r).find(x => x.id === w) || {}).name || "ohne Klasse")
+            : String(w || "");
+          const vor = lesbar(feld, S.krVorher && S.krVorher.sel === e.target.dataset.kk ? S.krVorher.wert : "");
+          const jetzt = lesbar(feld, k[feld]);
+          if (vor !== jetzt) krProtokoll(r, BEZ[feld] + " geändert: Konto " + (nrText(k) || "ohne Nummer") + " " + (k.name || ""), vor, jetzt);
+        }
+        rahmenSichern(); render(true); return;
+      }
+    }
     /* Name oder Erläuterung einer Klasse fertig eingegeben: Überschrift auffrischen. */
-    if (e.target.dataset && e.target.dataset.klasse) { render(true); return; }
+    if (e.target.dataset && e.target.dataset.klasse) {
+      const [kid, feld] = e.target.dataset.klasse.split("|");
+      const r = rahmenVon(S.rahmenOffen) || rahmenListe()[0];
+      const kl = klassenVon(r).find(x => x.id === kid);
+      const vor = S.krVorher && S.krVorher.sel === e.target.dataset.klasse ? String(S.krVorher.wert || "") : "";
+      if (kl && vor !== String(kl[feld] || ""))
+        krProtokoll(r, (feld === "name" ? "Kontenklasse umbenannt" : "Erläuterung der Klasse geändert"), vor, String(kl[feld] || ""));
+      rahmenSichern(); render(true); return;
+    }
     if (e.target.dataset.pf && ["vorname", "nachname", "firma"].includes(e.target.dataset.pf.split("|")[1])) { namenAktualisieren(e.target.dataset.pf.split("|")[0]); return; }
     if (e.target.id === "fb-datei") { const f = e.target.files[0]; e.target.value = ""; if (f) f.text().then(rueckmeldungUebernehmen); return; }
     if (e.target.id === "mail-datei") { const dateien = [...e.target.files]; e.target.value = "";
@@ -4537,6 +5016,18 @@ const Objekte = (() => {
       const hinweis = t.closest(".anlage")?.querySelector(".intervall-hinweis");
       if (hinweis && Objekte.ANLAGEN[a.art].hinweis) hinweis.textContent = Objekte.ANLAGEN[a.art].hinweis;
     }
+  });
+  /* Wert beim Hineinklicken merken, damit das Protokoll "vorher → nachher" zeigen kann. */
+  app.addEventListener("focusin", e => {
+    const d = e.target.dataset || {};
+    if (d.kk || d.klasse) S.krVorher = { sel: d.kk || d.klasse, wert: e.target.value };
+  });
+  /* Mit der Eingabetaste anmelden. */
+  document.addEventListener("keydown", e => {
+    if (e.key !== "Enter") return;
+    const el = $("#anmeldung"); if (!el || el.hidden || !el.contains(e.target)) return;
+    const knopf = el.querySelector("[data-act='an-login'], [data-act='an-pw-ok']");
+    if (knopf) { e.preventDefault(); knopf.click(); }
   });
   document.addEventListener("click", async e => {
     const b = e.target.closest("[data-act]"); if (!b || e.composedPath().some(n => n.id === "vv")) return; const act = b.dataset.act; const id = b.dataset.id;
@@ -4662,10 +5153,19 @@ const Objekte = (() => {
         render(true); toast("Kontenrahmen übernommen"); break;
       }
       case "kr-waehlen": S.rahmenOffen = id; render(true); break;
-      case "kr-neu": { const neu = { ...rahmenVorlage(), id: Objekte.neueId(), name: "Neue Vorlage", standard: false };
-        rahmenListe().push(neu); S.rahmenOffen = neu.id; rahmenSichern(); render(true); toast("Vorlage angelegt"); break; }
+      case "kr-neu": {
+        const art = b.dataset.wert === "weg" ? "weg" : "miet";
+        const neu = { ...rahmenVorlage(art), id: Objekte.neueId(), standard: !rahmenStandard(art),
+          name: art === "weg" ? "Neue WEG-Vorlage" : "Neue Mietvorlage" };
+        krProtokoll(neu, "Vorlage angelegt");
+        rahmenListe().push(neu); S.rahmenOffen = neu.id; S.kkDetail = false;
+        rahmenSichern(neu); render(true); toast("Vorlage angelegt"); break;
+      }
+      /* Standard gilt je Art der Verwaltung – eine für Miete, eine für WEG. */
       case "kr-standard": { const r = rahmenVon(S.rahmenOffen) || rahmenListe()[0];
-        rahmenListe().forEach(x => { x.standard = x.id === r.id; }); rahmenAlleSichern(); render(true); toast("Als Standard gesetzt"); break; }
+        rahmenListe().forEach(x => { if (rahmenArt(x) === rahmenArt(r)) x.standard = x.id === r.id; });
+        krProtokoll(r, "Als Standard gesetzt für " + (istWeg(r) ? "WEG-Objekte" : "Mietobjekte"));
+        rahmenAlleSichern(); render(true); toast("Als Standard gesetzt"); break; }
       case "kr-weg": {
         if (S.loeschen !== "kr" + id) { S.loeschen = "kr" + id; render(true); return; }
         const war = rahmenVon(id);
@@ -4675,11 +5175,128 @@ const Objekte = (() => {
         try { await Speicher.loeschen("kontenrahmen", id, S.rahmen); } catch (e) {}
         rahmenAlleSichern(); render(true); toast("Vorlage gelöscht"); break;
       }
+      /* ---------- Wirtschaftsplan ---------- */
+      case "wp-jahr": S.wpJahr = b.dataset.wert; render(true); break;
+      case "wp-jahr-neu": {
+        const o = S.entwurf; if (!o) return;
+        const vorhanden = Object.keys(wplanAlle(o)).concat([String(new Date().getFullYear())]).sort();
+        S.wpJahr = String(Number(vorhanden[vorhanden.length - 1]) + 1);
+        render(true); toast("Jahr " + S.wpJahr + " ausgewählt"); break;
+      }
+      case "wp-neu": {
+        const o = S.entwurf; if (!o) return;
+        const jahr = b.dataset.wert; wplanAnlegen(o, jahr); S.wpJahr = jahr;
+        bhProtokoll(o, "Wirtschaftsplan " + jahr + " angelegt");
+        await objektSichern(o); render(true); toast("Wirtschaftsplan " + jahr + " angelegt"); break;
+      }
+      case "wp-pos-neu": {
+        const o = S.entwurf; if (!o) return;
+        const wp = wplanVon(o, S.wpJahr || String(new Date().getFullYear())); if (!wp || wplanFest(wp)) return;
+        const sel = app.querySelector("#wp-konto"); const kid = sel && sel.value; if (!kid) return;
+        const k = objektKonten(o).find(x => x.id === kid); if (!k) return;
+        wp.positionen = (wp.positionen || []).concat({ id: Objekte.neueId(), kontoId: kid,
+          betrag: "", schluessel: k.schluessel === "flaeche" || k.schluessel === "personen" ? k.schluessel : "mea" });
+        await objektSichern(o); render(true);
+        app.querySelector("[data-wp='" + (wp.positionen.length - 1) + "|betrag']")?.focus({ preventScroll: true });
+        break;
+      }
+      case "wp-weg": {
+        const o = S.entwurf; if (!o) return;
+        const wp = wplanVon(o, S.wpJahr || String(new Date().getFullYear())); if (!wp || wplanFest(wp)) return;
+        wp.positionen.splice(Number(b.dataset.i), 1);
+        await objektSichern(o); render(true); break;
+      }
+      /* Beschluss über die Vorschüsse (§ 28 Abs. 1 WEG) – danach ist der Plan gesperrt. */
+      case "wp-fest": {
+        const o = S.entwurf; if (!o) return;
+        const jahr = S.wpJahr || String(new Date().getFullYear());
+        const wp = wplanVon(o, jahr); if (!wp || wplanFest(wp)) return;
+        const datum = (app.querySelector("#wp-datum") || {}).value || "";
+        const top = (app.querySelector("#wp-top") || {}).value || "";
+        if (!datum) { S.wpTop = top; toast("Bitte zuerst das Beschlussdatum eintragen."); render(true); return; }
+        if (!(wp.positionen || []).some(x => betragZahl(x.betrag)) && !betragZahl(wp.ruecklage)) {
+          toast("Der Plan enthält noch keine Beträge."); return; }
+        wp.beschlossenAm = datum; wp.beschlussTop = top;
+        S.wpDatum = ""; S.wpTop = "";
+        bhProtokoll(o, "Wirtschaftsplan " + jahr + " beschlossen", top, "", datum);
+        await objektSichern(o); render(true); toast("Wirtschaftsplan beschlossen – Hausgelder werden daraus gebildet"); break;
+      }
+      /* ---------- Anmeldung ---------- */
+      case "an-login": {
+        const mail = String(($("#an-mail") || {}).value || "").trim().toLowerCase();
+        const pw = String(($("#an-pw") || {}).value || "");
+        S.anMail = mail;
+        const m = zugaenge().find(x => String(x.email || "").trim().toLowerCase() === mail);
+        if (!m || !pw) { S.anFehler = "E-Mail-Adresse oder Kennwort stimmt nicht."; render(true); return; }
+        const pruef = await kennwortHash(m.salt, pw);
+        if (pruef !== m.pwHash) { S.anFehler = "E-Mail-Adresse oder Kennwort stimmt nicht."; render(true); return; }
+        S.anFehler = ""; S.anMail = ""; sitzungSetzen(m.id);
+        m.letzteAnmeldung = new Date().toISOString(); await teamSichern(m);
+        S.ichBin = m.id; render(); if (!m.pwStart) toast("Angemeldet als " + Objekte.mitarbeiterName(m)); break;
+      }
+      case "an-abmelden": { sitzungSetzen(""); S.pwWechsel = false; S.anFehler = ""; render(); break; }
+      case "an-pw-neu": { S.pwWechsel = true; S.anFehler = ""; render(); break; }
+      case "an-pw-ok": {
+        const m = angemeldet(); if (!m) return;
+        const a1 = String(($("#an-neu") || {}).value || ""), a2 = String(($("#an-neu2") || {}).value || "");
+        if (a1.length < 10) { S.anFehler = "Bitte mindestens 10 Zeichen verwenden."; render(true); return; }
+        if (a1 !== a2) { S.anFehler = "Die beiden Eingaben sind nicht gleich."; render(true); return; }
+        if (a1 === startKennwort(m)) { S.anFehler = "Bitte ein anderes als das Startkennwort wählen."; render(true); return; }
+        await kennwortSetzen(m, a1, false); S.pwWechsel = false; S.anFehler = "";
+        await teamSichern(m); render(); toast("Kennwort gespeichert"); break;
+      }
+      /* ---------- Zugang eines Mitarbeiters ---------- */
+      case "m-zugang": {
+        const m = S.tEntwurf; if (!m) return;
+        if (m.zugang) { m.zugang = false; m.pwHash = ""; m.salt = ""; m.pwStart = false; toast("Zugang entzogen"); }
+        else {
+          if (!String(m.email || "").trim()) { toast("Bitte zuerst die E-Mail-Adresse eintragen – sie ist der Benutzername."); return; }
+          await kennwortSetzen(m, startKennwort(m), true);
+          toast("Zugang angelegt – Startkennwort: " + startKennwort(m));
+        }
+        render(true); break;
+      }
+      case "m-pw-reset": {
+        const m = S.tEntwurf; if (!m || !m.email) return;
+        await kennwortSetzen(m, startKennwort(m), true);
+        render(true); toast("Startkennwort gesetzt: " + startKennwort(m)); break;
+      }
+      case "kr-prot": S.krProtAuf = !S.krProtAuf; render(true); break;
+      /* Eine fertige Vorlage als Ausgangspunkt für die nächste nehmen. */
+      case "kr-kopie": {
+        const r = rahmenVon(S.rahmenOffen) || rahmenListe()[0];
+        const kopie = JSON.parse(JSON.stringify(r));
+        kopie.id = Objekte.neueId(); kopie.standard = false; kopie.protokoll = [];
+        kopie.name = (r.name || "Vorlage") + " (Kopie)";
+        kopie.erstellt = new Date().toISOString();
+        const neuId = {};
+        kopie.klassen.forEach(x => { const alt = x.id; x.id = "kl" + Objekte.neueId(); neuId[alt] = x.id; });
+        kopie.konten.forEach(k => { k.id = Objekte.neueId(); if (k.klasse) k.klasse = neuId[k.klasse] || ""; });
+        krProtokoll(kopie, "Vorlage angelegt als Kopie von " + (r.name || "Vorlage"));
+        rahmenListe().push(kopie); S.rahmenOffen = kopie.id; S.kkDetail = false;
+        rahmenSichern(kopie); render(true); toast("Kopie angelegt – jetzt frei änderbar"); break;
+      }
+      /* Gebuchte Konten werden stillgelegt statt gelöscht (GoBD). */
+      case "kk-still": {
+        const r = rahmenVon(S.rahmenOffen) || rahmenListe()[0]; const k = r.konten[Number(b.dataset.i)]; if (!k) return;
+        k.inaktiv = !k.inaktiv;
+        const warVerw = k.inaktiv && k.rolle ? (sollPosten(r).find(x => x[0] === k.rolle) || ["", ""])[1] : "";
+        if (warVerw) k.rolle = "";
+        krProtokoll(r, (k.inaktiv ? "Konto stillgelegt" : "Konto wieder in Verwendung") + ": " + (nrText(k) || "ohne Nummer") + " " + (k.name || ""),
+          warVerw ? "Verwendung " + warVerw : "", warVerw ? "nicht mehr zugeordnet" : "");
+        rahmenSichern(); render(true);
+        toast(!k.inaktiv ? "Konto wird wieder angeboten – die Verwendung legen Sie in Schritt 3 neu fest"
+          : warVerw ? "Konto stillgelegt – bitte in Schritt 3 ein anderes Konto für " + warVerw + " wählen"
+          : "Konto stillgelegt – gebuchte Beträge bleiben erhalten"); break;
+      }
+      /* Feinheiten eines Kontos ein- und ausklappen – immer nur eines, damit es ruhig bleibt. */
+      case "kk-detail": { const i = Number(b.dataset.i); S.kkDetail = S.kkDetail === i ? false : i; render(true); break; }
       case "kk-klasse": S.kkAuf = { ...S.kkAuf, [b.dataset.wert]: !S.kkAuf[b.dataset.wert] }; render(true); break;
       case "kr-klasse-neu": {
         const r = rahmenVon(S.rahmenOffen) || rahmenListe()[0];
         const id = "kl" + Objekte.neueId();
         klassenSicherstellen(r).push({ id, name: "", text: "" });
+        krProtokoll(r, "Kontenklasse angelegt");
         S.kkAuf = { ...S.kkAuf, [id]: true };
         rahmenSichern(); render(true);
         { const f = app.querySelector("[data-klasse='" + id + "|name']"); if (f) { f.focus({ preventScroll: true }); f.select(); } }
@@ -4691,7 +5308,8 @@ const Objekte = (() => {
         const r = rahmenVon(S.rahmenOffen) || rahmenListe()[0];
         if (S.loeschen !== "leer" + r.id) { S.loeschen = "leer" + r.id; render(true); return; }
         const weg = r.konten.length, wegKl = klassenVon(r).length;
-        r.konten = []; r.klassen = []; S.loeschen = false; S.kkAuf = {};
+        r.konten = []; r.klassen = []; S.loeschen = false; S.kkAuf = {}; S.kkDetail = false;
+        krProtokoll(r, "Vorlage geleert", wegKl + " Klassen, " + weg + " Konten", "leer");
         rahmenSichern(); render(true);
         toast("Vorlage geleert – " + wegKl + " Klassen und " + weg + " Konten entfernt");
         break;
@@ -4702,7 +5320,9 @@ const Objekte = (() => {
         /* Konten dieser Klasse bleiben erhalten und rutschen nach "Ohne Klasse" – es geht nichts verloren. */
         let frei = 0;
         (r.konten || []).forEach(k => { if (k.klasse === id) { k.klasse = ""; frei++; } });
+        const wegKl = klassenVon(r).find(x => x.id === id);
         r.klassen = klassenSicherstellen(r).filter(x => x.id !== id); S.loeschen = false;
+        krProtokoll(r, "Kontenklasse gelöscht", wegKl ? klasseTitel(wegKl) : "", "");
         if (frei) S.kkAuf = { ...S.kkAuf, ohne: true };
         rahmenSichern(); render(true);
         toast(frei ? "Klasse gelöscht – " + frei + (frei === 1 ? " Konto liegt" : " Konten liegen") + " jetzt ohne Klasse" : "Kontenklasse gelöscht");
@@ -4715,17 +5335,21 @@ const Objekte = (() => {
         /* Art und Umlage aus dem, was in dieser Klasse schon steht. */
         const nachbar = (r.konten || []).filter(k => k.klasse === id).slice(-1)[0];
         if (nachbar) { neu.art = nachbar.art; neu.umlage = !!nachbar.umlage; neu.schluessel = nachbar.schluessel || ""; }
-        r.konten.push(neu); S.kkAuf = { ...S.kkAuf, [id || "ohne"]: true };
+        r.konten.push(neu); S.kkAuf = { ...S.kkAuf, [id || "ohne"]: true }; S.kkDetail = false;
+        krProtokoll(r, "Konto angelegt" + (neu.nr ? " mit Nummer " + neu.nr : ""));
         rahmenSichern(); render(true);
         app.querySelector("[data-kk='" + (r.konten.length - 1) + "|" + (neu.nr ? "name" : "nr") + "']")?.focus({ preventScroll: true });
         break;
       }
       case "kk-umlage": { const r = rahmenVon(S.rahmenOffen) || rahmenListe()[0]; const k = r.konten[Number(b.dataset.i)];
-        k.umlage = !k.umlage; b.setAttribute("aria-checked", k.umlage); rahmenSichern(); break; }
+        k.umlage = !k.umlage; b.setAttribute("aria-checked", k.umlage); rahmenSichern(); render(true); break; }
       case "kk-weg": {
         const i = Number(b.dataset.i);
         if (S.loeschen !== "kk" + i) { S.loeschen = "kk" + i; render(true); return; }
-        const r = rahmenVon(S.rahmenOffen) || rahmenListe()[0]; r.konten.splice(i, 1); S.loeschen = false;
+        const r = rahmenVon(S.rahmenOffen) || rahmenListe()[0]; const weg = r.konten[i]; if (!weg) return;
+        if (kontoBenutzt(r, weg)) { toast("Auf dieses Konto wurde gebucht – bitte stilllegen statt löschen."); S.loeschen = false; render(true); return; }
+        r.konten.splice(i, 1); S.loeschen = false; S.kkDetail = false;
+        krProtokoll(r, "Konto gelöscht", (nrText(weg) ? nrText(weg) + " " : "") + (weg.name || ""), "");
         rahmenSichern(); render(true); toast("Konto entfernt"); break;
       }
       case "rg-hin": {
@@ -5257,6 +5881,7 @@ const Objekte = (() => {
     try { S.einst = { ...S.einst, ...JSON.parse(localStorage.getItem("ov_einstellungen") || "{}") }; } catch (e) {}
     S.rahmen = Speicher.lokal("kontenrahmen").filter(r => r && Array.isArray(r.konten));
     if (!S.rahmen.length) { rahmenListe(); rahmenAlleSichern(); }
+    try { S.sitzung = sessionStorage.getItem("ov_sitzung") || ""; } catch (e) { S.sitzung = ""; }
     S.ichBin = S.einst.ichBin; S.tFilter.zeitraum = S.einst.zeitraum; S.tFilter.nurMeine = S.einst.nurMeine; S.tAnsicht = S.einst.ansicht || "liste"; S.kalModus = S.einst.kalModus || "monat";
     let hinweisGezeigt = false;
     const pruefeAblauf = async () => {
