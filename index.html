@@ -1771,8 +1771,9 @@ const Objekte = (() => {
   const hatZugang = m => !!(m && m.zugang && m.pwHash && !m.ausgeschieden);
   const zugaenge = () => S.team.filter(hatZugang);
   const angemeldet = () => S.sitzung === ADMIN_ID ? adminKonto() : (S.team.find(m => m.id === S.sitzung && hatZugang(m)) || null);
-  /* Solange niemand einen Zugang hat, ist das Programm offen – sonst sperrt man sich aus. */
-  const anmeldungNoetig = () => !!zugaenge().length && !angemeldet();
+  /* Ohne Anmeldung geht nichts. Ausgesperrt wird dabei niemand, weil es den
+     Notzugang „Admin“ immer gibt. */
+  const anmeldungNoetig = () => !angemeldet();
   /* Gibt es gar keinen Verwalter mehr, darf jeder verwalten – sonst sperrt man sich aus. */
   const verwalterDa = () => zugaenge().some(x => x.rolle !== "team");
   const istVerwalter = () => { const m = angemeldet(); return !zugaenge().length || !verwalterDa() || !m || m.rolle !== "team"; };
@@ -1794,7 +1795,10 @@ const Objekte = (() => {
     if (!m.rolle) m.rolle = zugaenge().filter(x => x.id !== m.id).length ? "team" : "verwalter";
     m.pwGeaendert = new Date().toISOString();
   }
-  const sitzungSetzen = id => { S.sitzung = id || ""; try { id ? sessionStorage.setItem("ov_sitzung", id) : sessionStorage.removeItem("ov_sitzung"); } catch (e) {} };
+  /* Einmal angemeldet, bleibt man angemeldet – auch nach dem Schließen des Browsers.
+     Beendet wird das nur über „Abmelden“. */
+  const sitzungSetzen = id => { S.sitzung = id || "";
+    try { if (id) localStorage.setItem("ov_sitzung", id); else localStorage.removeItem("ov_sitzung"); sessionStorage.removeItem("ov_sitzung"); } catch (e) {} };
   /* Kennwortfeld mit Auge zum Sichtbarmachen – damit man Tippfehler sieht. */
   function pwFeldHtml(id, label) {
     return "<div class='feld'><label for='" + id + "'>" + esc(label) + "</label>" +
@@ -1820,8 +1824,11 @@ const Objekte = (() => {
         "<div class='feld'><label for='an-pw'>Kennwort</label><div class='pw-reihe'><input type='password' id='an-pw' autocomplete='current-password'>" +
         "<button type='button' class='pw-auge' data-act='pw-sicht' data-ziel='an-pw' aria-label='Kennwort anzeigen'>anzeigen</button></div></div>" +
         "<div class='an-leiste'><button class='btn haupt' data-act='an-login'>Anmelden</button></div>" +
+        (zugaenge().length ? "" : "<p class='an-fuss'>Es ist noch kein Mitarbeiterzugang eingerichtet. " +
+          "Melden Sie sich mit dem Benutzernamen <strong>Admin</strong> an und legen Sie die Zugänge unter „Mitarbeiter“ an.</p>") +
         "<p class='an-fuss'>Ihr Startkennwort bekommen Sie von der Verwaltung. Kennwort vergessen? Die Verwaltung setzt es zurück. " +
-        "Die Verwaltung selbst kommt über den Benutzernamen <strong>Admin</strong> herein.</p>") +
+        "Die Verwaltung selbst kommt über den Benutzernamen <strong>Admin</strong> herein. " +
+        "Sie bleiben angemeldet, bis Sie sich abmelden.</p>") +
       "</div>";
     el.hidden = false;
     const f = el.querySelector("input"); if (f) f.focus({ preventScroll: true });
@@ -6208,7 +6215,8 @@ const Objekte = (() => {
     try { S.einst = { ...S.einst, ...JSON.parse(localStorage.getItem("ov_einstellungen") || "{}") }; } catch (e) {}
     S.rahmen = Speicher.lokal("kontenrahmen").filter(r => r && Array.isArray(r.konten));
     if (!S.rahmen.length) { rahmenListe(); rahmenAlleSichern(); }
-    try { S.sitzung = sessionStorage.getItem("ov_sitzung") || ""; } catch (e) { S.sitzung = ""; }
+    try { S.sitzung = localStorage.getItem("ov_sitzung") || sessionStorage.getItem("ov_sitzung") || ""; } catch (e) { S.sitzung = ""; }
+    if (S.sitzung) sitzungSetzen(S.sitzung);
     S.ichBin = S.einst.ichBin; S.tFilter.zeitraum = S.einst.zeitraum; S.tFilter.nurMeine = S.einst.nurMeine; S.tAnsicht = S.einst.ansicht || "liste"; S.kalModus = S.einst.kalModus || "monat";
     let hinweisGezeigt = false;
     const pruefeAblauf = async () => {
