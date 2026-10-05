@@ -158,7 +158,7 @@ main{padding:8px clamp(16px,4vw,40px) 64px}
 .plz-ort{display:grid;grid-template-columns:130px minmax(0,1fr);gap:18px}
 .feld label{font-weight:600;font-size:14.5px}
 .feld small{color:var(--muted);font-size:13px;line-height:1.4}
-input[type=text],input[type=number],input[type=date],input[type=email],input[type=tel],textarea{width:100%;padding:12px 14px;border:1.5px solid transparent;border-radius:12px;background:var(--field)}
+input[type=text],input[type=number],input[type=date],input[type=email],input[type=tel],input[type=password],input[type=month],input[type=search],textarea{width:100%;padding:12px 14px;border:1.5px solid transparent;border-radius:12px;background:var(--field)}
 input:focus,textarea:focus{outline:none;border-color:var(--accent);background:var(--surface)}
 textarea{min-height:110px;resize:vertical}
 .einheit{position:relative}
@@ -281,6 +281,39 @@ select:focus{outline:none;border-color:var(--accent)}
 .kal-tag.fremd{opacity:.45}
 .kal-tag.heute{box-shadow:inset 0 0 0 2px var(--accent)}
 .kal-nr{font-size:12.5px;font-weight:600;color:var(--muted)}
+.portal .gruppe{max-width:820px}
+.pt-nf{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px;margin-top:10px}
+.pt-nf-karte{display:flex;flex-direction:column;gap:3px;background:var(--field);border-radius:14px;padding:14px;text-decoration:none;color:inherit}
+.pt-nf-karte:hover{background:var(--accent-soft)}
+.pt-nr{font-size:19px;font-weight:600;color:var(--accent)}
+.pt-aushang{border-left:3px solid var(--accent);background:var(--field);border-radius:12px;padding:14px 16px;margin-bottom:10px}
+.pt-aushang h3{margin:0 0 2px;font-size:16px}
+.pt-aushang p{margin:0}
+.pt-datei{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--field);border-radius:10px;padding:12px 14px;text-decoration:none;color:inherit}
+.pt-datei:hover{background:var(--accent-soft)}
+.nf-kopf,.nf-zeile{display:grid;grid-template-columns:1fr 180px 1fr 32px;gap:10px;align-items:center}
+.nf-kopf{font-size:12px;color:var(--muted);padding:10px 2px 6px;border-bottom:1px solid var(--line)}
+.nf-zeile{padding:6px 0;border-bottom:1px solid var(--line)}
+.nf-zeile input{width:100%;min-width:0}
+.aus-block{border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px;background:var(--surface)}
+.aus-block.abgelaufen{opacity:.6}
+@media(max-width:800px){.nf-kopf{display:none}.nf-zeile{grid-template-columns:1fr 32px;row-gap:6px}.nf-zeile input{grid-column:1/-1}}
+.kal-wer{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+.kal-pille{display:inline-flex;align-items:center;gap:7px}
+.kal-punkt{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none;margin-right:6px}
+.kal-e{display:block;width:100%;text-align:left;background:var(--field);border:0;border-left:3px solid var(--muted);border-radius:8px;padding:5px 7px;font:inherit;font-size:12.5px;line-height:1.3;color:inherit;cursor:pointer;overflow:hidden}
+.kal-e:hover{background:var(--accent-soft)}
+.kal-e.fertig{opacity:.5;text-decoration:line-through}
+.kal-e small{display:block;color:var(--muted);font-size:11.5px}
+.kal-zeit{font-weight:600;margin-right:5px}
+.kal-spalten{display:grid;gap:10px;margin-top:8px}
+.kal-spalte{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.kal-spalte-kopf{display:flex;align-items:center;font-weight:600;font-size:14px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.kal-spalte-kopf .fuer{margin-left:6px;font-weight:400}
+.kal-naechste{display:grid;gap:2px}
+.kal-zeile{display:grid;grid-template-columns:150px 1fr 200px;gap:12px;align-items:center;width:100%;text-align:left;background:var(--surface);border:0;border-radius:10px;padding:10px 12px;font:inherit;color:inherit;cursor:pointer}
+.kal-zeile:hover{background:var(--accent-soft)}
+@media(max-width:800px){.kal-spalten{grid-template-columns:1fr!important}.kal-zeile{grid-template-columns:1fr;row-gap:2px}}
 .kal-t{border:0;border-radius:8px;padding:4px 7px;font-size:12.5px;text-align:left;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:var(--field);color:var(--ink)}
 .kal-t.fertig{text-decoration:line-through;opacity:.6}
 .t-termin{font-size:13px;font-weight:600;color:var(--accent)}
@@ -386,7 +419,9 @@ a.btn{text-decoration:none;display:inline-block}
 #ze .z-pause input{max-width:150px}
 #ze .z-minus{color:var(--err)}
 #ze .z-plus{color:var(--ok)}
-.abl-zeile{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) auto auto 30px;gap:10px;align-items:center;margin-bottom:8px}
+.abl-zeile{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) auto auto auto 30px;gap:10px;align-items:center;margin-bottom:8px}
+.abl-liste{display:grid;gap:6px}
+.abl-frei{background:var(--field);border-radius:10px;padding:10px 12px;font-size:14px}
 .abl-zeit{white-space:nowrap;font-size:12.5px}
 @media (max-width:820px){.abl-zeile{grid-template-columns:1fr auto 30px}}
 .dok-kopf,.dok-zeile{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1.2fr) auto auto 30px;gap:10px;align-items:center}
@@ -735,20 +770,32 @@ a.btn{text-decoration:none;display:inline-block}
 #anmeldung .an-fehler{background:var(--err-soft);color:var(--err);border-radius:12px;padding:11px 14px;font-size:14px;margin-bottom:14px}
 #anmeldung .an-fuss{color:var(--muted);font-size:12.5px;margin:16px 0 0;line-height:1.5}
 .an-leiste{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.pw-feld{grid-column:1/-1;max-width:460px}
 .pw-reihe{display:flex;gap:8px;align-items:stretch}
 .pw-reihe input{flex:1;min-width:0}
-.pw-auge{background:var(--field);border:1px solid var(--line);border-radius:12px;padding:0 12px;font:inherit;font-size:13px;color:var(--muted);cursor:pointer;white-space:nowrap}
-.pw-auge[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+.pw-auge{flex:none;background:var(--field);border:1.5px solid transparent;border-radius:12px;padding:0 14px;font:inherit;font-size:13.5px;color:var(--muted);cursor:pointer;white-space:nowrap}
+.pw-auge:hover{background:var(--accent-soft);color:var(--accent)}
+.pw-auge[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent)}
 .an-wer{color:var(--muted);font-size:13px}
+.az-ueber{font-size:15.5px;font-weight:650;margin:22px 0 10px}
+#m-arbeitszeit .felder{margin-top:0}
+.re-raster{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:8px;margin-top:12px}
+.re-feld{display:flex;align-items:center;gap:9px;background:var(--field);border:1.5px solid transparent;border-radius:12px;padding:10px 13px;font-size:14px;cursor:pointer}
+.re-feld input{width:17px;height:17px;flex:none;accent-color:var(--accent);cursor:pointer}
+.re-feld.aus{color:var(--muted);background:transparent;border-color:var(--line)}
+.lese-hinweis{margin:0 auto;max-width:1180px;padding:10px 16px;color:var(--warn);font-size:13.5px}
+.lese-hinweis[hidden]{display:none}
+body.nur-lesen input:disabled,body.nur-lesen select:disabled,body.nur-lesen textarea:disabled{opacity:1;color:var(--muted);cursor:not-allowed}
 </style>
 </head>
 <body>
 <header class="kopf">
   <div class="marke-app">Hausverwaltung</div>
-  <nav class="reiter" aria-label="Bereiche"><button data-act="tab" data-tab="vertraege">Verträge</button><button data-act="tab" data-tab="objekte">Objekte</button><button data-act="tab" data-tab="etv">ETV</button><button data-act="tab" data-tab="vermietung">Vermittlung</button><button data-act="tab" data-tab="zeit">Zeiterfassung</button><button data-act="tab" data-tab="tickets">Tickets</button><button data-act="tab" data-tab="mails">E-Mail</button><button data-act="tab" data-tab="handwerker">Handwerker</button><button data-act="tab" data-tab="personen">Eigentümer/Mieter</button><button data-act="tab" data-tab="team">Mitarbeiter</button><button data-act="tab" data-tab="einstellungen">Einstellungen</button></nav>
+  <nav class="reiter" aria-label="Bereiche"><button data-act="tab" data-tab="vertraege">Verträge</button><button data-act="tab" data-tab="objekte">Objekte</button><button data-act="tab" data-tab="etv">ETV</button><button data-act="tab" data-tab="vermietung">Vermittlung</button><button data-act="tab" data-tab="zeit">Zeiterfassung</button><button data-act="tab" data-tab="tickets">Tickets</button><button data-act="tab" data-tab="kalender">Kalender</button><button data-act="tab" data-tab="mails">E-Mail</button><button data-act="tab" data-tab="handwerker">Handwerker</button><button data-act="tab" data-tab="personen">Eigentümer/Mieter</button><button data-act="tab" data-tab="team">Mitarbeiter</button><button data-act="tab" data-tab="einstellungen">Einstellungen</button></nav>
   <button class="btn haupt" data-act="neu" id="neu-knopf">+ Neues Objekt</button>
 </header>
 <div id="anmeldung" hidden></div>
+<p class="lese-hinweis" id="lese-hinweis" hidden>Nur-Lese-Zugang: Sie können alles ansehen, öffnen und drucken, aber nichts ändern.</p>
 <main id="app"></main>
 <p class="status" id="status"></p>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -765,6 +812,7 @@ a.btn{text-decoration:none;display:inline-block}
 <datalist id="einheitenarten"><option value="Wohnung"><option value="Gewerbeeinheit"><option value="Stellplatz"><option value="Garage"><option value="Tiefgaragenstellplatz"></datalist>
 <datalist id="anlagenarten"></datalist>
 <datalist id="dokumentarten"></datalist>
+<datalist id="notfallarten"><option value='Hausmeister'><option value='Heizung und Sanitär'><option value='Wasserschaden'><option value='Strom'><option value='Aufzug'><option value='Schlüsseldienst'><option value='Schornsteinfeger'><option value='Verwaltung (Notruf)'><option value='Polizei'><option value='Feuerwehr'></datalist>
 <datalist id="funktionen"><option value="Objektbetreuung"><option value="WEG-Verwaltung"><option value="Mietverwaltung"><option value="Buchhaltung"><option value="Technik"><option value="Assistenz"><option value="Geschäftsführung"></datalist>
 <datalist id="gewerke"><option value="Heizung / Sanitär"><option value="Elektro"><option value="Aufzugsservice"><option value="Rauchwarnmelder-Service"><option value="Dach"><option value="Schlüsseldienst"><option value="Gartenpflege"><option value="Hausmeisterdienst"></datalist>
 
@@ -1087,7 +1135,7 @@ const Objekte = (() => {
   const tel = t => String(t || "").replace(/[^\d+]/g, "");
   const S = { hwTab: "stamm", rgStapel: [], rgEntwurf: null, rgZu: {}, rahmen: [], rahmenOffen: "", kkAuf: {}, kkDetail: false, krProtAuf: false, krVorher: null, bank: null, lsMonat: "", lsDatum: "", sitzung: "", anFehler: "", anMail: "", pwWechsel: false, pwMeldung: "", pwMeldungOk: false, wpJahr: "", wpDatum: "", wpTop: "",
     sollOffen: "", zaNeu: "", zaEntwurf: null, bhFrei: "", bhGrund: "", infoAlle: false, vmtTab: "miete", vkOffen: null, vkWahl: false, vkSuche: "", bonOffen: null, bonHinweis: "", tObjSuche: "", anruferTreffer: null, tdTab: "vorgang", briefAnzeige: null, datFilter: { suche: "", quelle: "" }, eTab: "stamm", pTab: "stamm", pBearbeiten: false, eaHinweis: "", vermTab: "frei", vermOffen: null, vermFeedback: null, kiLaeuft: false, kiHinweis: "", kiStop: null, mails: [], mailTab: "eingang", mailFilter: { suche: "" }, mailImport: null, mailOffenId: null, mailRichtung: "ein",
-    objTab: "stammdaten", ueEinheit: null, tickets: [], tAnsicht: "liste", kalDatum: "", kalModus: "monat", tEntwurfTicket: null, ticketOffen: null, ticketBearbeiten: false, ticketVorher: null, mailNeuFuer: null, mailOffen: null, mailVerschieben: null, mailRichtung: "ein", ichBin: "", einst: { ichBin: "", zeitraum: "woche", nurMeine: true, ansicht: "liste", kalModus: "monat" }, tFilter: { status: "", suche: "", nurMeine: true, zeitraum: "woche" }, bearbeiten: false, uOffen: null, anlageOffen: null, team: [], tEntwurf: null, eigNeuFuer: null, mieterNeuFuer: null, pObjekte: {}, pDirty: new Set(), tab: "vertraege", liste: [], handwerker: [], personen: [], pEntwurf: null, pFilter: { rolle: "", suche: "", ehemalige: false }, ansicht: "liste", entwurf: null, istNeu: false, hwEntwurf: null, hwNeuFuer: null,
+    objTab: "stammdaten", ueEinheit: null, tickets: [], tAnsicht: "liste", kalDatum: "", kalModus: "monat", kalWer: [], tEntwurfTicket: null, ticketOffen: null, ticketBearbeiten: false, ticketVorher: null, mailNeuFuer: null, mailOffen: null, mailVerschieben: null, mailRichtung: "ein", ichBin: "", einst: { ichBin: "", zeitraum: "woche", nurMeine: true, ansicht: "liste", kalModus: "monat" }, tFilter: { status: "", suche: "", nurMeine: true, zeitraum: "woche" }, bearbeiten: false, uOffen: null, anlageOffen: null, team: [], tEntwurf: null, eigNeuFuer: null, mieterNeuFuer: null, pObjekte: {}, pDirty: new Set(), tab: "vertraege", liste: [], handwerker: [], personen: [], pEntwurf: null, pFilter: { rolle: "", suche: "", ehemalige: false }, ansicht: "liste", entwurf: null, istNeu: false, hwEntwurf: null, hwNeuFuer: null,
     filter: { art: "", suche: "", beendete: false }, loeschen: false };
   const app = $("#app");
   $("#anlagenarten").innerHTML = Object.keys(Objekte.ANLAGEN).map(a => "<option value='" + esc(a) + "'>").join("");
@@ -1304,6 +1352,50 @@ const Objekte = (() => {
       "<div>" + zeile("Eigentümer", kontakt(eig)) + zeile("Mieter", mie ? kontakt(mie) + (mie.mietbeginn ? "<br><span class='fuer'>seit " + Objekte.datum(mie.mietbeginn) + (mie.kaltmiete ? " · " + esc(mie.kaltmiete) + " € kalt" : "") + "</span>" : "") : "selbst genutzt") +
       zeile("Umlageschlüssel", esc(schluessel)) + zeile("Zähler", esc(zaehler)) + "</div></div></div>";
   }
+  /* ---------- Portal: was Mieter und Eigentümer dieses Objekts sehen ---------- */
+  const notfallListe = o => Array.isArray(o.notfall) ? o.notfall : (o.notfall = []);
+  const aushangListe = o => Array.isArray(o.aushaenge) ? o.aushaenge : (o.aushaenge = []);
+  const NOTFALL_ARTEN = ["Hausmeister", "Heizung und Sanitär", "Wasserschaden", "Strom", "Aufzug", "Schlüsseldienst", "Schornsteinfeger", "Verwaltung", "Polizei", "Feuerwehr"];
+  function objektPortalHtml(o) {
+    const nf = notfallListe(o); const au = aushangListe(o);
+    const heute = new Date().toISOString().slice(0, 10);
+    const zugaenge = S.personen.filter(x => x.objektId === o.id && portalZugang(x)).length;
+    let h = "<section class='gruppe voll' style='margin-top:14px'><h2>Notfallnummern</h2>" +
+      "<p class='unter'>Diese Liste sehen alle Mieter und Eigentümer dieses Objekts in ihrem Portal. " +
+      "Tragen Sie ein, wen man außerhalb Ihrer Bürozeiten erreicht.</p>" +
+      "<div class='nf-kopf'><span>Wofür</span><span>Telefon</span><span>Hinweis</span><span></span></div>" +
+      nf.map((x, i) => "<div class='nf-zeile'>" +
+        "<input type='text' list='notfallarten' aria-label='Wofür' data-nf='" + i + "|was' value='" + esc(x.was || "") + "' placeholder='z. B. Heizung'>" +
+        "<input type='tel' aria-label='Telefon' data-nf='" + i + "|nummer' value='" + esc(x.nummer || "") + "' placeholder='0731 …'>" +
+        "<input type='text' aria-label='Hinweis' data-nf='" + i + "|hinweis' value='" + esc(x.hinweis || "") + "' placeholder='z. B. nur bei akutem Schaden'>" +
+        "<button type='button' class='e-weg' data-act='nf-weg' data-i='" + i + "' aria-label='Zeile entfernen'>" +
+        (S.loeschen === "nf" + i ? "↺?" : "×") + "</button></div>").join("") +
+      (nf.length ? "" : "<p class='unter' style='margin:8px 0 0'>Noch keine Nummer eingetragen.</p>") +
+      "<div class='leiste'><div><button class='btn klein haupt' data-act='nf-neu'>+ Nummer hinzufügen</button>" +
+      "<span class='fuer'>Die Reihenfolge ist die Reihenfolge im Portal.</span></div></div></section>";
+
+    h += "<section class='gruppe voll'><h2>Aushänge</h2>" +
+      "<p class='unter'>Mitteilungen an alle im Haus – wie der Zettel im Treppenhaus, nur dass ihn niemand abreißt. " +
+      "Mit Datum „sichtbar bis“ verschwindet der Aushang von selbst.</p>" +
+      au.map((x, i) => "<div class='aus-block" + (x.bis && x.bis < heute ? " abgelaufen" : "") + "'>" +
+        "<div class='felder'>" +
+        "<div class='feld breit'><label>Überschrift</label><input type='text' data-au='" + i + "|titel' value='" + esc(x.titel || "") + "' placeholder='z. B. Treppenhausreinigung am Freitag'></div>" +
+        "<div class='feld'><label>Sichtbar bis</label><input type='date' data-au='" + i + "|bis' value='" + esc(x.bis || "") + "'></div></div>" +
+        "<div class='feld' style='margin-top:10px'><label>Text</label><textarea data-au='" + i + "|text' style='min-height:90px' placeholder='Was die Bewohner wissen müssen'>" + esc(x.text || "") + "</textarea></div>" +
+        "<div class='leiste' style='padding:8px 0 0'><div><span class='fuer'>Angelegt am " + esc(Objekte.datum(String(x.erstellt || "").slice(0, 10))) +
+        (x.bis && x.bis < heute ? " · abgelaufen, wird nicht mehr angezeigt" : "") + "</span></div>" +
+        "<button class='btn gefahr klein' data-act='au-weg' data-i='" + i + "'>" + (S.loeschen === "au" + i ? "Wirklich löschen?" : "Aushang löschen") + "</button></div></div>").join("") +
+      (au.length ? "" : "<p class='unter'>Noch kein Aushang.</p>") +
+      "<div class='leiste'><div><button class='btn klein haupt' data-act='au-neu'>+ Neuer Aushang</button></div></div></section>";
+
+    h += "<section class='gruppe voll'><h2>Wer hat Zugang</h2>" +
+      "<p class='unter'>Den Zugang vergeben Sie beim einzelnen Mieter oder Eigentümer unter „Portal“.</p>" +
+      "<p class='unter'><strong>" + zugaenge + "</strong> von " + S.personen.filter(x => x.objektId === o.id).length +
+      " Personen dieses Objekts haben einen Portalzugang.</p>" +
+      "<ul class='meldungen'><li class='m-hinweis'>Das Portal zeigt ausschließlich Notfallnummern, Aushänge und die Schreiben, die Sie der jeweiligen Person freigegeben haben. " +
+      "Buchhaltung, andere Mieter und Objektdaten sind dort nicht zu sehen.</li></ul></section>";
+    return h;
+  }
   function objektAnsichtHtml(o) {
     const weg = o.art === "weg"; const liste = o.einheitenListe || []; const summe = Objekte.meaSumme(liste);
     const zeile = (l, w) => w ? "<div class='ue-zeile'><span class='ue-l'>" + l + "</span><span class='ue-w'>" + w + "</span></div>" : "";
@@ -1312,13 +1404,15 @@ const Objekte = (() => {
       .sort((a, b) => ["notfall", "hoch", "normal", "niedrig"].indexOf(a.dringlichkeit) - ["notfall", "hoch", "normal", "niedrig"].indexOf(b.dringlichkeit));
     const anlagen = (o.anlagen || []);
     const dok = (o.dokumente || []);
-    const unter = [["stammdaten", "Stammdaten"], ["buchhaltung", "Buchhaltung"], ["rund", "Rundschreiben"], ["erhoehung", "Mieterhöhung"]]
+    const unter = [["stammdaten", "Stammdaten"], ["buchhaltung", "Buchhaltung"], ["portal", "Portal"], ["rund", "Rundschreiben"], ["erhoehung", "Mieterhöhung"]]
       .concat(o.art === "weg" ? [["etv", "Eigentümerversammlung"]] : []);
     let h = "<div class='seite'><div class='hero'><h1>" + (o.nummer ? "<span class='obj-nr'>" + esc(o.nummer) + "</span> " : "") + esc(objName(o)) + "</h1>" +
       "<p>" + esc(Objekte.ARTEN[o.art] ? Objekte.ARTEN[o.art].name : "") + " · " + esc([o.strasse, [o.plz, o.ort].filter(Boolean).join(" ")].filter(Boolean).join(", ")) +
       (o.beendet ? " · beendet" : "") + "</p></div>" +
       "<nav class='reiter obj-reiter'>" + unter.map(([w, l]) => "<button data-act='obj-tab' data-wert='" + w + "'" + (S.objTab === w ? " aria-current='page'" : "") + ">" + l + "</button>").join("") + "</nav>";
     if (S.objTab === "buchhaltung") return h + buchhaltungHtml(o) +
+      "<div class='leiste'><div><button class='btn' data-act='abbrechen'>Zurück zur Übersicht</button></div></div></div>";
+    if (S.objTab === "portal") return h + objektPortalHtml(o) +
       "<div class='leiste'><div><button class='btn' data-act='abbrechen'>Zurück zur Übersicht</button></div></div></div>";
     if (S.objTab === "erhoehung") return h + "<p class='unter' style='margin:14px 0 0'>Mieterhöhung für eine Wohnung dieses Objekts vorbereiten.</p>" +
       "<div class='leiste'><div><button class='btn' data-act='abbrechen'>Zurück zur Übersicht</button></div></div></div>";
@@ -1707,19 +1801,81 @@ const Objekte = (() => {
       : "<p class='unter'>Diesem Eigentümer ist noch keine Einheit zugeordnet. Das stellen Sie im Objekt bei der Einheit ein.</p>";
     return h + "<div class='leiste'><div><button class='btn' data-act='p-abbrechen'>Zurück zur Übersicht</button></div></div></section>";
   }
+  /* ---------- Portalzugang für Mieter und Eigentümer ----------
+     Benutzername ist die E-Mail-Adresse, das Startkennwort „Portal“ und der Nachname.
+     Gespeichert wird wie bei den Mitarbeitern nur eine Prüfsumme, nie das Kennwort. */
+  const portalStart = p => "Portal" + String((p && (p.nachname || p.firma)) || "").replace(/\s+/g, "");
+  const portalZugang = p => !!(p && p.portal && p.pwHash && !Objekte.ehemalig(p));
+  async function portalKennwortSetzen(p, pw, istStart) {
+    p.salt = Math.random().toString(36).slice(2) + Date.now().toString(36);
+    p.pwHash = await kennwortHash(p.salt, pw);
+    p.pwStart = !!istStart; p.portal = true; p.pwGeaendert = new Date().toISOString();
+  }
+  /* Die Schreiben, die diese Person im Portal sieht. */
+  const portalDateien = p => (((ablageZiel("person:" + p.id) || {}).obj || {}).dokumente || []).filter(d => d.portal);
+  const portalObjekt = p => S.liste.find(o => o.id === p.objektId) || null;
+  function portalMailText(p) {
+    const o = portalObjekt(p);
+    return "Guten Tag " + Objekte.personName(p) + ",\n\n" +
+      "für " + (o ? objName(o) : "Ihr Objekt") + " steht Ihnen ab sofort unser Portal zur Verfügung. " +
+      "Dort finden Sie die Notfallnummern des Hauses, aktuelle Aushänge und Ihre Schreiben von uns.\n\n" +
+      "Adresse: " + location.origin + location.pathname + "\n" +
+      "Benutzername: " + String(p.email || "").trim() + "\n" +
+      "Kennwort: " + portalStart(p) + "\n\n" +
+      "Bitte vergeben Sie beim ersten Anmelden ein eigenes Kennwort.\n\n" +
+      "Mit freundlichen Grüßen\n";
+  }
+  function portalBlockHtml(p) {
+    const mail = String(p.email || "").trim();
+    const an = portalZugang(p);
+    const o = portalObjekt(p);
+    const dateien = portalDateien(p);
+    let h = "<section class='gruppe'><h2>Portal – " + esc(Objekte.personName(p)) + "</h2>" +
+      "<p class='unter'>Im Portal sieht " + (p.rolle === "eigentuemer" ? "der Eigentümer" : "der Mieter") + " ausschließlich " +
+      "die Notfallnummern des Objekts, die aktuellen Aushänge und die Schreiben, die Sie unten freigeben. " +
+      "Sonst nichts – keine Buchhaltung, keine anderen Parteien.</p>";
+    if (!mail) h += "<ul class='meldungen'><li class='m-hinweis'>Für einen Zugang brauchen Sie zuerst die E-Mail-Adresse unter „Stammdaten“ – sie ist der Benutzername.</li></ul>";
+    if (!o) h += "<ul class='meldungen'><li class='m-hinweis'>Diese Person ist noch keinem Objekt zugeordnet. Ohne Objekt gibt es keine Notfallnummern und Aushänge zu zeigen.</li></ul>";
+    h += "<div class='schalter-zeile'><div>Portalzugang erlauben<small>" +
+      (an ? "Benutzername: " + esc(mail) : "Noch kein Zugang eingerichtet.") + "</small></div>" +
+      "<button type='button' class='schalter' role='switch' aria-checked='" + an + "' aria-label='Portalzugang' data-act='pt-zugang' data-id='" + esc(p.id) + "'></button></div>";
+    if (an) {
+      h += (p.pwStart
+        ? "<ul class='meldungen' style='margin-top:12px'><li class='m-hinweis'>Startkennwort steht bereit: <strong>" + esc(portalStart(p)) +
+          "</strong> – beim ersten Anmelden muss es geändert werden.</li></ul>"
+        : "<p class='unter' style='margin-top:12px'>Eigenes Kennwort gesetzt" +
+          (p.pwGeaendert ? " am " + esc(Objekte.datum(String(p.pwGeaendert).slice(0, 10))) : "") + "." +
+          (p.letzteAnmeldung ? " Zuletzt angemeldet am " + esc(Objekte.datum(String(p.letzteAnmeldung).slice(0, 10))) + "." : " Noch nie angemeldet.") + "</p>") +
+        "<div class='leiste'><div>" +
+        "<a class='btn klein haupt' href='mailto:" + esc(mail) + "?subject=" + encodeURIComponent("Ihr Zugang zum Portal") +
+          "&body=" + encodeURIComponent(portalMailText(p)) + "'>Zugangsdaten per E-Mail senden</a>" +
+        "<button class='btn klein' data-act='pt-reset' data-id='" + esc(p.id) + "'>Startkennwort neu setzen</button>" +
+        "<button class='btn klein' data-act='pt-text' data-id='" + esc(p.id) + "'>Text kopieren</button></div></div>" +
+        "<p class='unter'>Der Knopf öffnet Ihr E-Mail-Programm mit fertigem Text. Schicken Sie Kennwörter möglichst nicht per E-Mail, sondern nennen Sie sie am Telefon oder bei der Übergabe.</p>";
+      h += "<h3 style='margin-top:22px'>Freigegebene Schreiben <span class='fuer'>" + dateien.length + "</span></h3>" +
+        (dateien.length
+          ? "<div class='abl-liste'>" + dateien.map(d => "<div class='abl-frei'><span>" + esc(d.name || "Schreiben") +
+            "<br><span class='fuer'>" + esc([d.art, zeitstempel(d.hochgeladen)].filter(Boolean).join(" · ")) + "</span></span></div>").join("") + "</div>"
+          : "<p class='unter'>Noch nichts freigegeben. Unter „Dokumente“ legen Sie die Datei ab und schalten dort „im Portal sichtbar“ ein.</p>");
+    }
+    return h + "<div class='leiste'><div><button class='btn' data-act='p-abbrechen'>Schließen</button></div></div></section>";
+  }
   function personFormHtml() {
     const p = S.pEntwurf; const neu = !S.personen.some(x => x.id === p.id);
     const f = (n, l, t = "text", ex = "", hilfe = "") => "<div class='feld'><label for='p-" + n + "'>" + l + "</label><input type='" + t + "' id='p-" + n + "' data-p='" + n + "' value='" + esc(p[n]) + "' " + ex + ">" + (hilfe ? "<small>" + hilfe + "</small>" : "") + "</div>";
     const sel = (n, l, opts) => "<div class='feld'><label for='p-" + n + "'>" + l + "</label><select id='p-" + n + "' data-p='" + n + "'>" + opts.map(([w, t]) => "<option value='" + esc(w) + "'" + (String(p[n] || "") === w ? " selected" : "") + ">" + esc(t) + "</option>").join("") + "</select></div>";
     const objekte = S.liste.filter(o => !o.beendet || o.id === p.objektId).sort((a, b) => objName(a).localeCompare(objName(b), "de"));
     const mieter = p.rolle === "mieter";
-    const pTabs = "<nav class='reiter e-reiter'>" + [["stamm", "Stammdaten"], ["konto", "Kontodaten"], ["dok", "Dokumente"]].concat(!neu && p.rolle === "eigentuemer" ? [["mieter", "Mieter"]] : []).map(([w, l]) =>
+    const pTabs = "<nav class='reiter e-reiter'>" + [["stamm", "Stammdaten"], ["konto", "Kontodaten"], ["dok", "Dokumente"]]
+      .concat(neu ? [] : [["portal", "Portal"]])
+      .concat(!neu && p.rolle === "eigentuemer" ? [["mieter", "Mieter"]] : []).map(([w, l]) =>
       "<button data-act='p-tab' data-wert='" + w + "'" + (S.pTab === w ? " aria-current='page'" : "") + ">" + l + "</button>").join("") + "</nav>";
     if (S.pTab === "dok") return pTabs + "<section class='gruppe'><h2>Dokumente" + (neu ? "" : " – " + esc(Objekte.personName(p))) + "</h2>" +
       (neu ? "<p class='unter'>Bitte zuerst speichern, danach können Sie Dateien ablegen.</p>"
            : ablageHtml("person:" + p.id, "Dateien", "Mietvertrag, Schriftverkehr, SEPA-Mandat, Nachweise.")) +
       "<div class='leiste'><div>" + (S.pBearbeiten || neu ? "<button class='btn haupt' data-act='p-speichern'>Speichern</button>" : "") +
       "<button class='btn' data-act='p-abbrechen'>Schließen</button></div></div></section>";
+    if (S.pTab === "portal" && !neu) return pTabs + portalBlockHtml(p);
     if (S.pTab === "mieter" && !neu && p.rolle === "eigentuemer") return pTabs + mieterZuEigentuemerHtml(p);
     if (S.pTab === "konto" && !neu && !S.pBearbeiten) {
       const z = (l, w) => String(w || "").trim() ? "<div class='ue-zeile'><span class='ue-l'>" + l + "</span><span class='ue-w'>" + w + "</span></div>" : "";
@@ -1829,13 +1985,32 @@ const Objekte = (() => {
   const startKennwort = m => "Willkommen" + String((m && m.vorname) || "").replace(/\s+/g, "");
   const hatZugang = m => !!(m && m.zugang && m.pwHash && !m.ausgeschieden);
   const zugaenge = () => S.team.filter(hatZugang);
-  const angemeldet = () => S.sitzung === ADMIN_ID ? adminKonto() : (S.team.find(m => m.id === S.sitzung && hatZugang(m)) || null);
+  /* Ein Portalnutzer ist ein Mieter oder Eigentümer, kein Mitarbeiter. */
+  const portalNutzer = () => String(S.sitzung || "").startsWith("p:")
+    ? (S.personen.find(x => "p:" + x.id === S.sitzung && portalZugang(x)) || null) : null;
+  const angemeldet = () => S.sitzung === ADMIN_ID ? adminKonto()
+    : portalNutzer() || (S.team.find(m => m.id === S.sitzung && hatZugang(m)) || null);
   /* Ohne Anmeldung geht nichts. Ausgesperrt wird dabei niemand, weil es den
      Notzugang „Admin“ immer gibt. */
   const anmeldungNoetig = () => !angemeldet();
   /* Gibt es gar keinen Verwalter mehr, darf jeder verwalten – sonst sperrt man sich aus. */
   const verwalterDa = () => zugaenge().some(x => x.rolle !== "team");
   const istVerwalter = () => { const m = angemeldet(); return !zugaenge().length || !verwalterDa() || !m || m.rolle !== "team"; };
+  /* Mitarbeiter und ihre Zugänge bearbeitet ausschließlich der Notzugang „Admin“. */
+  const istAdmin = () => { const m = angemeldet(); return !!m && m.id === ADMIN_ID; };
+  /* Welche Bereiche ein Mitarbeiter sieht und ob er etwas ändern darf, legt
+     ausschließlich der Notzugang „Admin“ fest. */
+  const BEREICHE = [["objekte", "Objekte"], ["vertraege", "Verträge"], ["etv", "ETV"], ["vermietung", "Vermittlung"],
+    ["zeit", "Zeiterfassung"], ["tickets", "Tickets"], ["kalender", "Kalender"], ["mails", "E-Mail"],
+    ["handwerker", "Handwerker"], ["personen", "Eigentümer/Mieter"], ["einstellungen", "Einstellungen"]];
+  const rechteVon = m => { const r = (m && m.rechte) || {}; return { gesperrt: Array.isArray(r.gesperrt) ? r.gesperrt : [], nurLesen: !!r.nurLesen }; };
+  const meineRechte = () => { const m = angemeldet(); return (!m || m.id === ADMIN_ID) ? { gesperrt: [], nurLesen: false } : rechteVon(m); };
+  const leseModus = () => meineRechte().nurLesen;
+  /* Ansehen, öffnen, drucken, abbrechen bleiben frei – alles andere ändert Daten. */
+  const LESEN_FREI = /^(tab|[a-z0-9]+-tab|oeffnen|[a-z0-9-]+-oeffnen|[a-z0-9-]+-auf|bearbeiten|[a-z0-9-]+-bearbeiten|abbrechen|[a-z0-9-]+-abbrechen|[a-z0-9-]+-abbr|zurueck|[a-z0-9-]+-zurueck|[a-z0-9-]+-zu|drucken|[a-z0-9-]+-drucken|download|[a-z0-9-]+-download|[a-z0-9-]+-pdf|filter|[a-z0-9-]+-filter|kal-[a-z]+|seg|pw-sicht|an-login|an-abmelden|an-pw-ok|an-pw-inline|e-meine|e-ansicht|t-meine|t-ansicht|p-ehemalige|beendete|info-alle|info-gelesen|td-verlauf|bs-ansehen|brief-anzeigen|prot-ordnung|kr-prot)$/;
+  /* Diese Felder bleiben auch im Nur-Lese-Zugang bedienbar. */
+  const feldFrei = el => !!el && (["mz-alt", "mz-neu", "mz-neu2", "suche"].includes(el.id) || el.type === "search" ||
+    !!el.closest("#ze") || !!el.closest("#anmeldung"));
   const ROLLEN = [["verwalter", "Verwalter – darf alles, auch Mitarbeiter und Kontenrahmen"], ["team", "Mitarbeiter – ohne Mitarbeiter- und Kontenrahmenverwaltung"]];
   async function kennwortHash(salt, pw) {
     const txt = String(salt) + "|" + String(pw);
@@ -1860,7 +2035,7 @@ const Objekte = (() => {
     try { if (id) localStorage.setItem("ov_sitzung", id); else localStorage.removeItem("ov_sitzung"); sessionStorage.removeItem("ov_sitzung"); } catch (e) {} };
   /* Kennwortfeld mit Auge zum Sichtbarmachen – damit man Tippfehler sieht. */
   function pwFeldHtml(id, label) {
-    return "<div class='feld'><label for='" + id + "'>" + esc(label) + "</label>" +
+    return "<div class='feld pw-feld'><label for='" + id + "'>" + esc(label) + "</label>" +
       "<div class='pw-reihe'><input type='password' id='" + id + "' autocomplete='off'>" +
       "<button type='button' class='pw-auge' data-act='pw-sicht' data-ziel='" + id + "' aria-label='Kennwort anzeigen'>anzeigen</button></div></div>";
   }
@@ -1896,6 +2071,22 @@ const Objekte = (() => {
   const betreuerNamen = o => ((o.betreuerIds && o.betreuerIds.length ? o.betreuerIds : [o.betreuerId]).map(id => teamName(id)).filter(Boolean)).join(", ");
   const teamName = id => { const m = S.team.find(x => x.id === id); return m ? Objekte.mitarbeiterName(m) : ""; };
   /* Zugang eines Mitarbeiters: Benutzername ist die E-Mail, Startkennwort „Willkommen“ + Vorname. */
+  /* Reiter freigeben oder sperren und der Nur-Lese-Zugang. */
+  function rechteBlockHtml(m) {
+    const r = rechteVon(m);
+    return "<h3 style='margin-top:22px'>Was dieser Mitarbeiter darf</h3>" +
+      "<p class='unter'>Abgewählte Bereiche erscheinen bei diesem Mitarbeiter gar nicht erst. Nur der Admin kann das hier ändern.</p>" +
+      "<div class='re-raster'>" + BEREICHE.map(([w, l]) => "<label class='re-feld" + (r.gesperrt.includes(w) ? " aus" : "") +
+        "'><input type='checkbox' data-act='m-recht' data-wert='" + w + "'" + (r.gesperrt.includes(w) ? "" : " checked") + ">" + esc(l) + "</label>").join("") + "</div>" +
+      "<div class='schalter-zeile' style='margin-top:16px'><div>Nur lesen, nichts ändern" +
+        "<small>Er darf alles ansehen, öffnen und drucken, aber nichts speichern oder löschen. Die eigene Zeiterfassung bleibt möglich.</small></div>" +
+      "<button type='button' class='schalter' role='switch' aria-checked='" + r.nurLesen + "' aria-label='Nur lesen' data-act='m-nurlesen'></button></div>" +
+      (r.gesperrt.length || r.nurLesen
+        ? "<ul class='meldungen' style='margin-top:12px'><li class='m-hinweis'>" +
+          (r.nurLesen ? "Nur-Lese-Zugang. " : "") +
+          (r.gesperrt.length ? "Gesperrt: " + esc(r.gesperrt.map(w => (BEREICHE.find(b => b[0] === w) || [w, w])[1]).join(", ")) + "." : "") + "</li></ul>"
+        : "<p class='unter' style='margin-top:10px'>Derzeit ohne Einschränkung.</p>");
+  }
   function zugangBlockHtml(m) {
     const mail = String(m.email || "").trim();
     const an = hatZugang(m);
@@ -1915,10 +2106,21 @@ const Objekte = (() => {
             (m.pwGeaendert ? " am " + esc(Objekte.datum(String(m.pwGeaendert).slice(0, 10))) : "") + "." +
             (m.letzteAnmeldung ? " Zuletzt angemeldet am " + esc(Objekte.datum(String(m.letzteAnmeldung).slice(0, 10))) + "." : "") + "</p>") +
         "<div class='leiste'><div><button class='btn klein' data-act='m-pw-reset'>Startkennwort neu setzen</button>" +
-        "<span class='fuer'>Für den Fall, dass jemand sein Kennwort vergessen hat.</span></div></div>" : "") +
+        "<span class='fuer'>Für den Fall, dass jemand sein Kennwort vergessen hat.</span></div></div>" +
+        rechteBlockHtml(m) : "") +
       "<ul class='meldungen' style='margin-top:14px'><li class='m-hinweis'>Diese Anmeldung schützt die Ansicht an einem gemeinsam genutzten Gerät. " +
       "Solange das Programm allein im Browser läuft, ist sie kein vollwertiger Schutz und die Daten liegen auf dem jeweiligen Gerät. " +
       "Echte Benutzertrennung mit gemeinsamen Daten bekommen Sie erst mit dem Server.</li></ul>";
+  }
+  /* Arbeitszeit, Urlaubsanspruch und Sollstunden – nur der Admin darf sie ändern. */
+  function arbeitszeitBlockHtml(m) {
+    if (!istAdmin()) return "";
+    const kopf = "<h3 style='margin-top:22px'>Arbeitszeit und Urlaub</h3>";
+    if (!S.team.some(x => x.id === m.id)) return kopf +
+      "<p class='unter'>Bitte den Mitarbeiter zuerst speichern. Danach stehen hier Arbeitsvertrag, Standardzeiten und Sollstunden für die Zeiterfassung.</p>";
+    let inhalt = ""; try { inhalt = window.Zeitdaten ? window.Zeitdaten.formHtml(m.id) : ""; } catch (e) { inhalt = ""; }
+    if (!inhalt) return kopf + "<p class='unter'>Die Zeiterfassung ist noch nicht geladen. Öffnen Sie einmal den Reiter „Zeiterfassung“.</p>";
+    return kopf + "<p class='unter'>Grundlage für die Zeiterfassung. Ändern kann das nur der Admin.</p>" + inhalt;
   }
   function teamHtml() {
     let h = "<div class='seite'><div class='hero'><h1>Mitarbeiter</h1><p>Ihr Team. Jedem Objekt können Sie danach eine Betreuung, die Buchhaltung und die Technik zuordnen.</p></div>";
@@ -1928,7 +2130,7 @@ const Objekte = (() => {
         f("vorname", "Vorname") + f("nachname", "Nachname") + f("funktion", "Funktion", "text", "list='funktionen'") + f("telefon", "Telefon / Durchwahl", "tel") + f("email", "E-Mail", "email") + "</div>" +
         "<div class='schalter-zeile' style='margin-top:16px'><div>Ausgeschieden<small>Wird dann nicht mehr zur Auswahl angeboten.</small></div>" +
         "<button type='button' class='schalter' role='switch' aria-checked='" + !!m.ausgeschieden + "' aria-label='Ausgeschieden' data-act='m-aus'></button></div>" +
-        zugangBlockHtml(m) +
+        zugangBlockHtml(m) + arbeitszeitBlockHtml(m) +
         "<div id='m-meldung'></div><div class='leiste'><div><button class='btn haupt' data-act='m-speichern'>Speichern</button><button class='btn' data-act='m-abbrechen'>Abbrechen</button></div></div></section>";
     }
     if (!S.team.length && !S.tEntwurf) return h + "<div class='leer'><h2>Noch keine Mitarbeiter</h2><p>Legen Sie Ihr Team an, damit Sie Objekte zuordnen können.</p><button class='btn haupt' data-act='neu'>+ Mitarbeiter</button></div></div>";
@@ -2198,6 +2400,144 @@ const Objekte = (() => {
       (letzter ? " · zuletzt " + zeitpunkt(letzter.zeit) + ": " + esc(String(letzter.text).slice(0, 70)) : "") + "</div></button>";
   };
   /* Monatskalender mit den Terminen der Vorgänge. */
+  /* ---------- Kalender aller Mitarbeiter ----------
+     Zeigt alle Termine, die im Programm entstehen: Ticket-Termine und Wartungen.
+     Termine aus Outlook kommen hier mit dazu, sobald die Verbindung steht. */
+  const KAL_FARBEN = ["#4057C9", "#0F7B6C", "#B25E09", "#8E44AD", "#C0392B", "#117A8B", "#7D6608", "#2C3E50"];
+  const kalFarbe = id => { const l = teamAktiv(); const i = l.findIndex(m => m.id === id);
+    return i < 0 ? "var(--muted)" : KAL_FARBEN[i % KAL_FARBEN.length]; };
+  /* Alle Termine mit Datum, Mitarbeiter und Herkunft. */
+  function kalTermine() {
+    const aus = [];
+    S.tickets.filter(t => t.termin).forEach(t => aus.push({
+      datum: String(t.termin).slice(0, 10), zeit: t.terminZeit || "", wer: t.bearbeiterId || "",
+      titel: ticketTitel(t), art: "ticket", id: t.id, erledigt: Objekte.ticketStatus(t) === "erledigt",
+      zusatz: Objekte.label(Objekte.KATEGORIEN, t.kategorie) }));
+    (S.liste || []).filter(o => !o.beendet).forEach(o => (o.anlagen || []).forEach(a => {
+      if (!a.naechste) return;
+      aus.push({ datum: String(a.naechste).slice(0, 10), zeit: "", wer: o.technikId || (o.betreuerIds || [o.betreuerId])[0] || "",
+        titel: (a.art || "Wartung") + " · " + objName(o), art: "wartung", id: o.id, erledigt: false,
+        zusatz: a.standort || "Wartung" });
+    }));
+    return aus.sort((a, b) => (a.datum + a.zeit).localeCompare(b.datum + b.zeit));
+  }
+  /* Was ein Mieter oder Eigentümer nach der Anmeldung sieht – sonst nichts. */
+  function portalSeiteHtml(p) {
+    const o = portalObjekt(p);
+    const heute = new Date().toISOString().slice(0, 10);
+    const nf = o ? notfallListe(o).filter(x => String(x.nummer || "").trim()) : [];
+    const au = o ? aushangListe(o).filter(x => (!x.bis || x.bis >= heute) && (x.titel || x.text)) : [];
+    const dateien = portalDateien(p);
+    let h = "<div class='seite portal'><div class='hero'><h1>Willkommen, " + esc(Objekte.personName(p)) + "</h1>" +
+      "<p>" + esc(o ? objName(o) : "Ihr Objekt") + (p.einheit ? " · " + esc(p.einheit) : "") + "</p></div>";
+
+    h += "<section class='gruppe'><h2>Im Notfall</h2>" +
+      (nf.length ? "<p class='unter'>Bei Gefahr für Leib und Leben immer zuerst 112 oder 110.</p><div class='pt-nf'>" +
+        nf.map(x => "<a class='pt-nf-karte' href='tel:" + esc(tel(x.nummer)) + "'>" +
+          "<strong>" + esc(x.was || "Notruf") + "</strong><span class='pt-nr'>" + esc(x.nummer) + "</span>" +
+          (x.hinweis ? "<span class='fuer'>" + esc(x.hinweis) + "</span>" : "") + "</a>").join("") + "</div>"
+        : "<p class='unter'>Für dieses Objekt sind noch keine Nummern hinterlegt. Wenden Sie sich bitte an die Verwaltung.</p>") + "</section>";
+
+    h += "<section class='gruppe'><h2>Aushänge <span class='fuer'>" + au.length + "</span></h2>" +
+      (au.length ? au.map(x => "<article class='pt-aushang'><h3>" + esc(x.titel || "Mitteilung") + "</h3>" +
+        "<p class='fuer'>" + esc(Objekte.datum(String(x.erstellt || "").slice(0, 10))) + "</p>" +
+        "<p>" + esc(x.text || "").replace(/\n/g, "<br>") + "</p></article>").join("")
+        : "<p class='unter'>Zurzeit gibt es keine Mitteilungen.</p>") + "</section>";
+
+    h += "<section class='gruppe'><h2>Ihre Schreiben <span class='fuer'>" + dateien.length + "</span></h2>" +
+      (dateien.length ? "<div class='abl-liste'>" + dateien.map(d => "<a class='pt-datei' href='/_blob/" + esc(d.id) + "' target='_blank' rel='noopener'>" +
+        "<span><strong>" + esc(d.name || "Schreiben") + "</strong><br><span class='fuer'>" +
+        esc([d.art, zeitstempel(d.hochgeladen)].filter(Boolean).join(" · ")) + "</span></span><span class='fuer'>öffnen</span></a>").join("") + "</div>"
+        : "<p class='unter'>Hier erscheinen Schreiben, die wir für Sie freigeben.</p>") + "</section>";
+
+    h += "<section class='gruppe'><h2>Ihr Zugang</h2>" +
+      "<p class='unter'>Angemeldet als <strong>" + esc(p.email || "") + "</strong>. " +
+      "Ihr Kennwort kann Ihnen niemand anzeigen – vergeben Sie hier bei Bedarf ein neues.</p>" +
+      (S.pwMeldung ? "<ul class='meldungen'><li class='" + (S.pwMeldungOk ? "m-ok" : "m-fehler") + "'>" + esc(S.pwMeldung) + "</li></ul>" : "") +
+      "<div class='felder'>" + pwFeldHtml("mz-alt", "Jetziges Kennwort") + pwFeldHtml("mz-neu", "Neues Kennwort") +
+      pwFeldHtml("mz-neu2", "Neues Kennwort wiederholen") + "</div>" +
+      "<div class='leiste'><div><button class='btn klein haupt' data-act='an-pw-inline'>Kennwort speichern</button>" +
+      "<span class='fuer'>Mindestens 10 Zeichen.</span></div>" +
+      "<button class='btn klein' data-act='an-abmelden'>Abmelden</button></div></section>";
+    return h + "</div>";
+  }
+  function kalenderSeiteHtml() {
+    const team = teamAktiv();
+    const gewaehlt = Array.isArray(S.kalWer) ? S.kalWer : [];
+    const alle = !gewaehlt.length;
+    const termine = kalTermine().filter(x => alle || gewaehlt.includes(x.wer || ""));
+    const woche = S.kalModus === "woche";
+    const d0 = S.kalDatum ? new Date(S.kalDatum + "T12:00:00") : new Date();
+    const heute = Objekte.alsIso(new Date());
+    const proTag = {}; termine.forEach(x => { (proTag[x.datum] = proTag[x.datum] || []).push(x); });
+    let tage, titel; const monat = d0.getMonth();
+    if (woche) {
+      const start = new Date(d0); start.setHours(12, 0, 0, 0); start.setDate(start.getDate() - ((start.getDay() + 6) % 7));
+      tage = Array.from({ length: 7 }, (_, i) => { const d = new Date(start); d.setDate(start.getDate() + i); return d; });
+      titel = tage[0].toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" }) + " – " +
+        tage[6].toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit", year: "numeric" });
+    } else { tage = Objekte.monatsTage(d0.getFullYear(), monat); titel = Objekte.monatsName(new Date(d0.getFullYear(), monat, 1)); }
+
+    let h = "<div class='seite'><div class='hero'><h1>Kalender</h1>" +
+      "<p>Alle Termine aus dem Programm auf einen Blick. Wählen Sie oben, wessen Kalender Sie sehen wollen – ohne Auswahl sind es alle.</p></div>";
+    h += "<div class='kal-wer'><button type='button' class='pille" + (alle ? " an" : "") + "' data-act='kal-wer' data-wert=''>Alle</button>" +
+      team.map(m => {
+        const an = gewaehlt.includes(m.id);
+        return "<button type='button' class='pille kal-pille" + (an ? " an" : "") + "' data-act='kal-wer' data-wert='" + esc(m.id) + "'>" +
+          "<span class='kal-punkt' style='background:" + kalFarbe(m.id) + "'></span>" + esc(Objekte.mitarbeiterName(m)) +
+          " <span class='fuer'>" + kalTermine().filter(x => x.wer === m.id).length + "</span></button>";
+      }).join("") +
+      (kalTermine().some(x => !x.wer) ? "<button type='button' class='pille kal-pille" + (gewaehlt.includes("") ? " an" : "") + "' data-act='kal-wer' data-wert='ohne'>" +
+        "<span class='kal-punkt' style='background:var(--muted)'></span>Niemandem zugeteilt " +
+        "<span class='fuer'>" + kalTermine().filter(x => !x.wer).length + "</span></button>" : "") + "</div>";
+
+    h += "<div class='kal-kopf'><button class='btn klein' data-act='kal-zurueck' aria-label='zurück'>‹</button><h2>" + esc(titel) + "</h2>" +
+      "<button class='btn klein' data-act='kal-vor' aria-label='weiter'>›</button><button class='btn klein' data-act='kal-heute'>Heute</button>" +
+      "<div class='pillen' style='margin-left:auto'><button type='button' class='pille" + (woche ? "" : " an") + "' data-act='kal-modus' data-wert='monat'>Monat</button>" +
+      "<button type='button' class='pille" + (woche ? " an" : "") + "' data-act='kal-modus' data-wert='woche'>Woche</button></div></div>";
+
+    const eintrag = x => "<button class='kal-e" + (x.erledigt ? " fertig" : "") + "' style='border-left-color:" + kalFarbe(x.wer) + "'" +
+      " data-act='" + (x.art === "ticket" ? "t-oeffnen" : "oeffnen") + "' data-id='" + esc(x.id) + "'" +
+      " title='" + esc((x.zeit ? x.zeit + " · " : "") + x.titel + (x.wer ? " · " + teamName(x.wer) : "")) + "'>" +
+      (x.zeit ? "<span class='kal-zeit'>" + esc(x.zeit) + "</span>" : "") + esc(x.titel) +
+      "<small>" + esc(x.wer ? teamName(x.wer) : "niemandem zugeteilt") + "</small></button>";
+
+    h += "<div class='kal" + (woche ? " kal-woche" : "") + "'>" + ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"].map(x => "<div class='kal-wt'>" + x + "</div>").join("") +
+      tage.map(d => { const iso = Objekte.alsIso(d); const liste = proTag[iso] || [];
+        return "<div class='kal-tag" + (woche || d.getMonth() === monat ? "" : " fremd") + (iso === heute ? " heute" : "") + "'>" +
+          "<div class='kal-nr'>" + (woche ? d.toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" }) : d.getDate()) + "</div>" +
+          liste.map(eintrag).join("") + "</div>"; }).join("") + "</div>";
+
+    /* Nebeneinander: je Mitarbeiter eine Spalte – so sieht man auf einen Blick, wer wann unterwegs ist. */
+    if (!woche) {
+      const spalten = (alle ? team : team.filter(m => gewaehlt.includes(m.id)));
+      if (spalten.length > 1) {
+        const imMonat = x => x.datum.slice(0, 7) === Objekte.alsIso(new Date(d0.getFullYear(), monat, 15)).slice(0, 7);
+        h += "<h2 class='t-gruppe'>Nebeneinander <span class='fuer'>" + esc(titel) + "</span></h2>" +
+          "<div class='kal-spalten' style='grid-template-columns:repeat(" + spalten.length + ",minmax(0,1fr))'>" +
+          spalten.map(m => {
+            const meine = termine.filter(x => x.wer === m.id && imMonat(x));
+            return "<div class='kal-spalte'><div class='kal-spalte-kopf'><span class='kal-punkt' style='background:" + kalFarbe(m.id) + "'></span>" +
+              esc(Objekte.mitarbeiterName(m)) + " <span class='fuer'>" + meine.length + "</span></div>" +
+              (meine.length ? meine.map(x => "<button class='kal-e' style='border-left-color:" + kalFarbe(m.id) + "'" +
+                " data-act='" + (x.art === "ticket" ? "t-oeffnen" : "oeffnen") + "' data-id='" + esc(x.id) + "'>" +
+                "<span class='kal-zeit'>" + esc(Objekte.datum(x.datum)) + (x.zeit ? " " + esc(x.zeit) : "") + "</span>" + esc(x.titel) + "</button>").join("")
+                : "<p class='unter' style='margin:6px 0 0'>Keine Termine</p>") + "</div>";
+          }).join("") + "</div>";
+      }
+    }
+    const kommend = termine.filter(x => x.datum >= heute).slice(0, 12);
+    h += "<h2 class='t-gruppe'>Als Nächstes <span class='fuer'>" + kommend.length + "</span></h2>" +
+      (kommend.length ? "<div class='kal-naechste'>" + kommend.map(x => "<button class='kal-zeile' data-act='" +
+        (x.art === "ticket" ? "t-oeffnen" : "oeffnen") + "' data-id='" + esc(x.id) + "'>" +
+        "<span class='ob-nr'>" + esc(Objekte.datum(x.datum)) + (x.zeit ? " " + esc(x.zeit) : "") + "</span>" +
+        "<span>" + esc(x.titel) + "<br><span class='fuer'>" + esc(x.zusatz || "") + "</span></span>" +
+        "<span class='fuer'><span class='kal-punkt' style='background:" + kalFarbe(x.wer) + "'></span>" +
+        esc(x.wer ? teamName(x.wer) : "niemandem zugeteilt") + "</span></button>").join("") + "</div>"
+        : "<p class='unter'>Keine kommenden Termine.</p>");
+    h += "<p class='unter' style='margin-top:18px'>Sobald die Verbindung zu Outlook steht, erscheinen hier auch die Termine aus den Postfächern Ihrer Mitarbeiter.</p>";
+    return h + "</div>";
+  }
   function kalenderHtml(alle) {
     const woche = S.kalModus === "woche";
     const d0 = S.kalDatum ? new Date(S.kalDatum + "T12:00:00") : new Date();
@@ -2240,8 +2580,8 @@ const Objekte = (() => {
       .sort((a, b) => ["notfall", "hoch", "normal", "niedrig"].indexOf(a.dringlichkeit) - ["notfall", "hoch", "normal", "niedrig"].indexOf(b.dringlichkeit) || String(b.erstellt).localeCompare(String(a.erstellt)));
     const kachel = (st, text) => "<button class='kachel' data-act='t-filter' data-status='" + st + "' aria-pressed='" + (f.status === st) + "'><b>" + nach(st).length + "</b><span>" + text + "</span></button>";
     let h = "<div class='seite'><div class='hero'><h1>Tickets</h1><p>Ihre Vorgänge auf einen Blick. Ein Vorgang ohne Eintrag gilt als neu, sobald etwas passiert ist, steht er auf „In Bearbeitung“.</p></div>";
-    h += "<div class='werkzeug'><div class='ich-bin'><label for='t-ich'>Ich bin</label><select id='t-ich' data-t-ich='1'><option value=''>– alle Mitarbeiter –</option>" +
-      teamAktiv().map(m => "<option value='" + esc(m.id) + "'" + (S.ichBin === m.id ? " selected" : "") + ">" + esc(Objekte.mitarbeiterName(m)) + "</option>").join("") + "</select></div>" +
+    h += "<div class='werkzeug'>" +
+      (S.ichBin ? "<div class='ich-bin'><span class='fuer'>Angemeldet als</span> <strong>" + esc(teamName(S.ichBin)) + "</strong></div>" : "") +
       (S.ichBin ? "<div class='umschalt'>nur meine Vorgänge <button type='button' class='schalter' role='switch' aria-checked='" + !!f.nurMeine + "' aria-label='nur meine Vorgänge' data-act='t-meine'></button></div>" : "") +
       "<div class='suche'><input type='text' id='t-suche' placeholder='Suchen nach Nummer, Objekt, Melder, Text …' value='" + esc(f.suche) + "' aria-label='Tickets suchen'></div></div>";
     h += "<div class='pillen zeit-pillen'><button type='button' class='pille" + (S.tAnsicht === "kalender" ? "" : " an") + "' data-act='t-ansicht' data-wert='liste'>Liste</button>" +
@@ -4486,9 +4826,10 @@ const Objekte = (() => {
         "<div class='leiste'><div><button class='btn klein haupt' data-act='an-pw-inline'>Kennwort speichern</button>" +
         "<span class='fuer'>Mindestens 10 Zeichen.</span></div>" +
         "<button class='btn klein' data-act='an-abmelden'>Abmelden</button></div></section>" : "") +
-      "<section class='gruppe'><h2>Ich bin</h2><p class='unter'>Damit weiß das Programm, welche Vorgänge Ihre sind.</p><div class='felder'>" +
-      "<div class='feld'><label for='e-ich'>Mitarbeiter</label><select id='e-ich' data-e='ichBin'><option value=''>– nicht festgelegt –</option>" +
-      teamAktiv().map(m => "<option value='" + esc(m.id) + "'" + (S.einst.ichBin === m.id ? " selected" : "") + ">" + esc(Objekte.mitarbeiterName(m)) + "</option>").join("") + "</select></div></div>" +
+      "<section class='gruppe'><h2>Ich bin</h2><p class='unter'>Damit weiß das Programm, welche Vorgänge Ihre sind. " +
+      "Das ergibt sich aus Ihrer Anmeldung und lässt sich hier nicht wechseln.</p>" +
+      "<p class='unter'><strong>" + esc(ich ? Objekte.mitarbeiterName(ich) : "nicht angemeldet") + "</strong>" +
+      (ich && ich.id === ADMIN_ID ? " <span class='fuer'>– Notzugang, keinem Mitarbeiter zugeordnet</span>" : "") + "</p>" +
       "<div class='schalter-zeile' style='margin-top:16px'><div>Standardmäßig nur meine Vorgänge zeigen<small>Im Dashboard jederzeit umschaltbar.</small></div>" +
       "<button type='button' class='schalter' role='switch' aria-checked='" + !!S.einst.nurMeine + "' aria-label='nur meine Vorgänge' data-act='e-meine'></button></div></section>" +
       "<section class='gruppe'><h2>Ticket-Übersicht</h2><p class='unter'>Welcher Zeitraum wird beim Öffnen angezeigt?</p><div class='pillen'>" +
@@ -4633,6 +4974,9 @@ const Objekte = (() => {
       "<span class='fuer abl-zeit'>" + esc(zeitstempel(d.hochgeladen)) + "</span>" +
       (d.quelle === "brief" ? "<button type='button' class='btn klein' data-act='brief-anzeigen' data-ctx='" + esc(ctx) + "' data-i='" + i + "'>Ansehen</button>"
         : "<a class='btn klein' href='/_blob/" + esc(d.id) + "' target='_blank' rel='noopener'>Öffnen</a>") +
+      (String(ctx).startsWith("person:")
+        ? "<button type='button' class='btn klein" + (d.portal ? " haupt" : "") + "' data-act='abl-portal' data-ctx='" + esc(ctx) + "' data-i='" + i + "'" +
+          " title='Im Portal für diese Person sichtbar'>" + (d.portal ? "im Portal ✓" : "ins Portal") + "</button>" : "") +
       "<button type='button' class='e-weg' data-act='abl-weg' data-ctx='" + esc(ctx) + "' data-i='" + i + "' aria-label='Datei entfernen'>" + (S.loeschen === ctx + "|" + i ? "↺?" : "×") + "</button></div>").join("");
     else h += "<p class='unter' style='margin:6px 0 0'>Noch keine Dateien.</p>";
     h += Dateien.verfuegbar()
@@ -4983,12 +5327,29 @@ const Objekte = (() => {
     const ich = angemeldet();
     if (anmeldungNoetig() || (ich && (ich.pwStart || S.pwWechsel))) { anmeldungHtml(); return; }
     $("#anmeldung").hidden = true;
+    /* Mieter und Eigentümer sehen ausschließlich ihr Portal. */
+    const pn = portalNutzer();
+    document.querySelector("header .reiter").hidden = !!pn;
+    if (pn) {
+      $("#neu-knopf").hidden = true; $("#status").hidden = true;
+      $("#ze").hidden = true; $("#vv").hidden = true;
+      app.innerHTML = portalSeiteHtml(pn);
+      window.scrollTo({ top: behalteScroll ? y : 0 });
+      return;
+    }
+    $("#status").hidden = false;
     if (ich && ich.id !== ADMIN_ID) S.ichBin = ich.id;
     /* Mitarbeiterverwaltung und Kontenrahmen sind der Verwalterrolle vorbehalten. */
     const verwalter = istVerwalter();
     const teamKnopf = document.querySelector("header .reiter button[data-tab='team']");
-    if (teamKnopf) teamKnopf.hidden = !verwalter;
-    if (!verwalter && S.tab === "team") S.tab = "objekte";
+    if (teamKnopf) teamKnopf.hidden = !istAdmin();
+    if (!istAdmin() && S.tab === "team") S.tab = "objekte";
+    /* Gesperrte Bereiche verschwinden aus der Leiste. */
+    const rechte = meineRechte();
+    document.querySelectorAll("header .reiter button[data-tab]").forEach(b => { if (b.dataset.tab !== "team") b.hidden = rechte.gesperrt.includes(b.dataset.tab); });
+    if (rechte.gesperrt.includes(S.tab)) S.tab = (BEREICHE.map(x => x[0]).find(t => !rechte.gesperrt.includes(t)) || "objekte");
+    document.body.classList.toggle("nur-lesen", rechte.nurLesen);
+    $("#lese-hinweis").hidden = !rechte.nurLesen;
     document.querySelectorAll("header .reiter button").forEach(b => { if (b.dataset.tab === S.tab) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
     const vv = S.tab === "vertraege"; const dok = S.tab === "einstellungen";
     const zeitAn = S.tab === "zeit";
@@ -4998,15 +5359,15 @@ const Objekte = (() => {
     const erhAn = S.tab === "objekte" && S.ansicht === "formular" && !S.bearbeiten && !S.istNeu && S.objTab === "erhoehung";
     const etvAn = S.tab === "etv" || S.tab === "schreiben" || rundAn || erhAn || (S.tab === "objekte" && S.ansicht === "formular" && !S.bearbeiten && !S.istNeu && S.objTab === "etv");
     $("#vv").hidden = !vv && !dok && !etvAn; $("#vv").classList.toggle("nur-daten", dok); $("#vv").classList.toggle("nur-etv", etvAn);
-    app.hidden = vv || S.tab === "etv" || S.tab === "schreiben" || zeitAn; $("#neu-knopf").hidden = vv || dok || etvAn; $("#status").hidden = vv || dok || etvAn;
+    app.hidden = vv || S.tab === "etv" || S.tab === "schreiben" || zeitAn; $("#neu-knopf").hidden = vv || dok || etvAn || rechte.nurLesen; $("#status").hidden = vv || dok || etvAn;
     if (dok && window.Firmendaten) window.Firmendaten.zeigen();
     if (S.tab === "schreiben") { app.hidden = true; window.scrollTo({ top: 0 }); return; }
     if (zeitAn) { $("#status").hidden = true; window.scrollTo({ top: behalteScroll ? y : 0 }); return; }
     if (vv && window.Vertragsbereich) window.Vertragsbereich.normal();
     if (vv || S.tab === "etv") { if (etvAn && window.EtvBruecke) window.EtvBruecke.zeigen(null); window.scrollTo({ top: behalteScroll ? y : 0 }); return; }
     $("#neu-knopf").textContent = S.tab === "handwerker" ? "+ Neuer Handwerker" : S.tab === "personen" ? "+ Eigentümer/Mieter" : S.tab === "team" ? "+ Mitarbeiter" : S.tab === "tickets" ? "+ Neues Ticket" : "+ Neues Objekt";
-    $("#neu-knopf").hidden = S.tab === "einstellungen" || S.tab === "mails" || S.tab === "vermietung" || S.tab === "dateien" || zeitAn || vv || etvAn;
-    app.innerHTML = S.tab === "einstellungen" ? einstellungenHtml() : S.tab === "dateien" ? dateienHtml() : S.tab === "vermietung" ? vermittlungHtml() : S.tab === "mails" ? mailsHtml() : S.tab === "tickets" ? ticketsHtml() : S.tab === "team" ? teamHtml() : S.tab === "handwerker" ? handwerkerHtml() : S.tab === "personen" ? personenHtml() :
+    $("#neu-knopf").hidden = rechte.nurLesen || S.tab === "einstellungen" || S.tab === "mails" || S.tab === "vermietung" || S.tab === "dateien" || S.tab === "kalender" || zeitAn || vv || etvAn;
+    app.innerHTML = S.tab === "kalender" ? kalenderSeiteHtml() : S.tab === "einstellungen" ? einstellungenHtml() : S.tab === "dateien" ? dateienHtml() : S.tab === "vermietung" ? vermittlungHtml() : S.tab === "mails" ? mailsHtml() : S.tab === "tickets" ? ticketsHtml() : S.tab === "team" ? teamHtml() : S.tab === "handwerker" ? handwerkerHtml() : S.tab === "personen" ? personenHtml() :
       S.ansicht === "formular" ? (!S.bearbeiten && !S.istNeu ? objektAnsichtHtml(S.entwurf) : formularHtml()) : listeHtml();
     if (S.tab === "objekte" && S.ansicht === "formular" && !S.bearbeiten && S.istNeu) sperren();
 
@@ -5015,6 +5376,7 @@ const Objekte = (() => {
     else if (rundAn && window.Schreiben && window.Schreiben.rundschreiben) window.Schreiben.rundschreiben({ objektId: S.entwurf.id,
       objekt: [S.entwurf.strasse, [S.entwurf.plz, S.entwurf.ort].filter(Boolean).join(" ")].filter(Boolean).join(", ") });
     else if (etvAn && window.EtvBruecke) window.EtvBruecke.zeigen(S.tab === "etv" ? null : S.entwurf);
+    if (rechte.nurLesen) app.querySelectorAll("input,select,textarea").forEach(el => { if (!feldFrei(el)) el.disabled = true; });
     window.scrollTo({ top: behalteScroll ? y : 0 });
   }
   /* Ansichtsmodus: nichts lässt sich versehentlich ändern. */
@@ -5069,7 +5431,8 @@ const Objekte = (() => {
       if (t.dataset.p === "objektId") { S.pEntwurf.einheitId = ""; S.pEntwurf.einheit = ""; render(true); }
       return;
     }
-    if (t.dataset.tIch !== undefined || t.dataset.e === "ichBin") { S.ichBin = t.value; S.einst.ichBin = t.value; einstellungenSpeichern(); render(true); return; }
+    /* „Ich bin“ kommt aus der Anmeldung und ist nicht mehr umstellbar. */
+    if (t.dataset.tIch !== undefined || t.dataset.e === "ichBin") return;
     if (t.dataset.uefrei) {
       const o = S.entwurf; const e = (o.einheitenListe || []).find(x => x.id === t.dataset.uefrei); if (!e) return;
       const v = vermVon(e, o); v.freiAb = t.value; if (v.status === "vermietet") v.status = "frei"; e.vermarktung = v;
@@ -5128,6 +5491,13 @@ const Objekte = (() => {
       return;
     }
     /* Art der Vorlage umstellen – Verwendungen, die es dort nicht gibt, werden gelöst. */
+    if (t.dataset.nf || t.dataset.au) {
+      const o = S.entwurf; if (!o) return;
+      const nf = !!t.dataset.nf;
+      const [i, feld] = String(nf ? t.dataset.nf : t.dataset.au).split("|");
+      const x = (nf ? notfallListe(o) : aushangListe(o))[Number(i)]; if (!x) return;
+      x[feld] = t.value; objektSichern(o); return;
+    }
     if (t.dataset.obbank) {
       const o = S.entwurf; if (!o) return;
       if (!o.bank || typeof o.bank !== "object") o.bank = {};
@@ -5368,6 +5738,21 @@ const Objekte = (() => {
     const knopf = el.querySelector("[data-act='an-login'], [data-act='an-pw-ok']");
     if (knopf) { e.preventDefault(); knopf.click(); }
   });
+  /* Nur-Lese-Zugang: Klicks, die etwas ändern würden, kommen nicht durch. */
+  document.addEventListener("click", e => {
+    if (!leseModus()) return;
+    const b = e.target.closest("[data-act]"); if (!b) return;
+    if (LESEN_FREI.test(b.dataset.act || "")) return;
+    e.preventDefault(); e.stopPropagation();
+    toast("Sie haben nur Leserechte – Änderungen sind gesperrt");
+  }, true);
+  /* Eingaben in Feldern ebenso; das eigene Kennwort darf jeder ändern. */
+  ["beforeinput", "input", "change", "paste", "drop"].forEach(n => document.addEventListener(n, e => {
+    if (!leseModus()) return;
+    const el = e.target;
+    if (!el || !/^(INPUT|SELECT|TEXTAREA)$/.test(el.tagName || "") || feldFrei(el)) return;
+    e.preventDefault(); e.stopPropagation();
+  }, true));
   document.addEventListener("click", async e => {
     const b = e.target.closest("[data-act]"); if (!b || e.composedPath().some(n => n.id === "vv")) return; const act = b.dataset.act; const id = b.dataset.id;
     if (!["loeschen", "hw-loeschen", "p-loeschen", "m-loeschen", "td-loeschen", "v-weg", "mail-weg", "dok-weg", "mail-loeschen", "abl-weg",
@@ -5415,6 +5800,14 @@ const Objekte = (() => {
         S.kalDatum = Objekte.alsIso(d); render(true); break;
       }
       case "kal-modus": S.kalModus = b.dataset.wert; S.einst.kalModus = b.dataset.wert; einstellungenSpeichern(); render(true); break;
+      /* Wessen Kalender wird gezeigt – mehrere gleichzeitig sind möglich. */
+      case "kal-wer": {
+        const w = b.dataset.wert === "ohne" ? "" : b.dataset.wert;
+        if (b.dataset.wert === "") S.kalWer = [];
+        else { const l = Array.isArray(S.kalWer) ? S.kalWer.slice() : [];
+          const i = l.indexOf(w); if (i >= 0) l.splice(i, 1); else l.push(w); S.kalWer = l; }
+        render(true); break;
+      }
       case "kal-heute": S.kalDatum = ""; render(true); break;
       case "e-ansicht": S.einst.ansicht = b.dataset.wert; S.tAnsicht = b.dataset.wert; einstellungenSpeichern(); render(true); toast("Gespeichert"); break;
       case "t-zeit": S.tFilter.zeitraum = b.dataset.wert; render(true); break;
@@ -5565,15 +5958,20 @@ const Objekte = (() => {
         const mail = String(($("#an-mail") || {}).value || "").trim().toLowerCase();
         const pw = String(($("#an-pw") || {}).value || "");
         S.anMail = mail;
-        const m = mail === ADMIN_ID ? adminKonto() : zugaenge().find(x => String(x.email || "").trim().toLowerCase() === mail);
+        const m = mail === ADMIN_ID ? adminKonto()
+          : zugaenge().find(x => String(x.email || "").trim().toLowerCase() === mail)
+          || S.personen.filter(portalZugang).find(x => String(x.email || "").trim().toLowerCase() === mail);
         if (!m || !pw) { S.anFehler = "Benutzername oder Kennwort stimmt nicht."; render(true); return; }
         const pruef = await kennwortHash(m.salt, pw);
         if (pruef !== m.pwHash) { S.anFehler = "Benutzername oder Kennwort stimmt nicht."; render(true); return; }
-        S.anFehler = ""; S.anMail = ""; sitzungSetzen(m.id);
+        const istPortal = !!m.rolle && (m.rolle === "mieter" || m.rolle === "eigentuemer");
+        S.anFehler = ""; S.anMail = ""; sitzungSetzen(istPortal ? "p:" + m.id : m.id);
         if (m.id === ADMIN_ID) { const d = adminGespeichert() || { salt: ADMIN_SALT, hash: ADMIN_START, geaendert: "" };
           d.letzteAnmeldung = new Date().toISOString(); adminSichern(d); }
+        else if (istPortal) { m.letzteAnmeldung = new Date().toISOString();
+          try { await Speicher.speichern("personen", m, S.personen); } catch (e) {} }
         else { m.letzteAnmeldung = new Date().toISOString(); await teamSichern(m); }
-        S.ichBin = m.id === ADMIN_ID ? S.ichBin : m.id;
+        S.ichBin = (m.id === ADMIN_ID || istPortal) ? "" : m.id;
         render(); if (!m.pwStart) toast("Angemeldet als " + Objekte.mitarbeiterName(m)); break;
       }
       case "an-abmelden": { sitzungSetzen(""); S.pwWechsel = false; S.anFehler = ""; S.pwMeldung = ""; render(); break; }
@@ -5598,7 +5996,9 @@ const Objekte = (() => {
           const salt = Math.random().toString(36).slice(2) + Date.now().toString(36);
           adminSichern({ salt, hash: await kennwortHash(salt, n1), geaendert: new Date().toISOString(),
             letzteAnmeldung: (adminGespeichert() || {}).letzteAnmeldung || "" });
-        } else { await kennwortSetzen(m, n1, false); await teamSichern(m); }
+        } else if (portalNutzer()) { await portalKennwortSetzen(m, n1, false);
+          try { await Speicher.speichern("personen", m, S.personen); } catch (e) {} }
+        else { await kennwortSetzen(m, n1, false); await teamSichern(m); }
         S.pwMeldung = "Kennwort geändert."; S.pwMeldungOk = true;
         render(true); toast("Kennwort geändert"); break;
       }
@@ -5615,11 +6015,17 @@ const Objekte = (() => {
             letzteAnmeldung: (adminGespeichert() || {}).letzteAnmeldung || "" });
           S.pwWechsel = false; S.anFehler = ""; render(); toast("Kennwort des Notzugangs gespeichert"); break;
         }
+        if (portalNutzer()) {
+          await portalKennwortSetzen(m, a1, false); S.pwWechsel = false; S.anFehler = "";
+          try { await Speicher.speichern("personen", m, S.personen); } catch (e) {}
+          render(); toast("Kennwort gespeichert"); break;
+        }
         await kennwortSetzen(m, a1, false); S.pwWechsel = false; S.anFehler = "";
         await teamSichern(m); render(); toast("Kennwort gespeichert"); break;
       }
       /* ---------- Zugang eines Mitarbeiters ---------- */
       case "m-zugang": {
+        if (!istAdmin()) { toast("Zugänge vergibt nur der Admin."); return; }
         const m = S.tEntwurf; if (!m) return;
         if (m.zugang) { m.zugang = false; m.pwHash = ""; m.salt = ""; m.pwStart = false; toast("Zugang entzogen"); }
         else {
@@ -5629,7 +6035,21 @@ const Objekte = (() => {
         }
         render(true); break;
       }
+      case "m-recht": {
+        if (!istAdmin()) { toast("Rechte vergibt nur der Admin."); return; }
+        const m = S.tEntwurf; if (!m) return;
+        const w = b.dataset.wert; const r = rechteVon(m);
+        m.rechte = { gesperrt: r.gesperrt.includes(w) ? r.gesperrt.filter(x => x !== w) : r.gesperrt.concat([w]), nurLesen: r.nurLesen };
+        render(true); break;
+      }
+      case "m-nurlesen": {
+        if (!istAdmin()) { toast("Rechte vergibt nur der Admin."); return; }
+        const m = S.tEntwurf; if (!m) return;
+        const r = rechteVon(m); m.rechte = { gesperrt: r.gesperrt, nurLesen: !r.nurLesen };
+        render(true); break;
+      }
       case "m-pw-reset": {
+        if (!istAdmin()) { toast("Zugänge vergibt nur der Admin."); return; }
         const m = S.tEntwurf; if (!m || !m.email) return;
         await kennwortSetzen(m, startKennwort(m), true);
         render(true); toast("Startkennwort gesetzt: " + startKennwort(m)); break;
@@ -5989,7 +6409,7 @@ const Objekte = (() => {
         render(true); break;
       case "t-oeffnen-objekt": S.tab = "tickets"; S.ansicht = "liste"; S.entwurf = null; S.ticketOffen = id; S.ticketBearbeiten = false; render(); break;
       case "td-tab": S.tdTab = b.dataset.wert; render(true); break;
-      case "t-oeffnen": S.ticketOffen = id; S.tdTab = "vorgang"; S.ticketBearbeiten = false; render(); break;
+      case "t-oeffnen": S.tab = "tickets"; S.ticketOffen = id; S.tdTab = "vorgang"; S.ticketBearbeiten = false; render(); break;
       case "v-weg": {
         const t = S.tickets.find(x => x.id === S.ticketOffen); const i = Number(b.dataset.i);
         if (S.loeschen !== "v" + i) { S.loeschen = "v" + i; render(true); return; }
@@ -6049,12 +6469,16 @@ const Objekte = (() => {
         try { await Speicher.loeschen("tickets", id, S.tickets); toast("Ticket gelöscht"); } catch (err) { toast("Löschen fehlgeschlagen."); }
         render(); break;
       case "m-aus": S.tEntwurf.ausgeschieden = !S.tEntwurf.ausgeschieden; b.setAttribute("aria-checked", S.tEntwurf.ausgeschieden); break;
-      case "m-bearbeiten": S.tEntwurf = JSON.parse(JSON.stringify(S.team.find(x => x.id === id))); render(); $("#m-vorname")?.focus(); break;
+      case "m-bearbeiten":
+        if (!istAdmin()) { toast("Mitarbeiter und Zugänge bearbeitet nur der Admin."); return; }
+        S.tEntwurf = JSON.parse(JSON.stringify(S.team.find(x => x.id === id))); render(); $("#m-vorname")?.focus(); break;
       case "m-abbrechen": S.tEntwurf = null; render(); break;
       case "m-speichern":
+        if (!istAdmin()) { toast("Mitarbeiter und Zugänge bearbeitet nur der Admin."); return; }
         if (!String(S.tEntwurf.nachname || "").trim() && !String(S.tEntwurf.vorname || "").trim()) { $("#m-meldung").innerHTML = "<div class='meldung fehler'>Bitte einen Namen eintragen.</div>"; return; }
         await teamSichern(S.tEntwurf); S.tEntwurf = null; render(); toast("Mitarbeiter gespeichert"); break;
       case "m-loeschen":
+        if (!istAdmin()) { toast("Mitarbeiter und Zugänge bearbeitet nur der Admin."); return; }
         if (S.loeschen !== id) { S.loeschen = id; render(true); return; }
         S.team = S.team.filter(x => x.id !== id); S.loeschen = false;
         try { await Speicher.loeschen("mitarbeiter", id, S.team); toast("Mitarbeiter gelöscht"); } catch (err) { toast("Löschen fehlgeschlagen."); }
@@ -6125,7 +6549,9 @@ const Objekte = (() => {
             kategorie: "", dringlichkeit: "normal", beschreibung: "", status: "neu", bearbeiterId: "", verlauf: [], erstellt: new Date().toISOString() };
           render(); $("#t-objekt")?.focus();
         }
-        else if (S.tab === "team") { S.tEntwurf = { id: Objekte.neueId(), vorname: "", nachname: "", funktion: "", telefon: "", email: "", ausgeschieden: false }; render(); $("#m-vorname")?.focus(); }
+        else if (S.tab === "team") {
+          if (!istAdmin()) { toast("Mitarbeiter legt nur der Admin an."); return; }
+          S.tEntwurf = { id: Objekte.neueId(), vorname: "", nachname: "", funktion: "", telefon: "", email: "", ausgeschieden: false }; render(); $("#m-vorname")?.focus(); }
         else if (S.tab === "personen") { S.pObjekte = {}; S.pTab = "stamm"; S.pBearbeiten = true; S.pEntwurf = leerePerson(); render(); $("#p-nachname")?.focus(); }
         else if (S.tab === "handwerker") { S.hwTab = "stamm"; S.hwEntwurf = { id: Objekte.neueId(), firma: "", gewerk: "", ansprechpartner: "", telefon: "", notfall: "", email: "", kontakte: [], kontoinhaber: "", iban: "", bic: "", bank: "" }; render(); $("#h-firma")?.focus(); }
         else { S.entwurf = Objekte.leer(); S.istNeu = true; S.bearbeiten = true; S.ansicht = "formular"; render(); }
@@ -6152,6 +6578,50 @@ const Objekte = (() => {
       case "bt-weg": S.entwurf.betreuerIds.splice(Number(b.dataset.i), 1); render(true); break;
       case "brief-anzeigen": S.briefAnzeige = { ctx: b.dataset.ctx, i: Number(b.dataset.i) }; render(true); break;
       case "brief-zu": S.briefAnzeige = null; render(true); break;
+      /* Datei für das Portal dieser Person freigeben oder zurückziehen. */
+      case "abl-portal": {
+        const ctx = b.dataset.ctx; const z = ablageZiel(ctx);
+        const d = z.obj && (z.obj.dokumente || [])[Number(b.dataset.i)]; if (!d) return;
+        d.portal = !d.portal;
+        await ablageSichern(ctx); render(true);
+        toast(d.portal ? "Im Portal sichtbar" : "Aus dem Portal genommen"); break;
+      }
+      /* ---------- Notfallnummern und Aushänge ---------- */
+      case "nf-neu": { const o = S.entwurf; if (!o) return; notfallListe(o).push({ id: Objekte.neueId(), was: "", nummer: "", hinweis: "" });
+        await objektSichern(o); render(true); app.querySelector("[data-nf='" + (o.notfall.length - 1) + "|was']")?.focus({ preventScroll: true }); break; }
+      case "nf-weg": { const o = S.entwurf; if (!o) return; const i = Number(b.dataset.i);
+        if (S.loeschen !== "nf" + i) { S.loeschen = "nf" + i; render(true); return; }
+        notfallListe(o).splice(i, 1); S.loeschen = false; await objektSichern(o); render(true); break; }
+      case "au-neu": { const o = S.entwurf; if (!o) return;
+        aushangListe(o).unshift({ id: Objekte.neueId(), titel: "", text: "", bis: "", erstellt: new Date().toISOString() });
+        await objektSichern(o); render(true); app.querySelector("[data-au='0|titel']")?.focus({ preventScroll: true }); break; }
+      case "au-weg": { const o = S.entwurf; if (!o) return; const i = Number(b.dataset.i);
+        if (S.loeschen !== "au" + i) { S.loeschen = "au" + i; render(true); return; }
+        aushangListe(o).splice(i, 1); S.loeschen = false; await objektSichern(o); render(true); toast("Aushang gelöscht"); break; }
+      /* ---------- Portalzugang einer Person ---------- */
+      case "pt-zugang": {
+        const pn = S.pEntwurf && S.pEntwurf.id === id ? S.pEntwurf : S.personen.find(x => x.id === id); if (!pn) return;
+        if (pn.portal) { pn.portal = false; pn.pwHash = ""; pn.salt = ""; pn.pwStart = false; toast("Portalzugang entzogen"); }
+        else {
+          if (!String(pn.email || "").trim()) { toast("Bitte zuerst die E-Mail-Adresse eintragen – sie ist der Benutzername."); return; }
+          await portalKennwortSetzen(pn, portalStart(pn), true);
+          toast("Zugang angelegt – Startkennwort: " + portalStart(pn));
+        }
+        S.pDirty.add(pn.id); try { await Speicher.speichern("personen", pn, S.personen); } catch (e) {}
+        render(true); break;
+      }
+      case "pt-reset": {
+        const pn = S.pEntwurf && S.pEntwurf.id === id ? S.pEntwurf : S.personen.find(x => x.id === id); if (!pn || !pn.email) return;
+        await portalKennwortSetzen(pn, portalStart(pn), true);
+        S.pDirty.add(pn.id); try { await Speicher.speichern("personen", pn, S.personen); } catch (e) {}
+        render(true); toast("Startkennwort gesetzt: " + portalStart(pn)); break;
+      }
+      case "pt-text": {
+        const pn = S.pEntwurf && S.pEntwurf.id === id ? S.pEntwurf : S.personen.find(x => x.id === id); if (!pn) return;
+        try { await navigator.clipboard.writeText(portalMailText(pn)); toast("Text kopiert – jetzt in Ihre E-Mail einfügen"); }
+        catch (e) { toast("Kopieren hat nicht geklappt."); }
+        break;
+      }
       case "abl-weg": {
         const ctx = b.dataset.ctx; const i = Number(b.dataset.i); const z = ablageZiel(ctx);
         if (!z.obj || !z.obj.dokumente) return;
@@ -8963,7 +9433,7 @@ const Pruefung = (() => {
       "<div class='werkzeug'><div class='feld' style='margin:0'><label for='z-mid'>Mitarbeiter</label><select id='z-mid'>" +
       "<option value=''>– bitte wählen –</option>" + liste.map(m => "<option value='" + esc(m.id) + "'" + (S.mid === m.id ? " selected" : "") + ">" + esc(mitarbeiterName(m)) + "</option>").join("") + "</select></div>" +
       "<div class='feld' style='margin:0'><label for='z-jahr'>Jahr</label><input type='number' id='z-jahr' value='" + S.jahr + "' min='2000' max='2100'></div></div>" +
-      "<nav class='reiter e-reiter'>" + [["monat", "Zeiten"], ["urlaub", "Urlaub"], ["person", "Arbeitszeit"]].map(([w, l]) =>
+      "<nav class='reiter e-reiter'>" + [["monat", "Zeiten"], ["urlaub", "Urlaub"], ["einst", "Einstellungen"]].map(([w, l]) =>
         "<button data-zact='tab' data-wert='" + w + "'" + (S.tab === w ? " aria-current='page'" : "") + ">" + l + "</button>").join("") + "</nav>";
   }
 
@@ -9157,9 +9627,10 @@ const Pruefung = (() => {
     return h;
   }
 
-  function personHtml(p) {
+  /* Arbeitszeit eines Mitarbeiters – eingebettet in seine Einstellungen unter „Mitarbeiter“. */
+  function arbeitszeitHtml(p) {
     const f = (n, l, typ, hilfe) => "<div class='feld'><label for='zp-" + n + "'>" + l + "</label><input type='" + (typ || "text") + "' id='zp-" + n + "' data-zperson='" + n + "' value='" + esc(p[n]) + "'>" + (hilfe ? "<small>" + hilfe + "</small>" : "") + "</div>";
-    return "<section class='gruppe'><h2>Arbeitsvertrag</h2><div class='felder'>" +
+    return "<h4 class='az-ueber'>Arbeitsvertrag</h4><div class='felder'>" +
       f("eintritt", "Eintritt", "date") + f("austritt", "Austritt", "date", "Leer lassen, solange beschäftigt.") +
       f("erfassungAb", "Erfassung beginnt am", "date", "Davor werden keine Soll- und Fehlzeiten gerechnet.") +
       "<div class='feld'><label for='zp-art'>Art</label><select id='zp-art' data-zperson='art'>" +
@@ -9168,22 +9639,36 @@ const Pruefung = (() => {
       WOCHENSTUNDEN.map(x => "<option value='" + x + "'" + (Number(p.wochenstunden) === x ? " selected" : "") + ">" + String(x).replace(".", ",") + " Stunden</option>").join("") + "</select></div>" +
       f("urlaubJahr", "Urlaubstage im Jahr", "number", "Gesetzlich mindestens 20 bei Fünftagewoche (§ 3 BUrlG).") +
       f("startUeberstunden", "Startsaldo Überstunden", "number", "Stunden, die zu Beginn der Erfassung bestanden.") + "</div>" +
-      "<h2 style='margin-top:24px'>Standardzeiten</h2><p class='unter'>Werden im Tagesfenster als Vorschlag eingesetzt.</p><div class='felder'>" +
+      "<h4 class='az-ueber'>Standardzeiten</h4><p class='unter'>Werden im Tagesfenster als Vorschlag eingesetzt.</p><div class='felder'>" +
       "<div class='feld'><label>Beginn</label>" + zeitFeld("data-zperson='vonStd'", p.vonStd, "Beginn") + "</div>" +
       "<div class='feld'><label>Ende</label>" + zeitFeld("data-zperson='bisStd'", p.bisStd, "Ende") + "</div>" +
       "<div class='feld'><label>Pause von</label>" + zeitFeld("data-zperson='pauseVon'", p.pauseVon, "Pause von") + "</div>" +
       "<div class='feld'><label>Pause bis</label>" + zeitFeld("data-zperson='pauseBis'", p.pauseBis, "Pause bis") + "</div></div>" +
-      "<h2 style='margin-top:24px'>Ansicht</h2><div class='feld'><label for='z-standard'>Standardansicht</label><select id='z-standard' data-zstandard='1'>" +
-      [["woche", "Woche"], ["monat", "Monat"], ["jahr", "Jahr"]].map(([w, l]) => "<option value='" + w + "'" + (S.zeitraum === w ? " selected" : "") + ">" + l + "</option>").join("") + "</select></div>" +
-      "<h2 style='margin-top:24px'>Sollstunden je Wochentag</h2><div class='felder'>" +
+      "<h4 class='az-ueber'>Sollstunden je Wochentag</h4><div class='felder'>" +
       [[1, "Montag"], [2, "Dienstag"], [3, "Mittwoch"], [4, "Donnerstag"], [5, "Freitag"], [6, "Samstag"]].map(([k, l]) =>
         "<div class='feld'><label>" + l + "</label><input type='number' step='0.25' min='0' data-zsoll='" + k + "' value='" + esc(p.soll[k] || 0) + "'></div>").join("") +
-      "</div><p class='unter'>Summe: " + [1, 2, 3, 4, 5, 6].reduce((s, k) => s + (Number(p.soll[k]) || 0), 0).toLocaleString("de-DE") + " Stunden</p>" +
-      "<div class='leiste'><div><button class='btn klein' data-zact='soll-standard'>Aus Wochenstunden verteilen</button></div></div></section>" +
-      "<section class='gruppe'><h2>Feiertage</h2><div class='feld'><label for='z-land'>Bundesland</label><select id='z-land' data-zland='1'>" +
-      LAENDER.map(([w, l]) => "<option value='" + w + "'" + (S.land === w ? " selected" : "") + ">" + l + "</option>").join("") + "</select>" +
-      "<small>Gilt für alle Mitarbeiter und wird für jedes Jahr automatisch berechnet.</small></div></section>";
+      "</div><p class='unter'>Summe: " + [1, 2, 3, 4, 5, 6].reduce((s2, k) => s2 + (Number(p.soll[k]) || 0), 0).toLocaleString("de-DE") + " Stunden</p>" +
+      "<div class='leiste'><div><button class='btn klein' data-zact='soll-standard'>Aus Wochenstunden verteilen</button>" +
+      "<span class='fuer'>Änderungen in diesem Abschnitt werden sofort gespeichert.</span></div></div>";
   }
+  /* Was für alle gilt: Ansicht und Bundesland. */
+  function einstHtml() {
+    return "<section class='gruppe'><h2>Einstellungen</h2>" +
+      "<ul class='meldungen'><li class='m-hinweis'>Arbeitsvertrag, Standardzeiten und Sollstunden stehen jetzt beim jeweiligen Mitarbeiter " +
+      "unter „Mitarbeiter“ – ändern kann sie nur der Admin.</li></ul>" +
+      "<div class='felder'><div class='feld'><label for='z-standard'>Standardansicht</label><select id='z-standard' data-zstandard='1'>" +
+      [["woche", "Woche"], ["monat", "Monat"], ["jahr", "Jahr"]].map(([w, l]) => "<option value='" + w + "'" + (S.zeitraum === w ? " selected" : "") + ">" + l + "</option>").join("") + "</select></div>" +
+      "<div class='feld'><label for='z-land'>Bundesland für die Feiertage</label><select id='z-land' data-zland='1'>" +
+      LAENDER.map(([w, l]) => "<option value='" + w + "'" + (S.land === w ? " selected" : "") + ">" + l + "</option>").join("") + "</select>" +
+      "<small>Gilt für alle Mitarbeiter und wird für jedes Jahr automatisch berechnet.</small></div></div></section>";
+  }
+  /* Brücke in das Mitarbeiterformular. */
+  const formMid = el => { const k = el && el.closest ? el.closest("#m-arbeitszeit") : null; return k ? (k.dataset.mid || "") : ""; };
+  const neuZeichnen = mid => { const k = document.getElementById("m-arbeitszeit");
+    if (k && k.dataset.mid === mid) k.innerHTML = arbeitszeitHtml(personVon(mid)); else render(); };
+  window.Zeitdaten = {
+    formHtml(mid) { if (!mid) return ""; return "<div id='m-arbeitszeit' data-mid='" + esc(mid) + "'>" + arbeitszeitHtml(personVon(mid)) + "</div>"; }
+  };
 
   function render() {
     if (!app) return;
@@ -9193,13 +9678,20 @@ const Pruefung = (() => {
     if (!liste.length) { app.innerHTML = h + "<div class='leer'><h2>Noch keine Mitarbeiter</h2><p>Legen Sie unter „Mitarbeiter“ Ihr Team an.</p></div></div>"; return; }
     if (!S.mid) { app.innerHTML = h + "<div class='leer'><h2>Bitte Mitarbeiter wählen</h2></div></div>"; return; }
     const p = personVon(S.mid); const jd = jahrVon(S.mid, S.jahr); const fTage = feiertage(S.jahr, S.land);
-    h += S.tab === "person" ? personHtml(p) : S.tab === "urlaub" ? urlaubHtml(p, jd, fTage) : zeitenHtml(p, jd, fTage);
+    h += (S.tab === "einst" || S.tab === "person") ? einstHtml() : S.tab === "urlaub" ? urlaubHtml(p, jd, fTage) : zeitenHtml(p, jd, fTage);
     app.innerHTML = h + "</div>";
   }
 
   /* ---------- Ereignisse ---------- */
   document.addEventListener("click", async e => {
-    const b = e.target.closest("[data-zact]"); if (!b || !document.getElementById("ze") || document.getElementById("ze").hidden) return;
+    const b = e.target.closest("[data-zact]"); if (!b) return;
+    const imForm = !!formMid(b); const zeEl = document.getElementById("ze");
+    if (!imForm && (!zeEl || zeEl.hidden)) return;
+    if (imForm) {
+      if (b.dataset.zact === "soll-standard") { const mid = formMid(b); const pf = personVon(mid);
+        pf.soll = sollFuer(Number(pf.wochenstunden) || 38.5); personSichern(mid); neuZeichnen(mid); toast("Sollstunden verteilt"); }
+      return;
+    }
     const act = b.dataset.zact; const id = b.dataset.id;
     const p = S.mid ? personVon(S.mid) : null; const jd = S.mid ? jahrVon(S.mid, S.jahr) : null;
     const fTage = feiertage(S.jahr, S.land);
@@ -9279,7 +9771,20 @@ const Pruefung = (() => {
   });
 
   document.addEventListener("input", e => {
-    const t = e.target; const ze = document.getElementById("ze"); if (!ze || ze.hidden) return;
+    const t = e.target; const imForm = !!formMid(t); const ze = document.getElementById("ze");
+    if (!imForm && (!ze || ze.hidden)) return;
+    /* Arbeitszeit aus dem Mitarbeiterformular oder aus der Zeiterfassung. */
+    if (t.dataset.zperson || t.dataset.zsoll) {
+      const mid = imForm ? formMid(t) : S.mid; if (!mid) return;
+      const pz = personVon(mid);
+      if (t.dataset.zsoll) { pz.soll[Number(t.dataset.zsoll)] = Number(t.value) || 0; personSichern(mid); return; }
+      const fz = t.dataset.zperson; pz[fz] = fz === "wochenstunden" ? Number(t.value) : t.value;
+      if (fz === "wochenstunden") pz.soll = sollFuer(Number(t.value));
+      personSichern(mid);
+      if (["wochenstunden", "art"].includes(fz)) { if (imForm) neuZeichnen(mid); else render(); }
+      return;
+    }
+    if (imForm) return;
     if (t.id === "z-mid") { S.mid = t.value; S.tab = S.tab; render(); return; }
     if (t.id === "z-jahr") { const j = Number(t.value); if (j > 1999 && j < 2101) { S.jahr = j; render(); } return; }
     if (t.dataset.zzeitraum) { S.zeitraum = t.value; render(); return; }
@@ -9287,13 +9792,6 @@ const Pruefung = (() => {
     if (t.dataset.zland) { S.land = t.value; ZSpeicher.lokalSetzen("land", S.land); render(); return; }
     if (!S.mid) return;
     const p = personVon(S.mid); const jd = jahrVon(S.mid, S.jahr);
-    if (t.dataset.zperson) {
-      const f = t.dataset.zperson; p[f] = f === "wochenstunden" ? Number(t.value) : t.value;
-      if (f === "wochenstunden") p.soll = sollFuer(Number(t.value));
-      personSichern(S.mid); if (["wochenstunden", "art"].includes(f)) render();
-      return;
-    }
-    if (t.dataset.zsoll) { p.soll[Number(t.dataset.zsoll)] = Number(t.value) || 0; personSichern(S.mid); return; }
     if (t.dataset.zuebertrag) {
       p.uebertrag = (p.uebertrag || []).filter(u => Number(u.jahr) !== S.jahr);
       const zeile = { jahr: S.jahr, tage: 0, grund: "" };
@@ -9320,8 +9818,10 @@ const Pruefung = (() => {
   });
   /* Beim Verlassen eines Zeitfelds sauber formatieren. */
   document.addEventListener("change", e => {
-    const t = e.target; const ze = document.getElementById("ze"); if (!ze || ze.hidden || !t.classList || !t.classList.contains("z-zeit")) return;
+    const t = e.target; const imForm = !!formMid(t); const ze = document.getElementById("ze");
+    if ((!imForm && (!ze || ze.hidden)) || !t.classList || !t.classList.contains("z-zeit")) return;
     const wert = zeitNormal(t.value); t.value = wert;
+    if (imForm) { const mid = formMid(t); if (mid && t.dataset.zperson) { personVon(mid)[t.dataset.zperson] = wert; personSichern(mid); } return; }
     if (t.dataset.ztagf && S.tagEntwurf) S.tagEntwurf[t.dataset.ztagf] = wert;
     if (t.dataset.zpause && S.tagEntwurf) { const [i, f2] = t.dataset.zpause.split("|"); (S.tagEntwurf.pausen[Number(i)] || {})[f2] = wert; }
     if (t.dataset.zperson && S.mid) { personVon(S.mid)[t.dataset.zperson] = wert; personSichern(S.mid); }
