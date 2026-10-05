@@ -4,6 +4,65 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Hausverwaltung</title>
+<!-- ================= Firebase-Anschluss: Daten online in Firebase (Frankfurt) speichern ================= -->
+<script>
+(() => {
+  const firebaseConfig = {
+    apiKey: "AIzaSyBFzUmVrh0r8tjf1Kfgp3C2rxn9s4LlPQ8",
+    authDomain: "veraltung-test.firebaseapp.com",
+    projectId: "veraltung-test",
+    storageBucket: "veraltung-test.firebasestorage.app",
+    messagingSenderId: "746223934864",
+    appId: "1:746223934864:web:3b8deef2afeade5a4fe715"
+  };
+  const SDK = "https://www.gstatic.com/firebasejs/12.19.0/";
+  let verbindung = null;
+  function firestore() {
+    if (!verbindung) verbindung = (async () => {
+      const [appMod, fs] = await Promise.all([import(SDK + "firebase-app.js"), import(SDK + "firebase-firestore.js")]);
+      const app = appMod.initializeApp(firebaseConfig);
+      return { fs, db: fs.getFirestore(app) };
+    })().catch(e => { verbindung = null; throw e; });
+    return verbindung;
+  }
+  /* Jeder Datensatz wird als JSON-Text gespeichert: so passen alle Datenformen der Software in Firestore. */
+  const packen = d => ({ json: JSON.stringify(d === undefined ? null : d) });
+  const auspacken = d => { if (d && typeof d.json === "string") { try { return JSON.parse(d.json); } catch (e) {} } return d || {}; };
+  function dokument(fs, db, pfad) {
+    return {
+      async get() { const s = await fs.getDoc(fs.doc(db, pfad)); return { id: s.id, exists: s.exists(), data: () => auspacken(s.data()) }; },
+      async set(daten) { return fs.setDoc(fs.doc(db, pfad), packen(daten)); },
+      async delete() { return fs.deleteDoc(fs.doc(db, pfad)); }
+    };
+  }
+  /* Beim allerersten Verbinden ist die Online-Datenbank leer: vorhandene Daten aus diesem Browser werden dann hochgeladen statt überschrieben. */
+  function lokaleListe(name) { try { const l = JSON.parse(localStorage.getItem("ov_" + name) || "[]"); return Array.isArray(l) ? l : []; } catch (e) { return []; } }
+  async function adapter() {
+    const { fs, db } = await firestore();
+    return {
+      doc: pfad => dokument(fs, db, pfad),
+      collection: name => ({
+        doc: id => dokument(fs, db, name + "/" + id),
+        onSnapshot(rueckruf, fehler) {
+          let erstes = true;
+          return fs.onSnapshot(fs.collection(db, name), async snap => {
+            if (erstes) {
+              erstes = false;
+              const lokal = snap.empty ? lokaleListe(name).filter(o => o && o.id) : [];
+              if (lokal.length) {
+                for (const o of lokal) { const { id, ...daten } = o; try { await fs.setDoc(fs.doc(db, name + "/" + id), packen(daten)); } catch (e) { fehler && fehler(e); return; } }
+                return;
+              }
+            }
+            rueckruf({ docs: snap.docs.map(d => ({ id: d.id, data: () => auspacken(d.data()) })) });
+          }, e => fehler && fehler(e));
+        }
+      })
+    };
+  }
+  window.claude = { use: async name => (name === "db" ? adapter() : null) };
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
