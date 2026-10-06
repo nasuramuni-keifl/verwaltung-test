@@ -813,26 +813,47 @@ body.portal-an .seite{max-width:880px;margin:0 auto}
 .md-hinterlegen{margin-top:22px}
 .aw-kopf,.aw-row{display:grid;grid-template-columns:1.5fr 1.1fr 1.2fr .8fr 1fr 90px;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
 .aw-kopf2,.aw-row2{display:grid;grid-template-columns:1.6fr .9fr .8fr .9fr .8fr 1fr;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
-.aw-kopf,.aw-kopf2,.org-kopf{font-size:12px;color:var(--muted)}
+.aw-kopf,.aw-kopf2,.org-kopf,.um-kopf,.um-kopf2,.abr-kopf{font-size:12px;color:var(--muted)}
+.um-kopf,.um-row{display:grid;grid-template-columns:1.6fr .7fr .9fr 1.2fr 1fr;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
+.um-kopf2,.um-row2{display:grid;grid-template-columns:1.6fr 1.1fr .8fr 1fr 1fr 100px;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.um-row2 input,.um-row2 select{padding:8px 10px;font-size:13px}
+.um-zusatz{display:grid;grid-template-columns:1fr 110px 44px;gap:10px;align-items:center;padding:7px 0 7px 14px;border-bottom:1px solid var(--line);font-size:13px;color:var(--muted)}
+.um-neu{padding:12px 14px;background:var(--field);border-radius:14px;margin:8px 0}
+.abr-kopf,.abr-row{display:grid;grid-template-columns:1.5fr 1.2fr 1fr 1fr .9fr 1fr;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.abr-row select,.abr-row input{padding:8px 10px;font-size:13px}
+.abr-row.abr-ok{background:var(--ok-soft);border-radius:10px;padding-left:8px;padding-right:8px}
+@media (max-width:760px){.um-kopf,.um-kopf2,.abr-kopf{display:none}.um-row,.um-row2,.abr-row{grid-template-columns:1fr 1fr}}
 .aw-row.aw-warn{background:var(--err-soft);border-radius:10px;padding-left:8px;padding-right:8px}
 .org-kopf,.org-row{display:grid;grid-template-columns:1fr 1.2fr 1.2fr;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
-.org{overflow-x:auto;padding:12px 4px 4px}
-.org ul{display:flex;gap:18px;justify-content:center;list-style:none;margin:0;padding:26px 0 0;position:relative}
-.org>ul{padding-top:4px}
-.org li{position:relative;list-style:none;padding:0 10px;text-align:center}
-.org li::before,.org li::after{content:"";position:absolute;top:-26px;height:26px;border-top:2px solid var(--line);width:50%}
-.org li::before{right:50%;border-right:2px solid var(--line)}
-.org li::after{left:50%}
-.org li:only-child::before,.org li:only-child::after{display:none}
-.org li:first-child::before,.org li:last-child::after{border:0}
-.org>ul>li::before,.org>ul>li::after{display:none}
-.org li ul::before{content:"";position:absolute;top:0;left:50%;height:26px;border-left:2px solid var(--line)}
-.org-karte{display:inline-flex;flex-direction:column;gap:3px;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:11px 16px;min-width:170px;max-width:250px;text-align:left}
-.org-karte.auf{border-color:var(--accent);gap:7px;min-width:240px}
-.org-karte input,.org-karte select{font-size:13px;padding:8px 10px}
-.org-person{font-size:12.5px;color:var(--ink)}
-.org-werkzeug{display:flex;gap:5px;margin-top:7px;flex-wrap:wrap}
-.org-werkzeug .btn{padding:4px 9px;font-size:12px}
+.org{overflow-x:auto;padding:16px 4px 8px}
+.org ul{display:flex;justify-content:center;align-items:flex-start;gap:20px;list-style:none;margin:0;padding:30px 0 0;position:relative}
+.org>ul{padding-top:0}
+.org li{position:relative;list-style:none;text-align:center;display:flex;flex-direction:column;align-items:center;flex:0 0 auto}
+.org li>ul::before{content:"";position:absolute;top:0;left:50%;width:2px;height:15px;margin-left:-1px;background:var(--line)}
+.org ul>li::before,.org ul>li::after{content:"";position:absolute;top:-15px;height:2px;background:var(--line);width:calc(50% + 10px)}
+.org ul>li::before{right:50%}
+.org ul>li::after{left:50%}
+.org ul>li:first-child::before,.org ul>li:last-child::after{display:none}
+.org ul>li>.org-karte::before{content:"";position:absolute;top:-15px;left:50%;width:2px;height:15px;margin-left:-1px;background:var(--line)}
+.org>ul>li::before,.org>ul>li::after,.org>ul>li>.org-karte::before{display:none}
+.org-karte{position:relative;display:flex;align-items:center;gap:11px;background:var(--surface);border:1.5px solid var(--line);
+  border-radius:16px;padding:12px 15px;min-width:190px;width:max-content;max-width:300px;text-align:left;box-shadow:0 2px 10px rgba(15,23,42,.05)}
+.org-karte.person{border-color:var(--accent-soft)}
+.org-karte.auf{flex-direction:column;align-items:stretch;gap:8px;border-color:var(--accent);min-width:250px;width:250px;box-shadow:0 6px 22px rgba(15,23,42,.12)}
+.org-karte input,.org-karte select{font-size:13px;padding:9px 11px}
+.org-kreis{flex:none;width:36px;height:36px;border-radius:50%;background:var(--accent-soft);color:var(--accent);
+  display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;letter-spacing:.3px}
+.org-text{display:flex;flex-direction:column;gap:1px;min-width:0}
+.org-text strong{font-size:14.5px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.org-person,.org-text .fuer{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.org-person{font-size:12px;color:var(--muted)}
+.org-zahl{font-size:11.5px;color:var(--accent)}
+.org-werkzeug{position:absolute;bottom:-15px;right:10px;display:flex;gap:3px;background:var(--surface);border:1px solid var(--line);
+  border-radius:999px;padding:3px 6px;box-shadow:0 5px 16px rgba(15,23,42,.14);opacity:0;pointer-events:none;transition:opacity .14s;z-index:2}
+.org-karte:hover .org-werkzeug,.org-karte:focus-within .org-werkzeug{opacity:1;pointer-events:auto}
+.org-karte.auf .org-werkzeug{position:static;opacity:1;pointer-events:auto;background:none;border:0;box-shadow:none;padding:0;justify-content:flex-start}
+.org-werkzeug .btn{padding:3px 9px;font-size:12px;min-width:0;line-height:1.5}
+@media (hover:none){.org-werkzeug{opacity:1;pointer-events:auto}}
 .org-karte strong{font-size:14.5px}
 .org-zahl{font-size:11.5px;color:var(--accent)}
 @media (max-width:760px){.aw-kopf,.aw-kopf2,.org-kopf{display:none}.aw-row{grid-template-columns:1fr 1fr}.aw-row2{grid-template-columns:1fr 1fr 1fr}.org-row{grid-template-columns:1fr}}
@@ -1917,32 +1938,32 @@ const Objekte = (() => {
       sortierung: geschwister.length ? Math.max(...geschwister.map(x => Number(x.sortierung) || 0)) + 1 : 1,
       erstellt: new Date().toISOString() };
   }
+  const orgInitialen = t => String(t || "").trim().split(/\s+/).slice(0, 2).map(w => w[0] || "").join("").toUpperCase();
   function orgKarteHtml(k, admin) {
     const m = k.mitarbeiterId ? S.team.find(x => x.id === k.mitarbeiterId) : null;
-    const last = m ? (auslastung().find(x => x.m.id === m.id) || null) : null;
+    const name = m ? Objekte.mitarbeiterName(m) : "";
+    const titel = k.titel || name || "Neuer Kasten";
     const offen = S.orgEdit === k.id;
-    let h = "<div class='org-karte" + (offen ? " auf" : "") + "'>";
     if (offen && admin) {
-      h += "<input type='text' data-ok='" + esc(k.id) + "|titel' value='" + esc(k.titel || "") + "' placeholder='Bezeichnung, z. B. Mietverwaltung'>" +
-        "<input type='text' data-ok='" + esc(k.id) + "|untertitel' value='" + esc(k.untertitel || "") + "' placeholder='Zusatz (optional)'>" +
+      return "<div class='org-karte auf'>" +
         "<select data-ok='" + esc(k.id) + "|mitarbeiterId'><option value=''>– ohne Person –</option>" +
         teamAktiv().map(x => "<option value='" + esc(x.id) + "'" + (k.mitarbeiterId === x.id ? " selected" : "") + ">" + esc(Objekte.mitarbeiterName(x)) + "</option>").join("") + "</select>" +
-        "<select data-ok='" + esc(k.id) + "|elternId'><option value=''>– oberste Ebene –</option>" +
-        orgListe().filter(x => x.id !== k.id && !orgNachfahre(k.id, x.id)).map(x => "<option value='" + esc(x.id) + "'" + (k.elternId === x.id ? " selected" : "") + ">" +
-          esc(x.titel || "ohne Namen") + "</option>").join("") + "</select>" +
+        "<input type='text' data-ok='" + esc(k.id) + "|titel' value='" + esc(k.titel || "") + "' placeholder='" + esc(name ? "Bezeichnung (sonst " + name + ")" : "Bezeichnung, z. B. Mietverwaltung") + "'>" +
         "<div class='org-werkzeug'><button class='btn klein haupt' data-act='org-fertig'>Fertig</button>" +
-        "<button class='btn klein gefahr' data-act='org-weg' data-id='" + esc(k.id) + "'>" + (S.loeschen === "org" + k.id ? "Wirklich?" : "Löschen") + "</button></div>";
-      return h + "</div>";
+        "<button class='btn klein gefahr' data-act='org-weg' data-id='" + esc(k.id) + "'>" + (S.loeschen === "org" + k.id ? "Wirklich?" : "Löschen") + "</button></div></div>";
     }
-    h += "<strong>" + esc(k.titel || (m ? Objekte.mitarbeiterName(m) : "Neuer Kasten")) + "</strong>" +
-      (k.untertitel ? "<span class='fuer'>" + esc(k.untertitel) + "</span>" : "") +
-      (m ? "<span class='org-person'>" + esc(Objekte.mitarbeiterName(m)) + (m.funktion ? " · " + esc(m.funktion) : "") + "</span>" : "") +
-      (last && last.einheiten ? "<span class='org-zahl'>" + last.objekte + " Objekte · " + last.einheiten + " Einheiten</span>" : "");
-    if (admin) h += "<div class='org-werkzeug'>" +
-      "<button class='btn klein' data-act='org-neu' data-id='" + esc(k.id) + "' title='Kasten darunter'>+</button>" +
+    let h = "<div class='org-karte" + (m ? " person" : "") + "'>" +
+      "<span class='org-kreis'>" + esc(orgInitialen(name || titel) || "·") + "</span>" +
+      "<span class='org-text'><strong>" + esc(titel) + "</strong>" +
+      (m && k.titel ? "<span class='org-person'>" + esc(name) + "</span>" : "") +
+      (m && m.funktion && !k.titel ? "<span class='org-person'>" + esc(m.funktion) + "</span>" : "") +
+      (k.untertitel ? "<span class='fuer'>" + esc(k.untertitel) + "</span>" : "") + "</span>";
+    if (admin) h += "<span class='org-werkzeug'>" +
+      "<button class='btn klein' data-act='org-neu' data-id='" + esc(k.id) + "' title='Kasten darunter anhängen'>+</button>" +
       "<button class='btn klein' data-act='org-hoch' data-id='" + esc(k.id) + "' title='nach links'>‹</button>" +
       "<button class='btn klein' data-act='org-runter' data-id='" + esc(k.id) + "' title='nach rechts'>›</button>" +
-      "<button class='btn klein' data-act='org-edit' data-id='" + esc(k.id) + "'>Ändern</button></div>";
+      (k.elternId ? "<button class='btn klein' data-act='org-hoeher' data-id='" + esc(k.id) + "' title='eine Ebene höher'>↑</button>" : "") +
+      "<button class='btn klein' data-act='org-edit' data-id='" + esc(k.id) + "' title='ändern'>✎</button></span>";
     return h + "</div>";
   }
   function orgKnotenHtml(k, tief, admin) {
@@ -1955,7 +1976,7 @@ const Objekte = (() => {
     const wurzeln = orgKinder("");
     let h = "<section class='gruppe'><h2>Organigramm</h2>" +
       "<p class='unter'>Ein Baum aus Kästen: oben die Leitung, darunter Bereiche, Teams und einzelne Stellen. " +
-      "Jedem Kasten können Sie einen Mitarbeiter zuordnen." + (admin ? " Mit „+“ hängen Sie einen Kasten darunter." : "") + "</p>";
+      "Wählen Sie je Kasten einen Mitarbeiter – oder tragen Sie nur eine Bezeichnung ein." + (admin ? " Mit „+“ hängen Sie einen Kasten darunter." : "") + "</p>";
     if (!orgListe().length) {
       h += admin
         ? "<p class='unter'>Noch kein Organigramm. Fangen Sie mit dem obersten Kasten an – oder übernehmen Sie Ihre Mitarbeiter als Startpunkt.</p>" +
@@ -1966,20 +1987,139 @@ const Objekte = (() => {
     }
     h += "<div class='org'><ul>" + wurzeln.map(k => orgKnotenHtml(k, 0, admin)).join("") + "</ul></div>";
     if (admin) h += "<div class='leiste'><div><button class='btn klein' data-act='org-neu' data-id=''>+ Kasten auf oberster Ebene</button>" +
-      "<span class='fuer'>Mit ‹ und › schieben Sie einen Kasten innerhalb seiner Ebene nach links oder rechts.</span></div></div>";
+      "<span class='fuer'>‹ und › schieben einen Kasten zur Seite, ↑ hängt ihn eine Ebene höher, + hängt einen neuen darunter.</span></div></div>";
     else h += "<ul class='meldungen'><li class='m-hinweis'>Ändern darf das Organigramm ausschließlich der Notzugang „Admin“.</li></ul>";
     return h + "</section>";
   }
+  /* ---------- Umsatz je Mitarbeiter ---------- */
+  const HONORARARTEN = [["einheit", "je Einheit und Monat"], ["objekt", "pauschal je Monat"], ["prozent", "% der Sollmiete"]];
+  const honorarListe = o => Array.isArray(o.honorare) ? o.honorare : (o.honorare = []);
+  function honorarMonat(o) {
+    const n = zahlD(o.honorar); if (!n) return 0;
+    const art = o.honorarArt || "einheit";
+    if (art === "objekt") return n;
+    if (art === "einheit") return n * (o.einheitenListe || []).length;
+    const miete = (o.einheitenListe || []).reduce((sm, e) => sm + zahlD(e.sollmiete), 0);
+    return Math.round(miete * n) / 100;
+  }
+  const honorarJahr = o => Math.round(honorarMonat(o) * 12 * 100) / 100;
+  const zusatzJahr = (o, jahr) => Math.round(honorarListe(o).filter(h => String(h.datum || "").slice(0, 4) === String(jahr))
+    .reduce((n, h) => n + zahlD(h.betrag), 0) * 100) / 100;
+  function umsatzZeilen(jahr) {
+    return awObjekte().map(o => ({ o, wer: objBetreuer(o)[0] || "", monat: honorarMonat(o), jahr: honorarJahr(o), zusatz: zusatzJahr(o, jahr) }))
+      .sort((a, b) => (b.jahr + b.zusatz) - (a.jahr + a.zusatz));
+  }
+  function umsatzHtml() {
+    const jahr = S.awJahr || new Date().getFullYear();
+    const alle = umsatzZeilen(jahr);
+    const liste = alle.filter(awPasst);
+    const mon = liste.reduce((n, x) => n + x.monat, 0);
+    const ges = liste.reduce((n, x) => n + x.jahr + x.zusatz, 0);
+    const ohne = liste.filter(x => !x.monat && !x.zusatz).length;
+    let h = "<div class='leiste'><div><label class='fuer' for='aw-jahr'>Jahr</label>" +
+      "<input type='number' id='aw-jahr' data-awjahr='1' value='" + jahr + "' min='2000' max='2100' style='width:110px'></div></div>";
+    h += "<div class='kacheln'><div class='kachel'><b>" + eurD(mon) + " €</b><span>Honorar im Monat</span></div>" +
+      "<div class='kachel'><b>" + eurD(ges) + " €</b><span>Umsatz " + jahr + "</span></div>" +
+      "<div class='kachel'><b>" + ohne + "</b><span>Objekte ohne Honorar</span></div></div>";
+    /* Je Mitarbeiter zusammengefasst. */
+    const proMa = {};
+    liste.forEach(x => { const k = x.wer || "ohne";
+      if (!proMa[k]) proMa[k] = { wer: x.wer, objekte: 0, monat: 0, jahr: 0, zusatz: 0 };
+      proMa[k].objekte++; proMa[k].monat += x.monat; proMa[k].jahr += x.jahr; proMa[k].zusatz += x.zusatz; });
+    const reihen = Object.values(proMa).sort((a, b) => (b.jahr + b.zusatz) - (a.jahr + a.zusatz));
+    if (reihen.length) h += "<div class='ue-tab'><div class='um-kopf'><span>Mitarbeiter</span><span>Objekte</span><span>je Monat</span><span>Zusatzhonorare " + jahr + "</span><span>Umsatz " + jahr + "</span></div>" +
+      reihen.map(r => "<div class='um-row'><span><strong>" + esc(teamName(r.wer) || "ohne Betreuung") + "</strong></span>" +
+        "<span>" + r.objekte + "</span><span>" + esc(eurD(r.monat)) + " €</span>" +
+        "<span>" + (r.zusatz ? esc(eurD(r.zusatz)) + " €" : "–") + "</span>" +
+        "<span><strong>" + esc(eurD(r.jahr + r.zusatz)) + " €</strong></span></div>").join("") + "</div>";
+    h += "<h3 style='margin-top:24px'>Honorar je Objekt</h3>" +
+      "<p class='unter'>Tragen Sie hier ein, was Sie für die Verwaltung bekommen. Die Eingaben werden sofort beim Objekt gespeichert.</p>";
+    h += "<div class='ue-tab'><div class='um-kopf2'><span>Objekt</span><span>Art</span><span>Betrag</span><span>je Monat</span><span>Betreuung</span><span></span></div>" +
+      liste.map(x => {
+        const o = x.o;
+        return "<div class='um-row2'><span><strong>" + esc(objName(o)) + "</strong><br><span class='fuer'>" +
+          esc(Objekte.ARTEN[o.art] ? Objekte.ARTEN[o.art].name : "") + " · " + (o.einheitenListe || []).length + " Einheiten</span></span>" +
+          "<span><select data-hon='" + esc(o.id) + "|honorarArt'>" + HONORARARTEN.map(([w, l]) =>
+            "<option value='" + w + "'" + ((o.honorarArt || "einheit") === w ? " selected" : "") + ">" + esc(l) + "</option>").join("") + "</select></span>" +
+          "<span><input type='number' step='0.01' min='0' inputmode='decimal' data-hon='" + esc(o.id) + "|honorar' value='" + esc(o.honorar || "") + "'></span>" +
+          "<span><strong>" + esc(eurD(x.monat)) + " €</strong>" + (x.zusatz ? "<br><span class='fuer'>+ " + esc(eurD(x.zusatz)) + " € Zusatz</span>" : "") + "</span>" +
+          "<span>" + esc(teamName(x.wer) || "–") + "</span>" +
+          "<span><button class='btn klein' data-act='hon-zusatz' data-id='" + esc(o.id) + "'>+ Zusatz</button></span></div>" +
+          (S.honNeu === o.id ? zusatzFormHtml(o) : "") +
+          (honorarListe(o).filter(z => String(z.datum || "").slice(0, 4) === String(jahr)).map((z, zi) =>
+            "<div class='um-zusatz'><span>" + esc(Objekte.datum(z.datum)) + " · " + esc(z.text || "Zusatzhonorar") + "</span>" +
+            "<span>" + esc(eurD(z.betrag)) + " €</span>" +
+            "<span><button class='btn klein gefahr' data-act='hon-weg' data-id='" + esc(o.id) + "' data-i='" + zi + "'>" +
+            (S.loeschen === "hon" + o.id + zi ? "Wirklich?" : "×") + "</button></span></div>").join(""));
+      }).join("") + "</div>";
+    return h + "<ul class='meldungen'><li class='m-hinweis'>Gerechnet wird mit dem, was Sie hier eintragen. " +
+      "Zusatzhonorare – etwa für Neuvermietung, Bauleitung oder eine Sonderversammlung – kommen mit Datum dazu und zählen in das Jahr ihres Datums.</li></ul>";
+  }
+  function zusatzFormHtml(o) {
+    const e = S.honEntwurf || {};
+    return "<div class='um-neu'><div class='felder'>" +
+      "<div class='feld'><label>Datum</label><input type='date' data-honneu='datum' value='" + esc(e.datum || new Date().toISOString().slice(0, 10)) + "'></div>" +
+      "<div class='feld breit'><label>Wofür</label><input type='text' data-honneu='text' value='" + esc(e.text || "") + "' placeholder='z. B. Neuvermietung WE 3'></div>" +
+      "<div class='feld'><label>Betrag netto</label><input type='number' step='0.01' data-honneu='betrag' value='" + esc(e.betrag || "") + "'></div></div>" +
+      "<div class='leiste'><div><button class='btn klein haupt' data-act='hon-ok' data-id='" + esc(o.id) + "'>Übernehmen</button>" +
+      "<button class='btn klein' data-act='hon-abbr'>Abbrechen</button></div></div></div>";
+  }
+  /* ---------- Abrechnungen: was ist fertig, was fehlt ---------- */
+  const ABR_STATUS = [["offen", "offen"], ["arbeit", "in Arbeit"], ["erstellt", "erstellt"], ["versandt", "versandt"], ["beschlossen", "beschlossen"]];
+  const abrArt = o => istWeg(o) ? "WEG-Jahresabrechnung" : "Betriebskostenabrechnung";
+  const abrStand = (o, jahr) => ((o.abrechnung || {})[String(jahr)] || {});
+  const abrFertig = st => ["erstellt", "versandt", "beschlossen"].includes(st.status || "");
+  /* Miete: Abrechnung binnen zwölf Monaten nach Ende des Zeitraums (§ 556 Abs. 3 BGB).
+     WEG: nach Ablauf des Kalenderjahres, üblich im ersten Halbjahr (§ 28 Abs. 2 WEG). */
+  const abrFrist = (o, jahr) => istWeg(o) ? (Number(jahr) + 1) + "-06-30" : (Number(jahr) + 1) + "-12-31";
+  function abrechnungenHtml() {
+    const jahr = S.awJahr || (new Date().getFullYear() - 1);
+    const heute = new Date().toISOString().slice(0, 10);
+    const alle = awObjekte().filter(o => ["miet", "weg", "garantie"].includes(o.art))
+      .map(o => ({ o, wer: objBetreuer(o)[0] || "", st: abrStand(o, jahr), frist: abrFrist(o, jahr) }));
+    const liste = alle.filter(awPasst);
+    const fertig = liste.filter(x => abrFertig(x.st)).length;
+    const offen = liste.length - fertig;
+    const spaet = liste.filter(x => !abrFertig(x.st) && x.frist < heute).length;
+    let h = "<div class='leiste'><div><label class='fuer' for='aw-jahr'>Abrechnungsjahr</label>" +
+      "<input type='number' id='aw-jahr' data-awjahr='1' value='" + jahr + "' min='2000' max='2100' style='width:110px'></div></div>";
+    h += "<div class='kacheln'><div class='kachel'><b>" + fertig + " von " + liste.length + "</b><span>erstellt</span></div>" +
+      "<div class='kachel'><b class='" + (offen ? "z-minus" : "z-plus") + "'>" + offen + "</b><span>fehlen noch</span></div>" +
+      "<div class='kachel'><b class='" + (spaet ? "z-minus" : "") + "'>" + spaet + "</b><span>Frist abgelaufen</span></div></div>";
+    if (!liste.length) return h + "<p class='unter'>Keine Objekte, für die eine Abrechnung zu erstellen wäre.</p>";
+    h += "<div class='ue-tab'><div class='abr-kopf'><span>Objekt</span><span>Art</span><span>Stand</span><span>Datum</span><span>Frist</span><span>Betreuung</span></div>" +
+      liste.map(x => {
+        const spaetDran = !abrFertig(x.st) && x.frist < heute;
+        return "<div class='abr-row" + (abrFertig(x.st) ? " abr-ok" : spaetDran ? " aw-warn" : "") + "'>" +
+          "<span><strong>" + esc(objName(x.o)) + "</strong><br><span class='fuer'>" + (x.o.einheitenListe || []).length + " Einheiten</span></span>" +
+          "<span>" + esc(abrArt(x.o)) + "</span>" +
+          "<span><select data-abr='" + esc(x.o.id) + "|" + jahr + "|status'>" + ABR_STATUS.filter(([w]) =>
+            w !== (istWeg(x.o) ? "versandt" : "beschlossen")).map(([w, l]) =>
+            "<option value='" + w + "'" + ((x.st.status || "offen") === w ? " selected" : "") + ">" + esc(l) + "</option>").join("") + "</select></span>" +
+          "<span><input type='date' data-abr='" + esc(x.o.id) + "|" + jahr + "|datum' value='" + esc(x.st.datum || "") + "'></span>" +
+          "<span>" + esc(Objekte.datum(x.frist)) + (spaetDran ? "<br><span class='fuer'>überschritten</span>" : "") + "</span>" +
+          "<span>" + esc(teamName(x.wer) || "–") + "</span></div>";
+      }).join("") + "</div>";
+    const proMa = {};
+    liste.forEach(x => { const k = x.wer || "ohne"; if (!proMa[k]) proMa[k] = { wer: x.wer, offen: 0, fertig: 0 };
+      if (abrFertig(x.st)) proMa[k].fertig++; else proMa[k].offen++; });
+    const reihen = Object.values(proMa).filter(r => r.offen).sort((a, b) => b.offen - a.offen);
+    if (reihen.length) h += "<p class='unter'>Noch offen: " + reihen.map(r => esc(teamName(r.wer) || "ohne Betreuung") + " " + r.offen).join(" · ") + "</p>";
+    return h + "<ul class='meldungen'><li class='m-hinweis'>Bei Mietverhältnissen muss die Abrechnung dem Mieter spätestens zwölf Monate nach Ende des Abrechnungszeitraums zugehen " +
+      "(§ 556 Abs. 3 BGB) – danach sind Nachforderungen grundsätzlich ausgeschlossen. Bei der WEG beschließen die Eigentümer über Nachschüsse und Anpassungen (§ 28 Abs. 2 WEG); " +
+      "der 30.06. ist hier nur ein üblicher Richtwert.</li></ul>";
+  }
   function auswertungHtml() {
-    const tabs = [["leerstand", "Leerstand"], ["rueckstand", "Rückstände"], ["team", "Auslastung"], ["org", "Organigramm"]];
-    const tab = ["leerstand", "rueckstand", "team", "org"].includes(S.awTab) ? S.awTab : "leerstand";
+    const tabs = [["leerstand", "Leerstand"], ["rueckstand", "Rückstände"], ["umsatz", "Umsatz"], ["abrechnung", "Abrechnungen"], ["team", "Auslastung"], ["org", "Organigramm"]];
+    const tab = ["leerstand", "rueckstand", "umsatz", "abrechnung", "team", "org"].includes(S.awTab) ? S.awTab : "leerstand";
     let h = "<div class='seite'><div class='hero'><h1>Auswertung</h1>" +
       "<p>Leerstand, Rückstände und die Auslastung Ihrer Mitarbeiter auf einen Blick.</p></div>" +
       "<nav class='reiter e-reiter'>" + tabs.map(([w, l]) => "<button data-act='aw-tab' data-wert='" + w + "'" +
         (tab === w ? " aria-current='page'" : "") + ">" + l + "</button>").join("") + "</nav>";
     if (tab === "org") return h + organigrammHtml() + "</div>";
     h += awWerHtml();
-    h += "<section class='gruppe'>" + (tab === "leerstand" ? leerstandHtml() : tab === "rueckstand" ? awRueckstandHtml() : teamLastHtml()) + "</section>";
+    h += "<section class='gruppe'>" + (tab === "leerstand" ? leerstandHtml() : tab === "rueckstand" ? awRueckstandHtml()
+      : tab === "umsatz" ? umsatzHtml() : tab === "abrechnung" ? abrechnungenHtml() : teamLastHtml()) + "</section>";
     return h + "</div>";
   }
   function objektAnsichtHtml(o) {
@@ -6306,13 +6446,33 @@ const Objekte = (() => {
       return;
     }
     /* Art der Vorlage umstellen – Verwendungen, die es dort nicht gibt, werden gelöst. */
+    if (t.dataset.awjahr) { const j = Number(t.value); if (j > 1999 && j < 2101) { S.awJahr = j; render(true); } return; }
+    if (t.dataset.hon) {
+      const [oid, feld] = String(t.dataset.hon).split("|");
+      const o = S.liste.find(x => x.id === oid); if (!o) return;
+      o[feld] = t.value; objektSichern(o);
+      clearTimeout(window.__honT); window.__honT = setTimeout(() => render(true), 700);
+      return;
+    }
+    if (t.dataset.honneu) { S.honEntwurf = { ...(S.honEntwurf || {}) }; S.honEntwurf[t.dataset.honneu] = t.value; return; }
+    if (t.dataset.abr) {
+      const [oid, jahr, feld] = String(t.dataset.abr).split("|");
+      const o = S.liste.find(x => x.id === oid); if (!o) return;
+      o.abrechnung = o.abrechnung && typeof o.abrechnung === "object" ? o.abrechnung : {};
+      const st = o.abrechnung[jahr] = o.abrechnung[jahr] || {};
+      st[feld] = t.value;
+      if (feld === "status" && ["erstellt", "versandt", "beschlossen"].includes(t.value) && !st.datum) st.datum = new Date().toISOString().slice(0, 10);
+      st.wer = teamName(S.ichBin) || "";
+      st.geaendert = new Date().toISOString();
+      objektSichern(o); render(true);
+      return;
+    }
     if (t.dataset.ok) {
       if (!istAdmin()) { toast("Das Organigramm ändert nur der Admin."); return; }
       const [id, feld] = String(t.dataset.ok).split("|");
       const k = orgKnoten(id); if (!k) return;
       if (feld === "elternId" && t.value && orgNachfahre(id, t.value)) { toast("Das ergäbe einen Kreis."); return; }
       k[feld] = t.value;
-      if (feld === "elternId") { k.sortierung = orgKinder(t.value).length + 1; orgSichern(k); render(true); return; }
       if (feld === "mitarbeiterId") { orgSichern(k); render(true); return; }
       orgSichern(k);
       return;
@@ -6604,7 +6764,7 @@ const Objekte = (() => {
     const b = e.target.closest("[data-act]"); if (!b || e.composedPath().some(n => n.id === "vv")) return; const act = b.dataset.act; const id = b.dataset.id;
     if (!["loeschen", "hw-loeschen", "p-loeschen", "m-loeschen", "td-loeschen", "v-weg", "mail-weg", "dok-weg", "mail-loeschen", "abl-weg",
       "bh-fest", "za-weg", "kk-weg", "kr-weg", "kr-klasse-weg", "kr-leeren",
-      "nf-weg", "au-weg", "dienst-weg", "lv-weg", "org-weg"].includes(act)) S.loeschen = false;
+      "nf-weg", "au-weg", "dienst-weg", "lv-weg", "org-weg", "hon-weg"].includes(act)) S.loeschen = false;
     switch (act) {
       case "tab": S.tab = b.dataset.tab; S.ansicht = "liste"; S.entwurf = null; S.hwEntwurf = null; S.pEntwurf = null; S.tEntwurf = null; S.tEntwurfTicket = null; S.ticketOffen = null;
         S.vermOffen = null; S.mailOffenId = null; S.mailImport = null; render(); break;
@@ -7435,6 +7595,28 @@ const Objekte = (() => {
         toast(d.portal ? "Im Portal sichtbar" : "Aus dem Portal genommen"); break;
       }
       /* ---------- Notfallnummern und Aushänge ---------- */
+      /* ---------- Umsatz: Zusatzhonorare ---------- */
+      case "hon-zusatz": S.honNeu = b.dataset.id; S.honEntwurf = { datum: new Date().toISOString().slice(0, 10), text: "", betrag: "" }; render(true); break;
+      case "hon-abbr": S.honNeu = ""; S.honEntwurf = null; render(true); break;
+      case "hon-ok": {
+        const o = S.liste.find(x => x.id === b.dataset.id); if (!o) return;
+        const e = S.honEntwurf || {};
+        if (!zahlD(e.betrag)) { toast("Bitte einen Betrag eintragen."); return; }
+        honorarListe(o).push({ id: Objekte.neueId(), datum: e.datum || new Date().toISOString().slice(0, 10),
+          text: e.text || "Zusatzhonorar", betrag: e.betrag });
+        S.honNeu = ""; S.honEntwurf = null;
+        await objektSichern(o); render(true); toast("Zusatzhonorar gespeichert"); break;
+      }
+      case "hon-weg": {
+        const o = S.liste.find(x => x.id === b.dataset.id); if (!o) return;
+        const jahr = S.awJahr || new Date().getFullYear();
+        const i = Number(b.dataset.i);
+        if (S.loeschen !== "hon" + o.id + i) { S.loeschen = "hon" + o.id + i; render(true); return; }
+        const sicht = honorarListe(o).filter(z => String(z.datum || "").slice(0, 4) === String(jahr));
+        const weg = sicht[i]; if (!weg) return;
+        o.honorare = honorarListe(o).filter(z => z !== weg);
+        S.loeschen = false; await objektSichern(o); render(true); break;
+      }
       /* ---------- Organigramm ---------- */
       case "org-neu": {
         if (!istAdmin()) { toast("Das Organigramm ändert nur der Admin."); return; }
@@ -7455,6 +7637,18 @@ const Objekte = (() => {
         S.org = orgListe().filter(x => x.id !== k.id);
         try { await Speicher.loeschen("organigramm", k.id, S.org); } catch (e) {}
         S.loeschen = false; S.orgEdit = ""; render(true); toast("Kasten gelöscht"); break;
+      }
+      case "org-hoeher": {
+        if (!istAdmin()) return;
+        const k = orgKnoten(b.dataset.id); if (!k || !k.elternId) return;
+        const eltern = orgKnoten(k.elternId);
+        k.elternId = eltern ? (eltern.elternId || "") : "";
+        k.sortierung = (Number(eltern && eltern.sortierung) || 0) + 0.5;
+        await orgSichern(k);
+        /* Danach sauber durchnummerieren, damit ‹ und › weiter stimmen. */
+        let n = 0;
+        for (const g of orgKinder(k.elternId)) { n++; if (Number(g.sortierung) !== n) { g.sortierung = n; await orgSichern(g); } }
+        render(true); break;
       }
       case "org-hoch": case "org-runter": {
         if (!istAdmin()) return;
