@@ -858,6 +858,8 @@ body.portal-an .seite{max-width:880px;margin:0 auto}
 .org-zahl{font-size:11.5px;color:var(--accent)}
 @media (max-width:760px){.aw-kopf,.aw-kopf2,.org-kopf{display:none}.aw-row{grid-template-columns:1fr 1fr}.aw-row2{grid-template-columns:1fr 1fr 1fr}.org-row{grid-template-columns:1fr}}
 .bs-raster{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;margin-top:12px}
+.bs-raster .re-feld .btn{margin-left:auto;padding:2px 7px;font-size:11.5px}
+.bs-schalter{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;margin-top:12px}
 .re-feld.fest{background:var(--accent-soft);color:var(--accent-ink,var(--ink))}
 .dv-liste{display:grid;gap:12px;margin-top:14px}
 .dv-karte{border:1.5px solid var(--line);border-radius:16px;overflow:hidden;background:var(--surface)}
@@ -1588,9 +1590,15 @@ const Objekte = (() => {
     { id: "schluss", titel: "Schlussbestimmungen", pflicht: true, fuer: "alle",
       text: "Änderungen und Ergänzungen bedürfen der Textform. Sollte eine Bestimmung unwirksam sein, bleibt der Vertrag im Übrigen wirksam. Mündliche Nebenabreden bestehen nicht." }
   ];
-  const bausteinePasst = (bs, art) => bs.fuer === "alle" || (Array.isArray(bs.fuer) && bs.fuer.includes(art));
+  const eigeneBausteine = () => Array.isArray(S.bausteine) ? S.bausteine : (S.bausteine = []);
+  const alleBausteine = () => DIENST_BAUSTEINE.concat(eigeneBausteine());
+  const bausteinePasst = (bs, art) => !bs.fuer || bs.fuer === "alle" || (Array.isArray(bs.fuer) && (!bs.fuer.length || bs.fuer.includes(art)));
   const bausteinAn = (d, bs) => bs.pflicht || (d.bausteine && Object.prototype.hasOwnProperty.call(d.bausteine, bs.id) ? !!d.bausteine[bs.id] : !!bs.standard);
-  const bausteineFuer = d => DIENST_BAUSTEINE.filter(bs => bausteinePasst(bs, d.art));
+  const bausteineFuer = d => alleBausteine().filter(bs => bausteinePasst(bs, d.art));
+  async function bausteinSichern(bs) {
+    const i = eigeneBausteine().findIndex(x => x.id === bs.id); if (i >= 0) S.bausteine[i] = bs; else S.bausteine.push(bs);
+    try { await Speicher.speichern("bausteine", bs, S.bausteine); } catch (e) { toast("Speichern im Konto fehlgeschlagen – vorerst nur in diesem Browser gesichert."); }
+  }
   const bausteineAktiv = d => bausteineFuer(d).filter(bs => bausteinAn(d, bs));
   const DIENST_KURZ = { hausmeister: "Hausmeister", reinigung: "Reinigung", gaertner: "Gartenpflege", winter: "Winterdienst", wartung: "Wartung", sonstiges: "Sonstiges" };
   const diensteListe = o => Array.isArray(o.dienste) ? o.dienste : (o.dienste = []);
@@ -1668,11 +1676,21 @@ const Objekte = (() => {
     let h = "<h3 style='margin-top:22px'>Vertragsbausteine <span class='fuer'>" + an.length + " von " + liste.length + "</span></h3>" +
       "<p class='unter'>Pflichtteile stehen fest. Alles andere schalten Sie zu, wenn Sie es brauchen – genau wie beim Verwaltervertrag.</p>" +
       "<div class='bs-raster'>" + liste.map(bs => {
+        if (bs.eigen) {
+          const drinE = bausteinAn(d, bs);
+          return "<label class='re-feld" + (drinE ? "" : " aus") + (bs.pflicht ? " fest" : "") + "' title='" + esc(String(bs.text || "").slice(0, 160)) + "'>" +
+            "<input type='checkbox' data-act='dv-baustein' data-i='" + i + "' data-wert='" + esc(bs.id) + "'" + (drinE ? " checked" : "") + (bs.pflicht ? " disabled" : "") + ">" +
+            esc(bs.titel) + (bs.pflicht ? " <span class='fuer'>fest</span>" : "") + " <span class='fuer'>eigener</span>" +
+            "<button class='btn klein' data-act='bs-edit' data-id='" + esc(bs.id) + "' title='ändern'>✎</button></label>";
+        }
         const drin = bausteinAn(d, bs);
         return "<label class='re-feld" + (drin ? "" : " aus") + (bs.pflicht ? " fest" : "") + "' title='" + esc(String(bs.text || "").slice(0, 160)) + "'>" +
           "<input type='checkbox' data-act='dv-baustein' data-i='" + i + "' data-wert='" + bs.id + "'" + (drin ? " checked" : "") + (bs.pflicht ? " disabled" : "") + ">" +
           esc(bs.titel) + (bs.pflicht ? " <span class='fuer'>fest</span>" : "") + "</label>";
-      }).join("") + "</div>";
+      }).join("") + "</div>" +
+      "<div class='leiste'><div><button class='btn klein' data-act='bs-neu' data-art='" + esc(d.art) + "'>+ Eigener Baustein</button>" +
+      "<span class='fuer'>Eigene Bausteine stehen danach in allen Verträgen zur Auswahl.</span></div></div>" +
+      (S.bsEntwurf ? bausteinFormHtml() : "");
     const zusatz = [];
     if (braucht("stoerung")) zusatz.push(fe("reaktion", "Reaktionszeit bei Störungen", "z. B. 4 Stunden an Werktagen"));
     if (braucht("intervall")) zusatz.push(fe("intervall", "Wartungsintervall", "z. B. einmal jährlich im Frühjahr"));
@@ -1684,6 +1702,25 @@ const Objekte = (() => {
       fe("anlageText", "oder Beschreibung", "z. B. Gasbrennwertkessel Vitodens, Baujahr 2019"));
     if (zusatz.length) h += "<div class='felder' style='margin-top:12px'>" + zusatz.join("") + "</div>";
     return h;
+  }
+  /* Maske für einen eigenen Vertragsbaustein. */
+  function bausteinFormHtml() {
+    const e = S.bsEntwurf || {};
+    const arten = Array.isArray(e.fuer) ? e.fuer : [];
+    return "<div class='um-neu'><h4 class='az-ueber' style='margin-top:0'>" + (e.neu ? "Eigener Baustein" : "Baustein ändern") + "</h4>" +
+      "<div class='felder'><div class='feld breit'><label>Überschrift</label>" +
+      "<input type='text' data-bs='titel' value='" + esc(e.titel || "") + "' placeholder='z. B. Schlüsselübergabe'></div>" +
+      "<div class='feld'><label>Gilt für</label><select data-bs='fuer'>" +
+      "<option value=''" + (arten.length ? "" : " selected") + ">alle Vertragsarten</option>" +
+      DIENSTARTEN.map(([w, l]) => "<option value='" + w + "'" + (arten.includes(w) ? " selected" : "") + ">nur " + esc(l) + "</option>").join("") + "</select></div></div>" +
+      "<div class='feld' style='margin-top:12px'><label>Text des Bausteins</label>" +
+      "<textarea rows='4' data-bs='text' placeholder='Ausformulierter Absatz. Mit [Objekt], [Auftragnehmer], [Vergütung], [Beginn], [Kündigungsfrist], [Reaktionszeit], [Intervall] oder [Anlage] setzen Sie Werte aus dem Vertrag ein.'>" + esc(e.text || "") + "</textarea></div>" +
+      "<div class='bs-schalter'><label class='re-feld" + (e.pflicht ? "" : " aus") + "'><input type='checkbox' data-act='bs-pflicht'" + (e.pflicht ? " checked" : "") + ">Pflichtbaustein – steht immer im Vertrag</label>" +
+      "<label class='re-feld" + (e.standard ? "" : " aus") + "'><input type='checkbox' data-act='bs-standard'" + (e.standard ? " checked" : "") + (e.pflicht ? " disabled" : "") + ">bei neuen Verträgen schon angehakt</label></div>" +
+      "<div class='leiste'><div><button class='btn klein haupt' data-act='bs-ok'>Speichern</button>" +
+      "<button class='btn klein' data-act='bs-abbr'>Abbrechen</button></div>" +
+      (e.neu ? "" : "<button class='btn klein gefahr' data-act='bs-weg' data-id='" + esc(e.id) + "'>" +
+        (S.loeschen === "bs" + e.id ? "Wirklich löschen?" : "Baustein löschen") + "</button>") + "</div></div>";
   }
   function objektDiensteHtml(o) {
     const liste = diensteListe(o);
@@ -1896,13 +1933,17 @@ const Objekte = (() => {
       "vorher mahnen und den Einzelfall prüfen.</li></ul>";
   }
   function teamLastHtml() {
-    const liste = auslastung();
+    const alleMa = auslastung();
+    const liste = S.awWer && S.awWer !== "ohne" ? alleMa.filter(x => x.m.id === S.awWer) : S.awWer === "ohne" ? [] : alleMa;
     const ohne = awObjekte().filter(o => !objBetreuer(o).length);
     const einheitenGes = liste.reduce((n, x) => n + x.einheiten, 0);
-    let h = "<div class='kacheln'><div class='kachel'><b>" + liste.length + "</b><span>Mitarbeiter</span></div>" +
+    let h = "<div class='kacheln'><div class='kachel'><b>" + liste.length + "</b><span>" + (liste.length === 1 ? "Mitarbeiter" : "Mitarbeiter") + "</span></div>" +
       "<div class='kachel'><b>" + einheitenGes + "</b><span>betreute Einheiten</span></div>" +
       "<div class='kachel'><b>" + ohne.length + "</b><span>Objekte ohne Betreuung</span></div></div>";
-    if (!liste.length) return h + "<p class='unter'>Legen Sie unter „Mitarbeiter“ Ihr Team an.</p>";
+    if (!liste.length) return h + "<p class='unter'>" +
+      (S.awWer === "ohne"
+        ? (ohne.length ? "Ohne Betreuung: " + ohne.map(o => esc(objName(o))).join(", ") + "." : "Jedes Objekt hat eine Betreuung.")
+        : S.awWer ? "Für diesen Mitarbeiter gibt es keine Zahlen." : "Legen Sie unter „Mitarbeiter“ Ihr Team an.") + "</p>";
     h += "<div class='ue-tab'><div class='aw-kopf2'><span>Mitarbeiter</span><span>Objekte</span><span>Einheiten</span><span>offene Tickets</span><span>Leerstand</span><span>Rückstand</span></div>" +
       liste.map(x => "<div class='aw-row2'>" +
         "<span><strong>" + esc(Objekte.mitarbeiterName(x.m)) + "</strong>" + (x.m.funktion ? "<br><span class='fuer'>" + esc(x.m.funktion) + "</span>" : "") + "</span>" +
@@ -1911,7 +1952,7 @@ const Objekte = (() => {
         "<span>" + x.tickets + "</span>" +
         "<span>" + x.leer + "</span>" +
         "<span class='" + (x.rueck ? "z-minus" : "") + "'>" + (x.rueck ? esc(eurD(x.rueck)) + " €" : "–") + "</span></div>").join("") + "</div>";
-    if (ohne.length) h += "<p class='unter'>Ohne Betreuung: " + ohne.map(o => esc(objName(o))).join(", ") + ".</p>";
+    if (ohne.length && !S.awWer) h += "<p class='unter'>Ohne Betreuung: " + ohne.map(o => esc(objName(o))).join(", ") + ".</p>";
     h += "<p class='unter'>Buchhaltung und Technik zählen gesondert: " +
       liste.filter(x => x.buchhaltung || x.technik).map(x => esc(Objekte.mitarbeiterName(x.m)) + " – " +
         [x.buchhaltung ? x.buchhaltung + "× Buchhaltung" : "", x.technik ? x.technik + "× Technik" : ""].filter(Boolean).join(", ")).join(" · ") + "</p>";
@@ -2069,14 +2110,24 @@ const Objekte = (() => {
   const abrArt = o => istWeg(o) ? "WEG-Jahresabrechnung" : "Betriebskostenabrechnung";
   const abrStand = (o, jahr) => ((o.abrechnung || {})[String(jahr)] || {});
   const abrFertig = st => ["erstellt", "versandt", "beschlossen"].includes(st.status || "");
-  /* Miete: Abrechnung binnen zwölf Monaten nach Ende des Zeitraums (§ 556 Abs. 3 BGB).
-     WEG: nach Ablauf des Kalenderjahres, üblich im ersten Halbjahr (§ 28 Abs. 2 WEG). */
-  const abrFrist = (o, jahr) => istWeg(o) ? (Number(jahr) + 1) + "-06-30" : (Number(jahr) + 1) + "-12-31";
+  /* Der Abrechnungszeitraum ist das Kalenderjahr – außer das Objekt hat ein abweichendes
+     Wirtschaftsjahr. Abgerechnet werden muss binnen zwölf Monaten danach (§ 556 Abs. 3 BGB). */
+  const MONATE_KURZ = [["1", "Januar"], ["2", "Februar"], ["3", "März"], ["4", "April"], ["5", "Mai"], ["6", "Juni"],
+    ["7", "Juli"], ["8", "August"], ["9", "September"], ["10", "Oktober"], ["11", "November"], ["12", "Dezember"]];
+  function abrZeitraum(o, jahr) {
+    const m = Math.min(12, Math.max(1, Number(o.wjStart || 1)));
+    const isoT = d => d.toISOString().slice(0, 10);
+    const von = new Date(Date.UTC(Number(jahr), m - 1, 1));
+    const bis = new Date(Date.UTC(Number(jahr), m - 1 + 12, 0));
+    const frist = new Date(Date.UTC(bis.getUTCFullYear() + 1, bis.getUTCMonth(), bis.getUTCDate()));
+    return { von: isoT(von), bis: isoT(bis), frist: isoT(frist), kalender: m === 1 };
+  }
+  const abrFrist = (o, jahr) => abrZeitraum(o, jahr).frist;
   function abrechnungenHtml() {
     const jahr = S.awJahr || (new Date().getFullYear() - 1);
     const heute = new Date().toISOString().slice(0, 10);
     const alle = awObjekte().filter(o => ["miet", "weg", "garantie"].includes(o.art))
-      .map(o => ({ o, wer: objBetreuer(o)[0] || "", st: abrStand(o, jahr), frist: abrFrist(o, jahr) }));
+      .map(o => { const z = abrZeitraum(o, jahr); return { o, wer: objBetreuer(o)[0] || "", st: abrStand(o, jahr), z, frist: z.frist }; });
     const liste = alle.filter(awPasst);
     const fertig = liste.filter(x => abrFertig(x.st)).length;
     const offen = liste.length - fertig;
@@ -2087,12 +2138,14 @@ const Objekte = (() => {
       "<div class='kachel'><b class='" + (offen ? "z-minus" : "z-plus") + "'>" + offen + "</b><span>fehlen noch</span></div>" +
       "<div class='kachel'><b class='" + (spaet ? "z-minus" : "") + "'>" + spaet + "</b><span>Frist abgelaufen</span></div></div>";
     if (!liste.length) return h + "<p class='unter'>Keine Objekte, für die eine Abrechnung zu erstellen wäre.</p>";
-    h += "<div class='ue-tab'><div class='abr-kopf'><span>Objekt</span><span>Art</span><span>Stand</span><span>Datum</span><span>Frist</span><span>Betreuung</span></div>" +
+    h += "<div class='ue-tab'><div class='abr-kopf'><span>Objekt</span><span>Zeitraum</span><span>Stand</span><span>Datum</span><span>Frist</span><span>Betreuung</span></div>" +
       liste.map(x => {
         const spaetDran = !abrFertig(x.st) && x.frist < heute;
         return "<div class='abr-row" + (abrFertig(x.st) ? " abr-ok" : spaetDran ? " aw-warn" : "") + "'>" +
-          "<span><strong>" + esc(objName(x.o)) + "</strong><br><span class='fuer'>" + (x.o.einheitenListe || []).length + " Einheiten</span></span>" +
-          "<span>" + esc(abrArt(x.o)) + "</span>" +
+          "<span><strong>" + esc(objName(x.o)) + "</strong><br><span class='fuer'>" + esc(abrArt(x.o)) + " · " + (x.o.einheitenListe || []).length + " Einheiten</span></span>" +
+          "<span>" + esc(Objekte.datum(x.z.von)) + " – " + esc(Objekte.datum(x.z.bis)) +
+          "<br><select data-wj='" + esc(x.o.id) + "'>" + MONATE_KURZ.map(([w, l]) =>
+            "<option value='" + w + "'" + (String(x.o.wjStart || "1") === w ? " selected" : "") + ">ab " + esc(l) + "</option>").join("") + "</select></span>" +
           "<span><select data-abr='" + esc(x.o.id) + "|" + jahr + "|status'>" + ABR_STATUS.filter(([w]) =>
             w !== (istWeg(x.o) ? "versandt" : "beschlossen")).map(([w, l]) =>
             "<option value='" + w + "'" + ((x.st.status || "offen") === w ? " selected" : "") + ">" + esc(l) + "</option>").join("") + "</select></span>" +
@@ -2105,9 +2158,10 @@ const Objekte = (() => {
       if (abrFertig(x.st)) proMa[k].fertig++; else proMa[k].offen++; });
     const reihen = Object.values(proMa).filter(r => r.offen).sort((a, b) => b.offen - a.offen);
     if (reihen.length) h += "<p class='unter'>Noch offen: " + reihen.map(r => esc(teamName(r.wer) || "ohne Betreuung") + " " + r.offen).join(" · ") + "</p>";
-    return h + "<ul class='meldungen'><li class='m-hinweis'>Bei Mietverhältnissen muss die Abrechnung dem Mieter spätestens zwölf Monate nach Ende des Abrechnungszeitraums zugehen " +
-      "(§ 556 Abs. 3 BGB) – danach sind Nachforderungen grundsätzlich ausgeschlossen. Bei der WEG beschließen die Eigentümer über Nachschüsse und Anpassungen (§ 28 Abs. 2 WEG); " +
-      "der 30.06. ist hier nur ein üblicher Richtwert.</li></ul>";
+    return h + "<ul class='meldungen'><li class='m-hinweis'>Der Abrechnungszeitraum ist das Kalenderjahr; hat ein Objekt ein abweichendes Wirtschaftsjahr, " +
+      "stellen Sie den Startmonat in der Zeile um – Zeitraum und Frist rechnen sich dann mit. " +
+      "Die Frist läuft zwölf Monate nach Ende des Zeitraums ab (§ 556 Abs. 3 BGB); danach sind Nachforderungen gegenüber Mietern grundsätzlich ausgeschlossen. " +
+      "Bei der WEG beschließen die Eigentümer über Nachschüsse und Anpassungen (§ 28 Abs. 2 WEG).</li></ul>";
   }
   function auswertungHtml() {
     const tabs = [["leerstand", "Leerstand"], ["rueckstand", "Rückstände"], ["umsatz", "Umsatz"], ["abrechnung", "Abrechnungen"], ["team", "Auslastung"], ["org", "Organigramm"]];
@@ -6455,6 +6509,16 @@ const Objekte = (() => {
       return;
     }
     if (t.dataset.honneu) { S.honEntwurf = { ...(S.honEntwurf || {}) }; S.honEntwurf[t.dataset.honneu] = t.value; return; }
+    if (t.dataset.bs) {
+      if (!S.bsEntwurf) return;
+      if (t.dataset.bs === "fuer") S.bsEntwurf.fuer = t.value ? [t.value] : [];
+      else S.bsEntwurf[t.dataset.bs] = t.value;
+      return;
+    }
+    if (t.dataset.wj) {
+      const o = S.liste.find(x => x.id === t.dataset.wj); if (!o) return;
+      o.wjStart = t.value; objektSichern(o); render(true); return;
+    }
     if (t.dataset.abr) {
       const [oid, jahr, feld] = String(t.dataset.abr).split("|");
       const o = S.liste.find(x => x.id === oid); if (!o) return;
@@ -6764,7 +6828,7 @@ const Objekte = (() => {
     const b = e.target.closest("[data-act]"); if (!b || e.composedPath().some(n => n.id === "vv")) return; const act = b.dataset.act; const id = b.dataset.id;
     if (!["loeschen", "hw-loeschen", "p-loeschen", "m-loeschen", "td-loeschen", "v-weg", "mail-weg", "dok-weg", "mail-loeschen", "abl-weg",
       "bh-fest", "za-weg", "kk-weg", "kr-weg", "kr-klasse-weg", "kr-leeren",
-      "nf-weg", "au-weg", "dienst-weg", "lv-weg", "org-weg", "hon-weg"].includes(act)) S.loeschen = false;
+      "nf-weg", "au-weg", "dienst-weg", "lv-weg", "org-weg", "hon-weg", "bs-weg"].includes(act)) S.loeschen = false;
     switch (act) {
       case "tab": S.tab = b.dataset.tab; S.ansicht = "liste"; S.entwurf = null; S.hwEntwurf = null; S.pEntwurf = null; S.tEntwurf = null; S.tEntwurfTicket = null; S.ticketOffen = null;
         S.vermOffen = null; S.mailOffenId = null; S.mailImport = null; render(); break;
@@ -7689,10 +7753,33 @@ const Objekte = (() => {
           umlage: true, leistungen: [], notizen: "", erstellt: new Date().toISOString() };
         diensteListe(o).push(d); S.dienstOffen = d.id; S.objTab = "dienste";
         await objektSichern(o); render(true); break; }
+      case "bs-neu": S.bsEntwurf = { id: Objekte.neueId(), titel: "", text: "", fuer: [], pflicht: false, standard: true, eigen: true, neu: true };
+        render(true); app.querySelector("[data-bs='titel']")?.focus({ preventScroll: true }); break;
+      case "bs-edit": { const bs = eigeneBausteine().find(x => x.id === b.dataset.id); if (!bs) return;
+        S.bsEntwurf = { ...bs, neu: false }; S.loeschen = false; render(true); break; }
+      case "bs-abbr": S.bsEntwurf = null; S.loeschen = false; render(true); break;
+      case "bs-pflicht": { const e = S.bsEntwurf; if (!e) return; e.pflicht = !e.pflicht; if (e.pflicht) e.standard = true; render(true); break; }
+      case "bs-standard": { const e = S.bsEntwurf; if (!e) return; if (e.pflicht) return; e.standard = !e.standard; render(true); break; }
+      case "bs-ok": {
+        const e = S.bsEntwurf; if (!e) return;
+        if (!String(e.titel || "").trim()) { toast("Bitte eine Überschrift eintragen."); return; }
+        if (!String(e.text || "").trim()) { toast("Bitte den Text des Bausteins eintragen."); return; }
+        const bs = { id: e.id, titel: e.titel.trim(), text: e.text, fuer: Array.isArray(e.fuer) ? e.fuer : [],
+          pflicht: !!e.pflicht, standard: !!e.standard, eigen: true, geaendert: new Date().toISOString() };
+        await bausteinSichern(bs);
+        S.bsEntwurf = null; render(true); toast("Baustein gespeichert"); break;
+      }
+      case "bs-weg": {
+        const id2 = b.dataset.id;
+        if (S.loeschen !== "bs" + id2) { S.loeschen = "bs" + id2; render(true); return; }
+        S.bausteine = eigeneBausteine().filter(x => x.id !== id2);
+        try { await Speicher.loeschen("bausteine", id2, S.bausteine); } catch (e) {}
+        S.bsEntwurf = null; S.loeschen = false; render(true); toast("Baustein gelöscht"); break;
+      }
       case "dv-baustein": {
         const o = S.entwurf; if (!o) return;
         const d = diensteListe(o)[Number(b.dataset.i)]; if (!d) return;
-        const bs = DIENST_BAUSTEINE.find(x => x.id === b.dataset.wert); if (!bs || bs.pflicht) return;
+        const bs = alleBausteine().find(x => x.id === b.dataset.wert); if (!bs || bs.pflicht) return;
         d.bausteine = d.bausteine && typeof d.bausteine === "object" ? d.bausteine : {};
         d.bausteine[bs.id] = !bausteinAn(d, bs);
         await objektSichern(o); render(true); break;
@@ -7974,6 +8061,7 @@ const Objekte = (() => {
     S.liste = Speicher.lokal("objekte"); S.handwerker = Speicher.lokal("handwerker"); S.personen = Speicher.lokal("personen"); S.team = Speicher.lokal("mitarbeiter"); S.tickets = Speicher.lokal("tickets"); S.mails = Speicher.lokal("mails");
     try { S.einst = { ...S.einst, ...JSON.parse(localStorage.getItem("ov_einstellungen") || "{}") }; } catch (e) {}
     S.org = Speicher.lokal("organigramm");
+    S.bausteine = Speicher.lokal("bausteine");
     S.rahmen = Speicher.lokal("kontenrahmen").filter(r => r && Array.isArray(r.konten));
     if (!S.rahmen.length) { rahmenListe(); rahmenAlleSichern(); }
     try { S.sitzung = localStorage.getItem("ov_sitzung") || sessionStorage.getItem("ov_sitzung") || ""; } catch (e) { S.sitzung = ""; }
@@ -8006,6 +8094,7 @@ const Objekte = (() => {
     Speicher.beobachten("personen", l => { S.personen = l; Speicher.lokalSetzen("personen", l); neuZeichnen(); });
     Speicher.beobachten("handwerker", l => { S.handwerker = l; Speicher.lokalSetzen("handwerker", l); neuZeichnen(); });
     Speicher.beobachten("organigramm", l => { S.org = l || []; Speicher.lokalSetzen("organigramm", S.org); if (S.tab === "auswertung") render(true); });
+    Speicher.beobachten("bausteine", l => { S.bausteine = l || []; Speicher.lokalSetzen("bausteine", S.bausteine); });
     Speicher.beobachten("kontenrahmen", l => { const gut = (l || []).filter(r => r && Array.isArray(r.konten));
       if (gut.length) { S.rahmen = gut; Speicher.lokalSetzen("kontenrahmen", gut); if (S.tab === "einstellungen") render(true); } });
   }
