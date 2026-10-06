@@ -793,13 +793,73 @@ body.portal-an .seite{max-width:880px;margin:0 auto}
 .vorschau-band small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
 .pt-vorgang{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:11px 0;border-top:1px solid var(--line);font-size:14px}
 .pt-vorgang:first-of-type{border-top:0}
+.md-werkzeug{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+.md-blatt{background:#fff;color:#16202e;max-width:840px;margin:0 auto;padding:38px 46px;border-radius:16px;box-shadow:0 12px 34px rgba(15,23,42,.10);font-size:14px;line-height:1.55}
+.md-blatt h1{font-size:22px;margin:26px 0 2px}
+.md-blatt h2{font-size:16px;margin:24px 0 8px}
+.md-kopf{display:flex;align-items:flex-start;justify-content:space-between;gap:20px}
+.md-logo{max-height:54px}
+.md-firma{font-weight:700;font-size:17px}
+.md-abs{font-size:11px;color:#64748b;border-bottom:1px solid #cbd5e1;padding-bottom:4px;margin-top:22px}
+.md-empf{margin:16px 0 6px;white-space:pre-line}
+.md-art{color:#64748b;font-size:12.5px;margin:0 0 14px}
+.md-text{margin:14px 0}
+.md-zeile{display:grid;grid-template-columns:230px 1fr;gap:12px;padding:6px 0;border-bottom:1px solid #e9edf3;font-size:13.5px}
+.md-zeile span:first-child{color:#64748b}
+.md-luecke{display:inline-block;min-width:200px;border-bottom:1px dotted #94a3b8;height:1.15em}
+.md-unter{display:flex;gap:44px;margin-top:46px}
+.md-unter div{flex:1;border-top:1px solid #334155;padding-top:6px;font-size:12px;color:#475569}
+.md-fuss{margin-top:26px;font-size:11px;color:#64748b;line-height:1.45}
+.md-hinterlegen{margin-top:22px}
+.aw-kopf,.aw-row{display:grid;grid-template-columns:1.5fr 1.1fr 1.2fr .8fr 1fr 90px;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
+.aw-kopf2,.aw-row2{display:grid;grid-template-columns:1.6fr .9fr .8fr .9fr .8fr 1fr;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
+.aw-kopf,.aw-kopf2,.org-kopf{font-size:12px;color:var(--muted)}
+.aw-row.aw-warn{background:var(--err-soft);border-radius:10px;padding-left:8px;padding-right:8px}
+.org-kopf,.org-row{display:grid;grid-template-columns:1fr 1.2fr 1.2fr;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+.org{overflow-x:auto;padding:12px 4px 4px}
+.org ul{display:flex;gap:18px;justify-content:center;list-style:none;margin:0;padding:26px 0 0;position:relative}
+.org>ul{padding-top:4px}
+.org li{position:relative;list-style:none;padding:0 10px;text-align:center}
+.org li::before,.org li::after{content:"";position:absolute;top:-26px;height:26px;border-top:2px solid var(--line);width:50%}
+.org li::before{right:50%;border-right:2px solid var(--line)}
+.org li::after{left:50%}
+.org li:only-child::before,.org li:only-child::after{display:none}
+.org li:first-child::before,.org li:last-child::after{border:0}
+.org>ul>li::before,.org>ul>li::after{display:none}
+.org li ul::before{content:"";position:absolute;top:0;left:50%;height:26px;border-left:2px solid var(--line)}
+.org-karte{display:inline-flex;flex-direction:column;gap:2px;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:11px 16px;min-width:160px}
+.org-karte strong{font-size:14.5px}
+.org-zahl{font-size:11.5px;color:var(--accent)}
+@media (max-width:760px){.aw-kopf,.aw-kopf2,.org-kopf{display:none}.aw-row{grid-template-columns:1fr 1fr}.aw-row2{grid-template-columns:1fr 1fr 1fr}.org-row{grid-template-columns:1fr}}
+.dv-liste{display:grid;gap:12px;margin-top:14px}
+.dv-karte{border:1.5px solid var(--line);border-radius:16px;overflow:hidden;background:var(--surface)}
+.dv-karte.auf{border-color:var(--accent)}
+.dv-karte.beendet{opacity:.65}
+.dv-kopf{width:100%;display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 16px;background:none;border:0;font:inherit;text-align:left;cursor:pointer;color:inherit}
+.dv-kopf:hover{background:var(--field)}
+.dv-inhalt{padding:4px 16px 18px;border-top:1px solid var(--line)}
+.lv-kopf,.lv-zeile{display:grid;grid-template-columns:2.4fr 1fr 1.6fr 44px;gap:8px;align-items:center}
+.lv-kopf{font-size:12px;color:var(--muted);padding:6px 2px 2px}
+.lv-zeile{margin-bottom:8px}
+.dv-kopf-tab,.dv-row{display:grid;grid-template-columns:1.4fr 1.4fr 1.2fr 90px 110px;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.dv-kopf-tab{font-size:12px;color:var(--muted)}
+.lv-tab{width:100%;border-collapse:collapse;margin:10px 0 14px;font-size:13px}
+.lv-tab th{text-align:left;font-size:11.5px;color:#64748b;border-bottom:1px solid #cbd5e1;padding:6px 8px 6px 0}
+.lv-tab td{vertical-align:top;padding:6px 8px 6px 0;border-bottom:1px solid #eef2f7}
+@media (max-width:760px){.lv-kopf{display:none}.lv-zeile{grid-template-columns:1fr 44px}.dv-kopf-tab,.dv-row{grid-template-columns:1fr 1fr}}
+@media print{
+  body.mandat-an>header.kopf,body.mandat-an #status,body.mandat-an #toast{display:none!important}
+  body.mandat-an #app{display:block!important}
+  body.mandat-an .md-werkzeug,body.mandat-an .md-hinterlegen,body.mandat-an .meldungen{display:none!important}
+  body.mandat-an .md-blatt{box-shadow:none;border-radius:0;max-width:none;padding:0;font-size:11pt}
+}
 body.nur-lesen input:disabled,body.nur-lesen select:disabled,body.nur-lesen textarea:disabled{opacity:1;color:var(--muted);cursor:not-allowed}
 </style>
 </head>
 <body>
 <header class="kopf">
   <div class="marke-app">Hausverwaltung</div>
-  <nav class="reiter" aria-label="Bereiche"><button data-act="tab" data-tab="vertraege">Verträge</button><button data-act="tab" data-tab="objekte">Objekte</button><button data-act="tab" data-tab="etv">ETV</button><button data-act="tab" data-tab="vermietung">Vermittlung</button><button data-act="tab" data-tab="zeit">Zeiterfassung</button><button data-act="tab" data-tab="tickets">Tickets</button><button data-act="tab" data-tab="kalender">Kalender</button><button data-act="tab" data-tab="mails">E-Mail</button><button data-act="tab" data-tab="handwerker">Handwerker</button><button data-act="tab" data-tab="personen">Eigentümer/Mieter</button><button data-act="tab" data-tab="team">Mitarbeiter</button><button data-act="tab" data-tab="einstellungen">Einstellungen</button></nav>
+  <nav class="reiter" aria-label="Bereiche"><button data-act="tab" data-tab="vertraege">Verträge</button><button data-act="tab" data-tab="objekte">Objekte</button><button data-act="tab" data-tab="etv">ETV</button><button data-act="tab" data-tab="vermietung">Vermittlung</button><button data-act="tab" data-tab="zeit">Zeiterfassung</button><button data-act="tab" data-tab="tickets">Tickets</button><button data-act="tab" data-tab="kalender">Kalender</button><button data-act="tab" data-tab="auswertung">Auswertung</button><button data-act="tab" data-tab="mails">E-Mail</button><button data-act="tab" data-tab="handwerker">Handwerker</button><button data-act="tab" data-tab="personen">Eigentümer/Mieter</button><button data-act="tab" data-tab="team">Mitarbeiter</button><button data-act="tab" data-tab="einstellungen">Einstellungen</button></nav>
   <button class="btn haupt" data-act="neu" id="neu-knopf">+ Neues Objekt</button>
 </header>
 <div id="anmeldung" hidden></div>
@@ -821,6 +881,7 @@ body.nur-lesen input:disabled,body.nur-lesen select:disabled,body.nur-lesen text
 <datalist id="anlagenarten"></datalist>
 <datalist id="dokumentarten"></datalist>
 <datalist id="notfallarten"><option value='Hausmeister'><option value='Heizung und Sanitär'><option value='Wasserschaden'><option value='Strom'><option value='Aufzug'><option value='Schlüsseldienst'><option value='Schornsteinfeger'><option value='Verwaltung (Notruf)'><option value='Polizei'><option value='Feuerwehr'></datalist>
+<datalist id="dienstturnus"><option value="wöchentlich"><option value="14-täglich"><option value="monatlich"><option value="vierteljährlich"><option value="halbjährlich"><option value="jährlich"><option value="nach Bedarf"><option value="laufend"><option value="je Einsatz"></datalist>
 <datalist id="funktionen"><option value="Objektbetreuung"><option value="WEG-Verwaltung"><option value="Mietverwaltung"><option value="Buchhaltung"><option value="Technik"><option value="Assistenz"><option value="Geschäftsführung"></datalist>
 <datalist id="gewerke"><option value="Heizung / Sanitär"><option value="Elektro"><option value="Aufzugsservice"><option value="Rauchwarnmelder-Service"><option value="Dach"><option value="Schlüsseldienst"><option value="Gartenpflege"><option value="Hausmeisterdienst"></datalist>
 
@@ -1404,6 +1465,392 @@ const Objekte = (() => {
       "Buchhaltung, andere Mieter und Objektdaten sind dort nicht zu sehen.</li></ul></section>";
     return h;
   }
+  /* ---------- Dienstleistungsverträge am Objekt ---------- */
+  /* Hausmeister, Gartenpflege, Treppenhausreinigung und Winterdienst mit Leistungsverzeichnis.
+     Die Umlage richtet sich nach § 2 BetrKV; Verwaltungs- und Instandsetzungsanteile sind nicht umlagefähig. */
+  const DIENSTARTEN = [
+    ["hausmeister", "Hausmeister / Hauswart", "§ 2 Nr. 14 BetrKV – ohne Verwaltungs- und Instandsetzungsanteil"],
+    ["reinigung", "Treppenhaus- und Gebäudereinigung", "§ 2 Nr. 9 BetrKV"],
+    ["gaertner", "Gartenpflege", "§ 2 Nr. 10 BetrKV"],
+    ["winter", "Winterdienst", "§ 2 Nr. 8 BetrKV – Straßenreinigung"],
+    ["sonstiges", "Sonstige Leistung", "Umlage im Einzelfall prüfen (§ 2 Nr. 17 BetrKV)"]];
+  const DIENSTTURNUS = ["wöchentlich", "14-täglich", "monatlich", "vierteljährlich", "halbjährlich", "jährlich", "nach Bedarf", "laufend", "je Einsatz"];
+  const LV_STANDARD = {
+    hausmeister: [
+      ["Kontrollgang über Grundstück, Gebäude und Gemeinschaftsflächen", "wöchentlich", "Schäden sofort der Verwaltung melden"],
+      ["Beleuchtung in Treppenhaus, Keller und Außenanlage prüfen, Leuchtmittel wechseln", "monatlich", "Material stellt der Auftraggeber"],
+      ["Müllbehälter heraus- und zurückstellen", "laufend", "nach Abfuhrkalender"],
+      ["Müllstandsplatz sauber halten", "wöchentlich", ""],
+      ["Zuwege und Hofflächen kehren", "wöchentlich", ""],
+      ["Dachrinnen und Einläufe sichtprüfen", "halbjährlich", "Reinigung nur nach gesonderter Beauftragung"],
+      ["Zählerstände ablesen und an die Verwaltung melden", "jährlich", ""],
+      ["Kleinreparaturen nach Absprache bis 100 € Materialwert", "nach Bedarf", "darüber hinaus nur mit Auftrag der Verwaltung"]],
+    reinigung: [
+      ["Treppenhaus kehren und feucht wischen, alle Geschosse", "wöchentlich", ""],
+      ["Handläufe und Geländer feucht abwischen", "wöchentlich", ""],
+      ["Hauseingang und Windfang reinigen, Fußmatten säubern", "wöchentlich", ""],
+      ["Briefkastenanlage und Klingeltableau abwischen", "monatlich", ""],
+      ["Kellergänge kehren", "monatlich", ""],
+      ["Waschküche und Trockenraum kehren", "monatlich", ""],
+      ["Aufzugkabine reinigen", "wöchentlich", "nur wenn ein Aufzug vorhanden ist"],
+      ["Treppenhausfenster und Glasflächen innen reinigen", "vierteljährlich", ""]],
+    gaertner: [
+      ["Rasen mähen einschließlich Abfuhr des Schnittguts", "14-täglich", "März bis Oktober"],
+      ["Rasenkanten stechen", "halbjährlich", ""],
+      ["Hecken schneiden", "halbjährlich", "Schnittzeiten nach § 39 BNatSchG beachten"],
+      ["Sträucher und Gehölze auslichten", "jährlich", "Oktober bis Februar"],
+      ["Beete pflegen und Unkraut entfernen", "monatlich", "März bis Oktober, ohne chemische Mittel"],
+      ["Laub aufnehmen und entsorgen", "nach Bedarf", "Oktober bis Dezember"],
+      ["Bewässerung in Trockenperioden", "nach Bedarf", ""],
+      ["Bäume auf offensichtliche Schäden sichten und melden", "jährlich", "ersetzt keine Baumkontrolle durch Sachkundige"]],
+    winter: [
+      ["Räumen und Streuen der Gehwege und Zuwege", "je Einsatz", "werktags bis 7:00 Uhr, sonn- und feiertags bis 9:00 Uhr"],
+      ["Räum- und Streubereitschaft bis 20:00 Uhr", "laufend", "bei anhaltendem Schneefall mehrfach täglich"],
+      ["Streugut stellen, lagern und auffüllen", "laufend", "abstumpfende Mittel, Salz nur wenn zulässig"],
+      ["Einsätze mit Datum und Uhrzeit dokumentieren", "je Einsatz", "Nachweis für die Verkehrssicherungspflicht"],
+      ["Dachlawinen und Eiszapfen melden", "nach Bedarf", "Absperrung nur nach Rücksprache"]],
+    sonstiges: []
+  };
+  const DIENST_KURZ = { hausmeister: "Hausmeister", reinigung: "Reinigung", gaertner: "Gartenpflege", winter: "Winterdienst", sonstiges: "Sonstiges" };
+  const diensteListe = o => Array.isArray(o.dienste) ? o.dienste : (o.dienste = []);
+  const dienstArtName = a => (DIENSTARTEN.find(x => x[0] === a) || [a, a])[1];
+  const dienstUmlageText = a => (DIENSTARTEN.find(x => x[0] === a) || ["", "", ""])[2];
+  const dienstLeistungen = d => Array.isArray(d.leistungen) ? d.leistungen : (d.leistungen = []);
+  const dienstAktiv = d => !d.ende || d.ende >= new Date().toISOString().slice(0, 10);
+  const eurD = n => (Number(n) || 0).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  function dienstJahr(d) {
+    const v = Number(String(d.verguetung || "").replace(",", ".")) || 0;
+    const mal = { monatlich: 12, vierteljaehrlich: 4, jaehrlich: 1, einsatz: 0 }[d.zahlweise || "monatlich"];
+    return mal ? v * mal : 0;
+  }
+  const dienstZahlweise = [["monatlich", "monatlich"], ["vierteljaehrlich", "vierteljährlich"], ["jaehrlich", "jährlich"], ["einsatz", "nach Einsatz"]];
+
+  function dienstZeileHtml(o, d, i) {
+    const offen = S.dienstOffen === d.id;
+    const lv = dienstLeistungen(d);
+    const hw = S.handwerker.filter(x => !x.beendet);
+    const fe = (feld, l, typ, extra) => "<div class='feld'><label>" + esc(l) + "</label><input type='" + (typ || "text") + "' data-dv='" + i + "|" + feld + "' value='" + esc(d[feld] || "") + "' " + (extra || "") + "></div>";
+    let h = "<div class='dv-karte" + (offen ? " auf" : "") + (dienstAktiv(d) ? "" : " beendet") + "'>" +
+      "<button type='button' class='dv-kopf' data-act='dienst-auf' data-id='" + esc(d.id) + "'>" +
+      "<span><strong>" + esc(dienstArtName(d.art)) + "</strong>" + (d.firma ? " · " + esc(d.firma) : " · <span class='fuer'>noch kein Partner</span>") + "</span>" +
+      "<span class='fuer'>" + (Number(d.verguetung) ? eurD(d.verguetung) + " € " + esc((dienstZahlweise.find(z => z[0] === (d.zahlweise || "monatlich")) || [])[1] || "") + " · " : "") +
+      lv.length + " Leistungen" + (dienstAktiv(d) ? "" : " · beendet") + "</span></button>";
+    if (!offen) return h + "</div>";
+    h += "<div class='dv-inhalt'><div class='felder'>" +
+      "<div class='feld'><label>Art der Leistung</label><select data-dv='" + i + "|art'>" +
+      DIENSTARTEN.map(([w, l]) => "<option value='" + w + "'" + (d.art === w ? " selected" : "") + ">" + esc(l) + "</option>").join("") + "</select></div>" +
+      "<div class='feld'><label>Aus den Handwerkern übernehmen</label><select data-dv='" + i + "|handwerkerId'>" +
+      "<option value=''>– frei eintragen –</option>" +
+      hw.map(x => "<option value='" + esc(x.id) + "'" + (d.handwerkerId === x.id ? " selected" : "") + ">" + esc(x.firma) + "</option>").join("") + "</select></div>" +
+      fe("firma", "Firma / Auftragnehmer") + fe("ansprechpartner", "Ansprechpartner") +
+      fe("telefon", "Telefon", "tel") + fe("email", "E-Mail", "email") +
+      "</div>" +
+      "<div class='felder' style='margin-top:14px'>" +
+      fe("beginn", "Beginn", "date") + fe("ende", "Ende (falls befristet)", "date") +
+      "<div class='feld'><label>Kündigungsfrist</label><input type='text' data-dv='" + i + "|kuendigung' value='" + esc(d.kuendigung || "") + "' placeholder='z. B. 3 Monate zum Quartalsende'></div>" +
+      fe("verguetung", "Vergütung netto", "number", "step='0.01' min='0' inputmode='decimal'") +
+      "<div class='feld'><label>Zahlweise</label><select data-dv='" + i + "|zahlweise'>" +
+      dienstZahlweise.map(([w, l]) => "<option value='" + w + "'" + ((d.zahlweise || "monatlich") === w ? " selected" : "") + ">" + esc(l) + "</option>").join("") + "</select></div>" +
+      "<div class='feld'><label>Umsatzsteuer</label><select data-dv='" + i + "|ust'>" +
+      [["19", "19 %"], ["7", "7 %"], ["0", "ohne (Kleinunternehmer § 19 UStG)"]].map(([w, l]) => "<option value='" + w + "'" + ((d.ust || "19") === w ? " selected" : "") + ">" + esc(l) + "</option>").join("") + "</select></div>" +
+      "</div>" +
+      "<div class='schalter-zeile' style='margin-top:14px'><div>Kosten sind umlagefähig<small>" + esc(dienstUmlageText(d.art)) + "</small></div>" +
+      "<button type='button' class='schalter' role='switch' aria-checked='" + (d.umlage !== false) + "' aria-label='umlagefähig' data-act='dienst-umlage' data-i='" + i + "'></button></div>" +
+      (Number(d.verguetung) ? "<p class='unter'>Das sind " + eurD(dienstJahr(d) * (1 + Number(d.ust || 19) / 100)) + " € brutto im Jahr" +
+        (d.zahlweise === "einsatz" ? " – bei Abrechnung nach Einsatz nicht vorhersehbar." : ".") + "</p>" : "");
+
+    h += "<h3 style='margin-top:20px'>Leistungsverzeichnis <span class='fuer'>" + lv.length + "</span></h3>" +
+      "<p class='unter'>Was genau geschuldet ist und wie oft. Das steht später wörtlich im Vertrag.</p>" +
+      (lv.length ? "<div class='lv-kopf'><span>Leistung</span><span>Turnus</span><span>Hinweis</span><span></span></div>" +
+        lv.map((x, j) => "<div class='lv-zeile'>" +
+          "<input type='text' data-lv='" + i + "|" + j + "|was' value='" + esc(x.was || "") + "' placeholder='Leistung'>" +
+          "<input type='text' list='dienstturnus' data-lv='" + i + "|" + j + "|turnus' value='" + esc(x.turnus || "") + "' placeholder='Turnus'>" +
+          "<input type='text' data-lv='" + i + "|" + j + "|hinweis' value='" + esc(x.hinweis || "") + "' placeholder='Hinweis (optional)'>" +
+          "<button class='btn klein gefahr' data-act='lv-weg' data-i='" + i + "' data-j='" + j + "'>" + (S.loeschen === "lv" + i + "-" + j ? "Wirklich?" : "×") + "</button></div>").join("")
+        : "<p class='unter'>Noch keine Leistungen eingetragen.</p>") +
+      "<div class='leiste'><div><button class='btn klein haupt' data-act='lv-neu' data-i='" + i + "'>+ Leistung</button>" +
+      ((LV_STANDARD[d.art] || []).length ? "<button class='btn klein' data-act='lv-standard' data-i='" + i + "'>Übliche Leistungen anhängen</button>" : "") +
+      "</div></div>" +
+      "<div class='feld' style='margin-top:14px'><label>Weitere Vereinbarungen</label><textarea rows='3' data-dv='" + i + "|notizen'>" + esc(d.notizen || "") + "</textarea></div>" +
+      "<div class='leiste'><div><button class='btn klein haupt' data-act='dienst-vertrag' data-id='" + esc(d.id) + "'>Vertrag erstellen</button>" +
+      "<span class='fuer'>Zum Drucken, Unterschreiben und Versenden.</span></div>" +
+      "<button class='btn klein gefahr' data-act='dienst-weg' data-i='" + i + "'>" + (S.loeschen === "dv" + i ? "Wirklich löschen?" : "Vertrag löschen") + "</button></div>";
+    return h + "</div></div>";
+  }
+  function objektDiensteHtml(o) {
+    const liste = diensteListe(o);
+    const summe = liste.filter(d => dienstAktiv(d) && d.umlage !== false).reduce((n, d) => n + dienstJahr(d), 0);
+    let h = "<section class='gruppe'><h2>Dienstleistungsverträge</h2>" +
+      "<p class='unter'>Hausmeister, Reinigung, Gartenpflege und Winterdienst für dieses Objekt – mit Leistungsverzeichnis. " +
+      "Alles wird sofort gespeichert und erscheint auch in den Stammdaten.</p>" +
+      "<div class='leiste'><div>" + DIENSTARTEN.map(([w, l]) =>
+        "<button class='btn klein' data-act='dienst-neu' data-wert='" + w + "'>+ " + esc(DIENST_KURZ[w] || l) + "</button>").join("") + "</div></div>" +
+      (summe ? "<p class='unter'>Umlagefähig nach heutigem Stand: rund " + eurD(summe) + " € netto im Jahr.</p>" : "");
+    h += liste.length ? "<div class='dv-liste'>" + liste.map((d, i) => dienstZeileHtml(o, d, i)).join("") + "</div>"
+      : "<p class='unter'>Noch kein Vertrag angelegt. Wählen Sie oben eine Leistung.</p>";
+    h += "<ul class='meldungen' style='margin-top:16px'><li class='m-hinweis'>Umlagefähig sind nur die laufenden Kosten (§ 2 BetrKV). " +
+      "Instandsetzung und Verwaltungsaufgaben des Hauswarts gehören nicht in die Betriebskostenabrechnung.</li>" +
+      "<li class='m-hinweis'>Der Vertragstext ist ein sorgfältig vorbereiteter Entwurf, aber keine Rechtsberatung. " +
+      "Lassen Sie ihn bei größeren Aufträgen anwaltlich prüfen.</li></ul></section>";
+    return h;
+  }
+  /* Der fertige Vertrag zum Drucken. */
+  function dienstVertragHtml(o, d) {
+    const vw = (() => { try { return window.Firmendaten ? window.Firmendaten.daten() : {}; } catch (x) { return {}; } })();
+    const lv = dienstLeistungen(d);
+    const weg = istWeg(o);
+    const ust = Number(d.ust || 19);
+    const netto = Number(String(d.verguetung || "").replace(",", ".")) || 0;
+    const zw = (dienstZahlweise.find(z => z[0] === (d.zahlweise || "monatlich")) || [])[1] || "monatlich";
+    const luecke = w => String(w || "").trim() ? esc(w) : "<span class='md-luecke'></span>";
+    const par = (nr, titel, text) => "<h2>§ " + nr + " " + esc(titel) + "</h2><p class='md-text'>" + text + "</p>";
+    let h = "<div class='seite'>";
+    h += "<div class='md-werkzeug'><div><button class='btn klein' data-act='dienst-zurueck'>‹ Zurück</button>" +
+      "<button class='btn klein haupt' data-act='mandat-drucken'>Drucken / als PDF speichern</button>" +
+      (String(d.email || "").trim()
+        ? "<a class='btn klein' href='mailto:" + esc(d.email) + "?subject=" + encodeURIComponent(dienstArtName(d.art) + " – " + objName(o)) +
+          "&body=" + encodeURIComponent(dienstMailText(o, d)) + "'>Per E-Mail senden</a>"
+        : "<span class='fuer'>Ohne E-Mail-Adresse der Firma ist kein Versand per Mail möglich.</span>") +
+      "<button class='btn klein' data-act='dienst-text' data-id='" + esc(d.id) + "'>Text kopieren</button></div>" +
+      "<span class='fuer'>Zweifach ausdrucken – ein Exemplar bleibt beim Auftragnehmer.</span></div>";
+    h += "<div class='md-blatt'><header class='md-kopf'>" +
+      (vw.logo ? "<img class='md-logo' src='" + esc(vw.logo) + "' alt='" + esc(vw.name || "Logo") + "'>"
+        : "<div class='md-firma'>" + esc(vw.name || "Hausverwaltung") + "</div>") +
+      "<div class='fuer'>" + esc(Objekte.datum(new Date().toISOString().slice(0, 10))) + "</div></header>" +
+      "<h1>" + esc(dienstArtName(d.art)) + "</h1><p class='md-art'>Dienstleistungsvertrag für " + esc(objName(o)) + "</p>" +
+      "<p class='md-text'><strong>Auftraggeber:</strong><br>" + luecke(o.auftraggeber || (weg ? "Wohnungseigentümergemeinschaft" : "")) + "<br>" +
+      esc([o.strasse, [o.plz, o.ort].filter(Boolean).join(" ")].filter(Boolean).join(", ")) + "<br>" +
+      "vertreten durch " + esc(vw.name || "die Hausverwaltung") + "</p>" +
+      "<p class='md-text'><strong>Auftragnehmer:</strong><br>" + luecke(d.firma) +
+      (d.ansprechpartner ? "<br>" + esc(d.ansprechpartner) : "") +
+      (d.telefon || d.email ? "<br>" + esc([d.telefon, d.email].filter(Boolean).join(" · ")) : "") + "</p>" +
+      par(1, "Gegenstand", "Der Auftragnehmer erbringt für das Objekt " + esc(objName(o)) +
+        " die in § 2 aufgeführten Leistungen in eigener Verantwortung und mit eigenem Gerät. " +
+        "Ein Arbeitsverhältnis wird nicht begründet.") +
+      "<h2>§ 2 Leistungsverzeichnis</h2>" +
+      (lv.length ? "<table class='lv-tab'><thead><tr><th>Leistung</th><th>Turnus</th><th>Hinweis</th></tr></thead><tbody>" +
+        lv.map(x => "<tr><td>" + esc(x.was || "") + "</td><td>" + esc(x.turnus || "") + "</td><td>" + esc(x.hinweis || "") + "</td></tr>").join("") +
+        "</tbody></table>" : "<p class='md-text'>Noch keine Leistungen erfasst.</p>") +
+      (String(d.notizen || "").trim() ? "<p class='md-text'>" + esc(d.notizen).replace(/\n/g, "<br>") + "</p>" : "") +
+      par(3, "Vergütung", (netto ? "Die Vergütung beträgt <strong>" + eurD(netto) + " € netto</strong> " + esc(zw) +
+        (ust ? " zuzüglich " + ust + " % Umsatzsteuer, mithin " + eurD(netto * (1 + ust / 100)) + " € brutto" : " (ohne Umsatzsteuerausweis nach § 19 UStG)") + ". "
+        : "Die Vergütung beträgt <span class='md-luecke'></span> € netto " + esc(zw) + ". ") +
+        "Sie ist nach Rechnungsstellung ohne Abzug fällig. Mit der Vergütung sind sämtliche Leistungen nach § 2 abgegolten; " +
+        "Material und Sonderleistungen werden nur nach vorheriger schriftlicher Beauftragung durch die Verwaltung vergütet.") +
+      par(4, "Laufzeit und Kündigung", "Der Vertrag beginnt am " + luecke(d.beginn ? Objekte.datum(d.beginn) : "") +
+        (d.ende ? " und endet am " + esc(Objekte.datum(d.ende)) + "" : " und läuft auf unbestimmte Zeit") + ". " +
+        "Er kann von beiden Seiten mit einer Frist von " + luecke(d.kuendigung) + " gekündigt werden. " +
+        "Das Recht zur außerordentlichen Kündigung aus wichtigem Grund bleibt unberührt. Kündigungen bedürfen der Textform.") +
+      par(5, "Ausführung", "Die Leistungen sind fachgerecht, sorgfältig und zu den üblichen Zeiten zu erbringen. " +
+        "Der Auftragnehmer setzt zuverlässiges Personal ein und beachtet die gesetzlichen Vorgaben, insbesondere das Mindestlohngesetz " +
+        "und die Vorschriften zur Arbeitssicherheit. Der Einsatz von Nachunternehmern bedarf der vorherigen Zustimmung der Verwaltung.") +
+      par(6, "Nachweise und Haftung", "Der Auftragnehmer weist auf Verlangen eine Betriebshaftpflichtversicherung in angemessener Höhe nach. " +
+        "Er haftet für Schäden, die er oder seine Erfüllungsgehilfen schuldhaft verursachen. " +
+        (d.art === "winter" ? "Soweit die Verkehrssicherungspflicht übertragen wird, dokumentiert der Auftragnehmer jeden Einsatz mit Datum und Uhrzeit und bewahrt die Nachweise mindestens drei Jahre auf. " : "") +
+        "Mängel zeigt die Verwaltung an; der Auftragnehmer beseitigt sie unverzüglich.") +
+      par(7, "Datenschutz", "Beide Seiten verarbeiten personenbezogene Daten nur, soweit es für die Durchführung dieses Vertrages erforderlich ist " +
+        "(Art. 6 Abs. 1 lit. b DSGVO), und wahren die Vertraulichkeit. Schlüssel und Zutrittsmittel werden gesondert quittiert.") +
+      par(8, "Schlussbestimmungen", "Änderungen und Ergänzungen bedürfen der Textform. " +
+        "Sollte eine Bestimmung unwirksam sein, bleibt der Vertrag im Übrigen wirksam. " +
+        "Mündliche Nebenabreden bestehen nicht.") +
+      "<div class='md-unter'><div>Ort, Datum · Auftraggeber</div><div>Ort, Datum · Auftragnehmer</div></div>" +
+      "<p class='md-fuss'>Entwurf der Hausverwaltung. Umlagefähigkeit der Kosten: " + esc(dienstUmlageText(d.art)) +
+      (d.umlage === false ? " – hier als nicht umlagefähig gekennzeichnet." : ".") + "</p></div>";
+    return h + "</div>";
+  }
+  function dienstMailText(o, d) {
+    const lv = dienstLeistungen(d);
+    return "Guten Tag" + (d.ansprechpartner ? " " + d.ansprechpartner : "") + ",\n\n" +
+      "anbei der Vertragsentwurf für " + dienstArtName(d.art) + " am Objekt " + objName(o) + ".\n\n" +
+      "Leistungen:\n" + (lv.length ? lv.map(x => "– " + (x.was || "") + (x.turnus ? " (" + x.turnus + ")" : "")).join("\n") : "– siehe Anlage") + "\n\n" +
+      (Number(d.verguetung) ? "Vergütung: " + eurD(d.verguetung) + " € netto " +
+        ((dienstZahlweise.find(z => z[0] === (d.zahlweise || "monatlich")) || [])[1] || "") + "\n" : "") +
+      (d.beginn ? "Beginn: " + Objekte.datum(d.beginn) + "\n" : "") + "\n" +
+      "Bitte prüfen Sie den Entwurf. Sind Sie einverstanden, senden Sie uns bitte ein unterschriebenes Exemplar zurück.\n\n" +
+      "Mit freundlichen Grüßen\n";
+  }
+  /* ---------- Auswertung: Leerstand, Rückstände, Auslastung, Organigramm ---------- */
+  const awObjekte = () => S.liste.filter(o => !o.beendet);
+  const objBetreuer = o => ((o.betreuerIds && o.betreuerIds.length ? o.betreuerIds : [o.betreuerId]) || []).filter(Boolean);
+  const tageSeit = iso => iso ? Math.max(0, Math.round((Date.now() - new Date(iso + "T12:00:00").getTime()) / 86400000)) : null;
+  const zahlD = w => Number(String(w == null ? "" : w).replace(/\./g, "").replace(",", ".")) || 0;
+  /* Jede Wohnung ohne laufenden Mietvertrag. */
+  function leerstandListe() {
+    const aus = [];
+    awObjekte().filter(o => o.art === "miet" || o.art === "garantie").forEach(o => {
+      (o.einheitenListe || []).forEach(e => {
+        if (mieterVon(e.id, o)) return;
+        const frueher = S.personen.filter(x => x.rolle === "mieter" && x.einheitId === e.id && x.mietende)
+          .sort((a, b) => String(b.mietende).localeCompare(String(a.mietende)))[0];
+        const seit = frueher ? frueher.mietende : "";
+        const miete = zahlD(e.sollmiete) || (frueher ? zahlD(frueher.kaltmiete) : 0);
+        aus.push({ o, e, seit, tage: tageSeit(seit), miete, vormieter: frueher ? Objekte.personName(frueher) : "",
+          wer: objBetreuer(o)[0] || "" });
+      });
+    });
+    return aus.sort((a, b) => (b.tage === null ? -1 : b.tage) - (a.tage === null ? -1 : a.tage));
+  }
+  /* Rückstände je Einheit: alle fälligen Sollstellungen, die noch nicht ausgeglichen sind. */
+  function rueckstandListe() {
+    const gruppen = {};
+    awObjekte().forEach(o => {
+      sollListe(o).filter(x => !x.storniert).forEach(sx => {
+        const st = sollStand(o, sx);
+        if (st.stand !== "rueckstand" || st.rest <= 0) return;
+        const k = o.id + "|" + sx.einheitId;
+        const e = (o.einheitenListe || []).find(x => x.id === sx.einheitId) || null;
+        if (!gruppen[k]) gruppen[k] = { o, e, pn: personVon(sx.mieterId) || null, rest: 0, monate: 0,
+          aeltester: sx.faellig, soll: sx.summe || 0, wer: objBetreuer(o)[0] || "" };
+        const g = gruppen[k];
+        g.rest = Math.round((g.rest + st.rest) * 100) / 100;
+        g.monate++;
+        if (String(sx.faellig) < String(g.aeltester)) g.aeltester = sx.faellig;
+        if ((sx.summe || 0) > g.soll) g.soll = sx.summe || 0;
+      });
+    });
+    return Object.values(gruppen).sort((a, b) => b.rest - a.rest);
+  }
+  /* Zwei Monatsmieten Rückstand sind der Punkt, an dem § 543 Abs. 2 Nr. 3 BGB greifen kann. */
+  const kuendigungsreif = g => !istWeg(g.o) && g.soll > 0 && g.rest >= g.soll * 2;
+  function auslastung() {
+    const leer = leerstandListe(); const rueck = rueckstandListe();
+    return teamAktiv().map(m => {
+      const objekte = awObjekte().filter(o => objBetreuer(o).includes(m.id));
+      return { m,
+        objekte: objekte.length,
+        einheiten: objekte.reduce((n, o) => n + (o.einheitenListe || []).length, 0),
+        weg: objekte.filter(o => o.art === "weg").length,
+        miet: objekte.filter(o => o.art !== "weg").length,
+        buchhaltung: awObjekte().filter(o => o.buchhaltungId === m.id).length,
+        technik: awObjekte().filter(o => o.technikId === m.id).length,
+        tickets: S.tickets.filter(t => t.bearbeiterId === m.id && Objekte.offen(t)).length,
+        leer: leer.filter(x => x.wer === m.id).length,
+        rueck: Math.round(rueck.filter(x => x.wer === m.id).reduce((n, x) => n + x.rest, 0) * 100) / 100 };
+    }).sort((a, b) => b.einheiten - a.einheiten);
+  }
+  const awFilter = x => !S.awWer || x.wer === S.awWer;
+  function awWerHtml() {
+    const alle = !S.awWer;
+    return "<div class='kal-wer'><button type='button' class='pille" + (alle ? " an" : "") + "' data-act='aw-wer' data-wert=''>Alle</button>" +
+      teamAktiv().map(m => "<button type='button' class='pille" + (S.awWer === m.id ? " an" : "") + "' data-act='aw-wer' data-wert='" + esc(m.id) + "'>" +
+        esc(Objekte.mitarbeiterName(m)) + "</button>").join("") +
+      "<button type='button' class='pille" + (S.awWer === "ohne" ? " an" : "") + "' data-act='aw-wer' data-wert='ohne'>ohne Betreuung</button></div>";
+  }
+  const awPasst = x => !S.awWer || (S.awWer === "ohne" ? !x.wer : x.wer === S.awWer);
+  function leerstandHtml() {
+    const alle = leerstandListe(); const liste = alle.filter(awPasst);
+    const miete = liste.reduce((n, x) => n + x.miete, 0);
+    const lang = liste.filter(x => x.tage !== null && x.tage > 90).length;
+    let h = "<div class='kacheln'><div class='kachel'><b>" + liste.length + "</b><span>leere Einheiten</span></div>" +
+      "<div class='kachel'><b>" + (miete ? eurD(miete) : "–") + "</b><span>entgangene Miete / Monat</span></div>" +
+      "<div class='kachel'><b>" + lang + "</b><span>länger als 90 Tage</span></div></div>";
+    if (!liste.length) return h + "<p class='unter'>Keine leeren Einheiten – alle Wohnungen sind vermietet.</p>";
+    h += "<div class='ue-tab'><div class='aw-kopf'><span>Objekt</span><span>Einheit</span><span>Leer seit</span><span>Miete</span><span>Betreuung</span><span></span></div>" +
+      liste.map(x => "<div class='aw-row'>" +
+        "<span><strong>" + esc(objName(x.o)) + "</strong>" + (x.o.nummer ? "<br><span class='fuer'>" + esc(x.o.nummer) + "</span>" : "") + "</span>" +
+        "<span>" + esc(x.e.nr || x.e.art || "Einheit") + (x.e.flaeche ? "<br><span class='fuer'>" + esc(x.e.flaeche) + " m²</span>" : "") + "</span>" +
+        "<span>" + (x.seit ? esc(Objekte.datum(x.seit)) + "<br><span class='fuer'>" + x.tage + " Tage</span>" : "<span class='fuer'>unbekannt</span>") +
+        (x.vormieter ? "<br><span class='fuer'>vorher " + esc(x.vormieter) + "</span>" : "") + "</span>" +
+        "<span>" + (x.miete ? esc(eurD(x.miete)) + " €" : "–") + "</span>" +
+        "<span>" + esc(teamName(x.wer) || "–") + "</span>" +
+        "<span><button class='btn klein' data-act='aw-objekt' data-id='" + esc(x.o.id) + "'>Objekt</button></span></div>").join("") + "</div>";
+    return h + "<p class='unter'>Leer heißt: für diese Einheit ist kein laufender Mieter hinterlegt. " +
+      "Tragen Sie Ende und Beginn der Mietverhältnisse bei den Personen ein, dann stimmt die Liste von allein.</p>";
+  }
+  function awRueckstandHtml() {
+    const liste = rueckstandListe().filter(awPasst);
+    const summe = liste.reduce((n, x) => n + x.rest, 0);
+    const reif = liste.filter(kuendigungsreif).length;
+    let h = "<div class='kacheln'><div class='kachel'><b>" + liste.length + "</b><span>Einheiten im Rückstand</span></div>" +
+      "<div class='kachel'><b class='z-minus'>" + (summe ? eurD(summe) : "0,00") + " €</b><span>offene Forderungen</span></div>" +
+      "<div class='kachel'><b>" + reif + "</b><span>ab zwei Monatsmieten</span></div></div>";
+    if (!liste.length) return h + "<p class='unter'>Kein Rückstand. Alle fälligen Sollstellungen sind ausgeglichen.</p>";
+    h += "<div class='ue-tab'><div class='aw-kopf'><span>Objekt / Einheit</span><span>Zahler</span><span>Rückstand</span><span>Monate</span><span>Betreuung</span><span></span></div>" +
+      liste.map(x => "<div class='aw-row" + (kuendigungsreif(x) ? " aw-warn" : "") + "'>" +
+        "<span><strong>" + esc(objName(x.o)) + "</strong><br><span class='fuer'>" + esc(x.e ? (x.e.nr || x.e.art) : "Einheit gelöscht") + "</span></span>" +
+        "<span>" + esc(x.pn ? Objekte.personName(x.pn) : "–") + (x.pn && x.pn.telefon ? "<br><span class='fuer'>" + esc(x.pn.telefon) + "</span>" : "") + "</span>" +
+        "<span class='z-minus'><strong>" + esc(eurD(x.rest)) + " €</strong>" + (kuendigungsreif(x) ? "<br><span class='fuer'>Kündigung prüfen</span>" : "") + "</span>" +
+        "<span>" + x.monate + "<br><span class='fuer'>seit " + esc(Objekte.datum(x.aeltester)) + "</span></span>" +
+        "<span>" + esc(teamName(x.wer) || "–") + "</span>" +
+        "<span><button class='btn klein' data-act='aw-objekt' data-id='" + esc(x.o.id) + "'>Objekt</button></span></div>").join("") + "</div>";
+    return h + "<ul class='meldungen'><li class='m-hinweis'>Gerechnet wird aus den Sollstellungen und den erfassten Zahlungen. " +
+      "Bei zwei aufeinanderfolgenden Terminen mit insgesamt mehr als einer Monatsmiete kann nach § 543 Abs. 2 Nr. 3 BGB gekündigt werden – " +
+      "vorher mahnen und den Einzelfall prüfen.</li></ul>";
+  }
+  function teamLastHtml() {
+    const liste = auslastung();
+    const ohne = awObjekte().filter(o => !objBetreuer(o).length);
+    const einheitenGes = liste.reduce((n, x) => n + x.einheiten, 0);
+    let h = "<div class='kacheln'><div class='kachel'><b>" + liste.length + "</b><span>Mitarbeiter</span></div>" +
+      "<div class='kachel'><b>" + einheitenGes + "</b><span>betreute Einheiten</span></div>" +
+      "<div class='kachel'><b>" + ohne.length + "</b><span>Objekte ohne Betreuung</span></div></div>";
+    if (!liste.length) return h + "<p class='unter'>Legen Sie unter „Mitarbeiter“ Ihr Team an.</p>";
+    h += "<div class='ue-tab'><div class='aw-kopf2'><span>Mitarbeiter</span><span>Objekte</span><span>Einheiten</span><span>offene Tickets</span><span>Leerstand</span><span>Rückstand</span></div>" +
+      liste.map(x => "<div class='aw-row2'>" +
+        "<span><strong>" + esc(Objekte.mitarbeiterName(x.m)) + "</strong>" + (x.m.funktion ? "<br><span class='fuer'>" + esc(x.m.funktion) + "</span>" : "") + "</span>" +
+        "<span>" + x.objekte + "<br><span class='fuer'>" + x.miet + " Miet · " + x.weg + " WEG</span></span>" +
+        "<span><strong>" + x.einheiten + "</strong></span>" +
+        "<span>" + x.tickets + "</span>" +
+        "<span>" + x.leer + "</span>" +
+        "<span class='" + (x.rueck ? "z-minus" : "") + "'>" + (x.rueck ? esc(eurD(x.rueck)) + " €" : "–") + "</span></div>").join("") + "</div>";
+    if (ohne.length) h += "<p class='unter'>Ohne Betreuung: " + ohne.map(o => esc(objName(o))).join(", ") + ".</p>";
+    h += "<p class='unter'>Buchhaltung und Technik zählen gesondert: " +
+      liste.filter(x => x.buchhaltung || x.technik).map(x => esc(Objekte.mitarbeiterName(x.m)) + " – " +
+        [x.buchhaltung ? x.buchhaltung + "× Buchhaltung" : "", x.technik ? x.technik + "× Technik" : ""].filter(Boolean).join(", ")).join(" · ") + "</p>";
+    return h;
+  }
+  /* Organigramm – Aufbau nur über den Notzugang „Admin“. */
+  const orgKinder = id => teamAktiv().filter(m => (m.chefId || "") === id)
+    .sort((a, b) => Objekte.mitarbeiterName(a).localeCompare(Objekte.mitarbeiterName(b), "de"));
+  function orgNachfahre(id, moeglich) {
+    let x = S.team.find(m => m.id === moeglich);
+    for (let i = 0; i < 50 && x; i++) { if (x.id === id) return true; x = S.team.find(m => m.id === x.chefId); }
+    return false;
+  }
+  function orgKnotenHtml(m, tief) {
+    const kinder = orgKinder(m.id);
+    const last = auslastung().find(x => x.m.id === m.id) || { objekte: 0, einheiten: 0 };
+    return "<li><div class='org-karte'><strong>" + esc(Objekte.mitarbeiterName(m)) + "</strong>" +
+      "<span class='fuer' data-orgk='" + esc(m.id) + "'>" + esc(m.orgRolle || m.funktion || "") + "</span>" +
+      (last.einheiten ? "<span class='org-zahl'>" + last.objekte + " Objekte · " + last.einheiten + " Einheiten</span>" : "") + "</div>" +
+      (kinder.length && tief < 6 ? "<ul>" + kinder.map(k => orgKnotenHtml(k, tief + 1)).join("") + "</ul>" : "") + "</li>";
+  }
+  function organigrammHtml() {
+    const aktive = teamAktiv();
+    const wurzeln = aktive.filter(m => !m.chefId || !aktive.some(x => x.id === m.chefId));
+    let h = "<section class='gruppe'><h2>Organigramm</h2>" +
+      "<p class='unter'>Wer berichtet an wen. Aufgebaut aus Ihren Mitarbeitern – ändern darf das nur der Admin.</p>";
+    h += aktive.length
+      ? "<div class='org'><ul>" + wurzeln.map(m => orgKnotenHtml(m, 0)).join("") + "</ul></div>"
+      : "<p class='unter'>Noch keine Mitarbeiter angelegt.</p>";
+    h += "</section>";
+    if (!aktive.length) return h;
+    h += "<section class='gruppe'><h2>Aufbau bearbeiten</h2>";
+    if (!istAdmin()) return h + "<ul class='meldungen'><li class='m-hinweis'>Das Organigramm ändert ausschließlich der Notzugang „Admin“. " +
+      "Melden Sie sich mit dem Benutzernamen „Admin“ an, um Vorgesetzte und Bezeichnungen zu setzen.</li></ul></section>";
+    h += "<p class='unter'>Für jeden Mitarbeiter den Vorgesetzten wählen. Wer keinen hat, steht oben.</p>" +
+      "<div class='ue-tab'><div class='org-kopf'><span>Mitarbeiter</span><span>Bezeichnung im Organigramm</span><span>Vorgesetzter</span></div>" +
+      aktive.map(m => "<div class='org-row'><span><strong>" + esc(Objekte.mitarbeiterName(m)) + "</strong></span>" +
+        "<span><input type='text' data-org='" + esc(m.id) + "|orgRolle' value='" + esc(m.orgRolle || "") + "' placeholder='" + esc(m.funktion || "z. B. Teamleitung") + "'></span>" +
+        "<span><select data-org='" + esc(m.id) + "|chefId'><option value=''>– niemand (oberste Ebene) –</option>" +
+        aktive.filter(x => x.id !== m.id && !orgNachfahre(m.id, x.id)).map(x => "<option value='" + esc(x.id) + "'" + (m.chefId === x.id ? " selected" : "") + ">" +
+          esc(Objekte.mitarbeiterName(x)) + "</option>").join("") + "</select></span></div>").join("") + "</div>" +
+      "<ul class='meldungen' style='margin-top:14px'><li class='m-hinweis'>Ein Mitarbeiter kann nicht seinem eigenen Untergebenen unterstellt werden – " +
+      "solche Einträge bietet das Programm gar nicht erst an.</li></ul></section>";
+    return h;
+  }
+  function auswertungHtml() {
+    const tabs = [["leerstand", "Leerstand"], ["rueckstand", "Rückstände"], ["team", "Auslastung"], ["org", "Organigramm"]];
+    const tab = ["leerstand", "rueckstand", "team", "org"].includes(S.awTab) ? S.awTab : "leerstand";
+    let h = "<div class='seite'><div class='hero'><h1>Auswertung</h1>" +
+      "<p>Leerstand, Rückstände und die Auslastung Ihrer Mitarbeiter auf einen Blick.</p></div>" +
+      "<nav class='reiter e-reiter'>" + tabs.map(([w, l]) => "<button data-act='aw-tab' data-wert='" + w + "'" +
+        (tab === w ? " aria-current='page'" : "") + ">" + l + "</button>").join("") + "</nav>";
+    if (tab === "org") return h + organigrammHtml() + "</div>";
+    h += awWerHtml();
+    h += "<section class='gruppe'>" + (tab === "leerstand" ? leerstandHtml() : tab === "rueckstand" ? awRueckstandHtml() : teamLastHtml()) + "</section>";
+    return h + "</div>";
+  }
   function objektAnsichtHtml(o) {
     const weg = o.art === "weg"; const liste = o.einheitenListe || []; const summe = Objekte.meaSumme(liste);
     const zeile = (l, w) => w ? "<div class='ue-zeile'><span class='ue-l'>" + l + "</span><span class='ue-w'>" + w + "</span></div>" : "";
@@ -1412,13 +1859,15 @@ const Objekte = (() => {
       .sort((a, b) => ["notfall", "hoch", "normal", "niedrig"].indexOf(a.dringlichkeit) - ["notfall", "hoch", "normal", "niedrig"].indexOf(b.dringlichkeit));
     const anlagen = (o.anlagen || []);
     const dok = (o.dokumente || []);
-    const unter = [["stammdaten", "Stammdaten"], ["buchhaltung", "Buchhaltung"], ["portal", "Portal"], ["rund", "Rundschreiben"], ["erhoehung", "Mieterhöhung"]]
+    const unter = [["stammdaten", "Stammdaten"], ["buchhaltung", "Buchhaltung"], ["dienste", "Dienstleister"], ["portal", "Portal"], ["rund", "Rundschreiben"], ["erhoehung", "Mieterhöhung"]]
       .concat(o.art === "weg" ? [["etv", "Eigentümerversammlung"]] : []);
     let h = "<div class='seite'><div class='hero'><h1>" + (o.nummer ? "<span class='obj-nr'>" + esc(o.nummer) + "</span> " : "") + esc(objName(o)) + "</h1>" +
       "<p>" + esc(Objekte.ARTEN[o.art] ? Objekte.ARTEN[o.art].name : "") + " · " + esc([o.strasse, [o.plz, o.ort].filter(Boolean).join(" ")].filter(Boolean).join(", ")) +
       (o.beendet ? " · beendet" : "") + "</p></div>" +
       "<nav class='reiter obj-reiter'>" + unter.map(([w, l]) => "<button data-act='obj-tab' data-wert='" + w + "'" + (S.objTab === w ? " aria-current='page'" : "") + ">" + l + "</button>").join("") + "</nav>";
     if (S.objTab === "buchhaltung") return h + buchhaltungHtml(o) +
+      "<div class='leiste'><div><button class='btn' data-act='abbrechen'>Zurück zur Übersicht</button></div></div></div>";
+    if (S.objTab === "dienste") return h + objektDiensteHtml(o) +
       "<div class='leiste'><div><button class='btn' data-act='abbrechen'>Zurück zur Übersicht</button></div></div></div>";
     if (S.objTab === "portal") return h + objektPortalHtml(o) +
       "<div class='leiste'><div><button class='btn' data-act='abbrechen'>Zurück zur Übersicht</button></div></div></div>";
@@ -1451,6 +1900,17 @@ const Objekte = (() => {
       anlagen.map(a => { const hw = S.handwerker.find(x => x.id === a.handwerkerId);
         return "<li><strong>" + esc(a.art || "Anlage") + "</strong>" + (a.standort ? " · " + esc(a.standort) : "") +
           "<span class='fuer'><br>" + (hw ? esc(hw.firma) + " · " + kontaktZeile(hw, a.kontaktId) : "kein Handwerker") + (a.naechste ? " · Prüfung " + Objekte.datum(a.naechste) : "") + "</span></li>"; }).join("") + "</ul></section>";
+    const dienste = diensteListe(o).filter(dienstAktiv);
+    if (dienste.length) h += "<section class='gruppe voll'>" + h2("Dienstleistungsverträge <span class='fuer'>" + dienste.length + "</span>") +
+      "<div class='ue-tab'><div class='dv-kopf-tab'><span>Leistung</span><span>Firma</span><span>Vergütung</span><span>Leistungen</span><span></span></div>" +
+      dienste.map(d => "<div class='dv-row'><span><strong>" + esc(dienstArtName(d.art)) + "</strong>" +
+        (d.beginn ? "<br><span class='fuer'>seit " + esc(Objekte.datum(d.beginn)) + (d.ende ? " bis " + esc(Objekte.datum(d.ende)) : "") + "</span>" : "") + "</span>" +
+        "<span>" + esc(d.firma || "–") + (d.telefon ? "<br><span class='fuer'>" + esc(d.telefon) + "</span>" : "") + "</span>" +
+        "<span>" + (Number(d.verguetung) ? esc(eurD(d.verguetung)) + " € " + esc((dienstZahlweise.find(z => z[0] === (d.zahlweise || "monatlich")) || [])[1] || "") +
+          (d.umlage === false ? "<br><span class='fuer'>nicht umlagefähig</span>" : "<br><span class='fuer'>umlagefähig</span>") : "–") + "</span>" +
+        "<span>" + dienstLeistungen(d).length + "</span>" +
+        "<span><button class='btn klein' data-act='dienst-vertrag' data-id='" + esc(d.id) + "'>Vertrag</button></span></div>").join("") + "</div>" +
+      "<div class='leiste'><div><button class='btn klein' data-act='obj-tab' data-wert='dienste'>Verträge bearbeiten</button></div></div></section>";
     const rgDok = dok.map((d, i) => ({ d, i })).filter(x => x.d.art === "Rechnung");
     const uebrig = dok.filter(d => d.art !== "Rechnung");
     if (rgDok.length) h += "<section class='gruppe voll'>" + h2("Rechnungen <span class='fuer'>" + rgDok.length + "</span>") +
@@ -1877,6 +2337,104 @@ const Objekte = (() => {
     }
     return h + "<div class='leiste'><div><button class='btn' data-act='p-abbrechen'>Schließen</button></div></div></section>";
   }
+  /* ---------- SEPA-Lastschriftmandat ---------- */
+  /* Text nach dem SEPA-Regelwerk des European Payments Council. Das unterschriebene
+     Original ist aufzubewahren, solange eingezogen wird, und danach nach § 147 AO. */
+  const mandatPerson = () => S.personen.find(x => x.id === S.mandatFuer) || null;
+  const mandatEinheit = (o, p) => (o && (o.einheitenListe || []).find(x => x.id === p.einheitId)) || null;
+  function mandatRefFuer(p) {
+    const o = S.liste.find(x => x.id === p.objektId) || null;
+    return String(p.mandatRef || "").trim() || (o ? mandatRefVon(o, mandatEinheit(o, p), p) : "");
+  }
+  function mandatZweck(p, o, e) {
+    const was = p.rolle === "mieter" ? "Miete und Nebenkosten" : "Hausgeld";
+    return was + (o ? " für " + objName(o) : "") + (e ? ", " + (e.nr || e.art) : p.einheit ? ", " + p.einheit : "");
+  }
+  function mandatMailText(p) {
+    const o = S.liste.find(x => x.id === p.objektId) || null;
+    const bank = objektBank(o);
+    return "Guten Tag " + Objekte.personName(p) + ",\n\n" +
+      "für " + mandatZweck(p, o, mandatEinheit(o, p)) + " möchten wir künftig am Lastschriftverfahren teilnehmen. " +
+      "Das spart Ihnen den Dauerauftrag und uns die Nachverfolgung.\n\n" +
+      "Im Anhang finden Sie das SEPA-Lastschriftmandat. Bitte drucken Sie es aus, unterschreiben Sie es und senden Sie es uns " +
+      "per Post zurück oder als Scan an diese Adresse.\n\n" +
+      "Gläubiger-Identifikationsnummer: " + (bank.glaeubigerId || "—") + "\n" +
+      "Mandatsreferenz: " + mandatRefFuer(p) + "\n\n" +
+      "Sie können die Einzugsermächtigung jederzeit widerrufen und belastete Beträge innerhalb von acht Wochen zurückbuchen lassen.\n\n" +
+      "Mit freundlichen Grüßen\n";
+  }
+  function mandatSeiteHtml(p) {
+    const o = S.liste.find(x => x.id === p.objektId) || null;
+    const e = mandatEinheit(o, p);
+    const bank = objektBank(o);
+    const vw = (() => { try { return window.Firmendaten ? window.Firmendaten.daten() : {}; } catch (x) { return {}; } })();
+    const ref = mandatRefFuer(p);
+    const luecke = w => String(w || "").trim() ? esc(w) : "<span class='md-luecke'></span>";
+    const zeile = (l, w) => "<div class='md-zeile'><span>" + esc(l) + "</span><span>" + w + "</span></div>";
+    const empf = [Objekte.personName(p), p.strasse, [p.plz, p.ort].filter(Boolean).join(" ")].filter(Boolean).join("\n");
+    const abs = [vw.name, String(vw.anschrift || "").replace(/\s*,\s*/g, ", ")].filter(Boolean).join(" · ");
+    const fehlt = [];
+    if (!glaeubigerGueltig(bank.glaeubigerId)) fehlt.push("Die Gläubiger-Identifikationsnummer fehlt oder ist nicht gültig. Ohne sie ist das Mandat unwirksam – eintragen beim Objekt unter „Buchhaltung“ oder unter „Einstellungen“.");
+    if (!String(bank.inhaber || "").trim()) fehlt.push("Der Zahlungsempfänger fehlt – das ist der Kontoinhaber des Objektkontos.");
+    if (!o) fehlt.push("Diese Person ist keinem Objekt zugeordnet.");
+
+    let h = "<div class='seite'>";
+    h += "<div class='md-werkzeug'><div><button class='btn klein' data-act='mandat-zurueck'>‹ Zurück</button>" +
+      "<button class='btn klein haupt' data-act='mandat-drucken'>Drucken / als PDF speichern</button>" +
+      (String(p.email || "").trim()
+        ? "<a class='btn klein' href='mailto:" + esc(p.email) + "?subject=" + encodeURIComponent("SEPA-Lastschriftmandat – " + mandatZweck(p, o, e)) +
+          "&body=" + encodeURIComponent(mandatMailText(p)) + "' data-act='mandat-mail'>Per E-Mail senden</a>"
+        : "<span class='fuer'>Ohne E-Mail-Adresse der Person ist kein Versand per Mail möglich.</span>") +
+      "<button class='btn klein' data-act='mandat-text'>Text kopieren</button></div>" +
+      "<span class='fuer'>Das Mandat selbst wird gedruckt, der E-Mail-Knopf öffnet ein Anschreiben.</span></div>";
+    if (fehlt.length) h += "<ul class='meldungen'>" + fehlt.map(x => "<li class='m-fehler'>" + esc(x) + "</li>").join("") + "</ul>";
+    if (S.mdMeldung) h += "<ul class='meldungen'><li class='" + (S.mdOk ? "m-ok" : "m-hinweis") + "'>" + esc(S.mdMeldung) + "</li></ul>";
+
+    h += "<div class='md-blatt'><header class='md-kopf'>" +
+      (vw.logo ? "<img class='md-logo' src='" + esc(vw.logo) + "' alt='" + esc(vw.name || "Logo") + "'>"
+        : "<div class='md-firma'>" + esc(vw.name || "Hausverwaltung") + "</div>") +
+      "<div class='fuer'>" + esc(Objekte.datum(new Date().toISOString().slice(0, 10))) + "</div></header>" +
+      (abs ? "<div class='md-abs'>" + esc(abs) + "</div>" : "") +
+      "<div class='md-empf'>" + esc(empf) + "</div>" +
+      "<h1>SEPA-Lastschriftmandat</h1><p class='md-art'>Basislastschrift · wiederkehrende Zahlungen</p>" +
+      zeile("Zahlungsempfänger", luecke(bank.inhaber)) +
+      zeile("Anschrift", luecke(String(vw.anschrift || "").replace(/\s*,\s*/g, ", "))) +
+      zeile("Gläubiger-Identifikationsnummer", luecke(bank.glaeubigerId)) +
+      zeile("Mandatsreferenz", luecke(ref)) +
+      "<p class='md-text'>Ich ermächtige / Wir ermächtigen " + esc(bank.inhaber || "den Zahlungsempfänger") +
+      ", Zahlungen von meinem / unserem Konto mittels Lastschrift einzuziehen. Zugleich weise ich mein / weisen wir unser Kreditinstitut an, " +
+      "die von " + esc(bank.inhaber || "dem Zahlungsempfänger") + " auf mein / unser Konto gezogenen Lastschriften einzulösen.</p>" +
+      "<p class='md-text'><strong>Hinweis:</strong> Ich kann / Wir können innerhalb von acht Wochen, beginnend mit dem Belastungsdatum, " +
+      "die Erstattung des belasteten Betrages verlangen. Es gelten dabei die mit meinem / unserem Kreditinstitut vereinbarten Bedingungen.</p>" +
+      "<h2>Angaben des Zahlungspflichtigen</h2>" +
+      zeile("Name", luecke(Objekte.personName(p))) +
+      zeile("Anschrift", luecke([p.strasse, [p.plz, p.ort].filter(Boolean).join(" ")].filter(Boolean).join(", "))) +
+      zeile("Kontoinhaber", luecke(p.kontoinhaber || Objekte.personName(p))) +
+      zeile("Kreditinstitut", luecke(p.bank)) +
+      zeile("IBAN", luecke(p.iban ? Objekte.ibanFormat(p.iban) : "")) +
+      zeile("BIC", luecke(String(p.bic || "").toUpperCase())) +
+      zeile("Verwendungszweck", esc(mandatZweck(p, o, e))) +
+      "<div class='md-unter'><div>Ort, Datum</div><div>Unterschrift des Kontoinhabers</div></div>" +
+      "<p class='md-fuss'>Ihre Angaben verarbeiten wir ausschließlich zur Abwicklung des Zahlungsverkehrs (Art. 6 Abs. 1 lit. b DSGVO). " +
+      "Das unterschriebene Mandat bewahren wir auf, solange daraus eingezogen wird, und danach nach den gesetzlichen Fristen auf.</p></div>";
+
+    const heute = new Date().toISOString().slice(0, 10);
+    h += "<section class='gruppe md-hinterlegen'><h2>Mandat hinterlegen</h2>" +
+      "<p class='unter'>Sobald das unterschriebene Mandat zurück ist, tragen Sie es hier ein. Erst dann darf eingezogen werden, " +
+      "und das Datum geht in jede Lastschriftdatei.</p>" +
+      "<div class='felder'><div class='feld'><label for='md-datum'>Unterschrieben am</label>" +
+      "<input type='date' id='md-datum' data-md='datum' value='" + esc(p.mandatDatum || heute) + "'></div>" +
+      "<div class='feld breit'><label for='md-ref'>Mandatsreferenz</label><input type='text' id='md-ref' data-md='ref' value='" + esc(ref) + "'>" +
+      "<small>Eindeutig je Zahler. Diese Referenz steht auch auf dem Mandat.</small></div></div>" +
+      "<div class='leiste'><div><button class='btn klein haupt' data-act='mandat-hinterlegen'>Als vorliegend hinterlegen</button>" +
+      "<button class='btn klein' data-act='mandat-versendet'>Versand vermerken</button>" +
+      "<button class='btn klein' data-act='mandat-dokumente'>Scan ablegen</button></div></div>" +
+      "<ul class='meldungen'><li class='" + (p.mandat ? "m-ok" : "m-hinweis") + "'>" +
+      (p.mandat ? "Mandat liegt vor" + (p.mandatDatum ? " seit " + esc(Objekte.datum(p.mandatDatum)) : "") + "." : "Noch kein Mandat hinterlegt.") +
+      (p.mandatGesendet ? " Versendet am " + esc(Objekte.datum(String(p.mandatGesendet).slice(0, 10))) + "." : "") +
+      "</li><li class='m-hinweis'>Das Original gehört in die Ablage: unter „Dokumente“ als „SEPA-Mandat“ ablegen.</li></ul></section>";
+    return h + "</div>";
+  }
   function personFormHtml() {
     const p = S.pEntwurf; const neu = !S.personen.some(x => x.id === p.id);
     const f = (n, l, t = "text", ex = "", hilfe = "") => "<div class='feld'><label for='p-" + n + "'>" + l + "</label><input type='" + t + "' id='p-" + n + "' data-p='" + n + "' value='" + esc(p[n]) + "' " + ex + ">" + (hilfe ? "<small>" + hilfe + "</small>" : "") + "</div>";
@@ -1905,6 +2463,7 @@ const Objekte = (() => {
       return pTabs + "<section class='gruppe'><h2>Kontodaten – " + esc(Objekte.personName(p)) + "</h2>" +
         (inhalt || "<p class='unter'>Noch keine Kontodaten hinterlegt.</p>") +
         "<div class='leiste'><div><button class='btn haupt' data-act='p-bearbeiten-an'>Bearbeiten</button>" +
+        "<button class='btn' data-act='mandat-brief' data-id='" + esc(p.id) + "'>SEPA-Mandat erstellen</button>" +
         "<button class='btn' data-act='p-abbrechen'>Zurück zur Übersicht</button></div></div></section>";
     }
     if (S.pTab === "konto") return pTabs + "<section class='gruppe'><h2>Kontodaten" + (neu ? "" : " – " + esc(Objekte.personName(p))) + "</h2>" +
@@ -1915,6 +2474,8 @@ const Objekte = (() => {
       "<div class='schalter-zeile' style='margin-top:16px'><div>SEPA-Lastschriftmandat liegt vor<small>" + (mieter ? "Miete" : "Hausgeld") + " darf per Lastschrift eingezogen werden.</small></div>" +
       "<button type='button' class='schalter' role='switch' aria-checked='" + !!p.mandat + "' aria-label='SEPA-Lastschriftmandat liegt vor' data-act='p-mandat'></button></div>" +
       (p.mandat ? "<div class='felder' style='margin-top:12px'>" + f("mandatDatum", "Mandat erteilt am", "date") + "</div>" : "") +
+      (neu ? "" : "<div class='leiste'><div><button class='btn klein' data-act='mandat-brief' data-id='" + esc(p.id) + "'>SEPA-Mandat erstellen und versenden</button>" +
+        "<span class='fuer'>Fertiges Mandat zum Drucken oder Mailen – danach hier hinterlegen.</span></div></div>") +
       abrechnungHtml(p) +
       "<div id='p-meldung'></div><div class='leiste'><div>" +
       (S.pBearbeiten || neu ? "<button class='btn haupt' data-act='p-speichern'>Speichern</button><button class='btn' data-act='p-abbrechen'>Abbrechen</button>"
@@ -2018,7 +2579,7 @@ const Objekte = (() => {
   /* Welche Bereiche ein Mitarbeiter sieht und ob er etwas ändern darf, legt
      ausschließlich der Notzugang „Admin“ fest. */
   const BEREICHE = [["objekte", "Objekte"], ["vertraege", "Verträge"], ["etv", "ETV"], ["vermietung", "Vermittlung"],
-    ["zeit", "Zeiterfassung"], ["tickets", "Tickets"], ["kalender", "Kalender"], ["mails", "E-Mail"],
+    ["zeit", "Zeiterfassung"], ["tickets", "Tickets"], ["kalender", "Kalender"], ["auswertung", "Auswertung"], ["mails", "E-Mail"],
     ["handwerker", "Handwerker"], ["personen", "Eigentümer/Mieter"], ["einstellungen", "Einstellungen"]];
   const rechteVon = m => { const r = (m && m.rechte) || {}; return { gesperrt: Array.isArray(r.gesperrt) ? r.gesperrt : [], nurLesen: !!r.nurLesen }; };
   const meineRechte = () => { const m = angemeldet(); return (!m || m.id === ADMIN_ID) ? { gesperrt: [], nurLesen: false } : rechteVon(m); };
@@ -2462,9 +3023,8 @@ const Objekte = (() => {
       "<textarea id='ptm-text' data-ptm='text' rows='4' placeholder='Bitte kurz beschreiben, was nicht in Ordnung ist.'" + gesperrt + "></textarea></div>" +
       "<label class='re-feld' style='margin-top:12px;max-width:420px'><input type='checkbox' data-ptm='eilt'" + gesperrt +
       ">Es eilt – es läuft Wasser, es ist kalt oder etwas ist gefährlich</label>" +
-      (vorschau ? "<p class='unter' style='margin-top:12px'>Hier sendet die Person ihre Meldung ab. Sie landet als Ticket „Schadensmeldung“ bei Ihnen.</p>"
-        : "<div class='leiste'><div><button class='btn klein haupt' data-act='pt-meldung'>Meldung absenden</button>" +
-          "<span class='fuer'>Sie bekommen hier eine Vorgangsnummer.</span></div></div>");
+      "<div class='leiste'><div><button class='btn klein haupt' data-act='pt-meldung'" + (vorschau ? " disabled" : "") + ">Meldung absenden</button>" +
+      "<span class='fuer'>" + (vorschau ? "In der Vorschau ist der Knopf gesperrt – der Mieter sendet damit seine Meldung ab." : "Sie bekommen hier eine Vorgangsnummer.") + "</span></div></div>";
     h += "<h3 style='margin-top:22px'>Ihre Meldungen <span class='fuer'>" + meine.length + "</span></h3>" +
       (meine.length ? meine.map(t => "<div class='pt-vorgang'><span><strong>" + esc(t.titel || "Meldung") + "</strong><br>" +
         "<span class='fuer'>Nr. " + esc(t.nr) + " · " + esc(Objekte.datum(String(t.erstellt || "").slice(0, 10))) + "</span></span>" +
@@ -2516,7 +3076,7 @@ const Objekte = (() => {
       "<div class='felder'>" + kf("telefon", "Telefon", "tel") + kf("email", "E-Mail", "email", "Damit melden Sie sich an.") + "</div>" +
       "<h3 style='margin-top:20px'>Anschrift für Post</h3><div class='felder'>" +
       kf("strasse", "Straße und Nr.") + kf("plz", "PLZ") + kf("ort", "Ort") + "</div>" +
-      "<div class='leiste'><div>" + (vorschau ? "" : "<button class='btn klein haupt' data-act='pt-mein-speichern'>Angaben speichern</button>") +
+      "<div class='leiste'><div><button class='btn klein haupt' data-act='pt-mein-speichern'" + (vorschau ? " disabled" : "") + ">Angaben speichern</button>" +
       (p.kontaktGeaendert ? "<span class='fuer'>Zuletzt " + (vorschau ? "von der Person" : "von Ihnen") + " geändert am " +
         esc(Objekte.datum(String(p.kontaktGeaendert).slice(0, 10))) + ".</span>" : "") +
       "</div></div></section>";
@@ -5431,6 +5991,24 @@ const Objekte = (() => {
       window.scrollTo({ top: behalteScroll ? y : 0 });
       return;
     }
+    /* Das Mandat füllt die ganze Seite, damit es sauber gedruckt werden kann. */
+    const mdP = S.mandatFuer ? mandatPerson() : null;
+    const dvD = (!mdP && S.dienstDruck && S.entwurf) ? diensteListe(S.entwurf).find(x => x.id === S.dienstDruck) : null;
+    document.body.classList.toggle("mandat-an", !!mdP || !!dvD);
+    if (dvD) {
+      $("#neu-knopf").hidden = true; $("#status").hidden = true; $("#lese-hinweis").hidden = true;
+      $("#ze").hidden = true; $("#vv").hidden = true; app.hidden = false;
+      app.innerHTML = dienstVertragHtml(S.entwurf, dvD);
+      window.scrollTo({ top: behalteScroll ? y : 0 });
+      return;
+    }
+    if (mdP) {
+      $("#neu-knopf").hidden = true; $("#status").hidden = true; $("#lese-hinweis").hidden = true;
+      $("#ze").hidden = true; $("#vv").hidden = true; app.hidden = false;
+      app.innerHTML = mandatSeiteHtml(mdP);
+      window.scrollTo({ top: behalteScroll ? y : 0 });
+      return;
+    }
     /* Vorschau: die Verwaltung sieht das Portal einer Person, ohne etwas ändern zu können. */
     const schau = S.portalVorschau ? S.personen.find(x => x.id === S.portalVorschau) : null;
     if (schau) {
@@ -5472,8 +6050,8 @@ const Objekte = (() => {
     if (vv && window.Vertragsbereich) window.Vertragsbereich.normal();
     if (vv || S.tab === "etv") { if (etvAn && window.EtvBruecke) window.EtvBruecke.zeigen(null); window.scrollTo({ top: behalteScroll ? y : 0 }); return; }
     $("#neu-knopf").textContent = S.tab === "handwerker" ? "+ Neuer Handwerker" : S.tab === "personen" ? "+ Eigentümer/Mieter" : S.tab === "team" ? "+ Mitarbeiter" : S.tab === "tickets" ? "+ Neues Ticket" : "+ Neues Objekt";
-    $("#neu-knopf").hidden = rechte.nurLesen || S.tab === "einstellungen" || S.tab === "mails" || S.tab === "vermietung" || S.tab === "dateien" || S.tab === "kalender" || zeitAn || vv || etvAn;
-    app.innerHTML = S.tab === "kalender" ? kalenderSeiteHtml() : S.tab === "einstellungen" ? einstellungenHtml() : S.tab === "dateien" ? dateienHtml() : S.tab === "vermietung" ? vermittlungHtml() : S.tab === "mails" ? mailsHtml() : S.tab === "tickets" ? ticketsHtml() : S.tab === "team" ? teamHtml() : S.tab === "handwerker" ? handwerkerHtml() : S.tab === "personen" ? personenHtml() :
+    $("#neu-knopf").hidden = rechte.nurLesen || S.tab === "einstellungen" || S.tab === "mails" || S.tab === "vermietung" || S.tab === "dateien" || S.tab === "kalender" || S.tab === "auswertung" || zeitAn || vv || etvAn;
+    app.innerHTML = S.tab === "auswertung" ? auswertungHtml() : S.tab === "kalender" ? kalenderSeiteHtml() : S.tab === "einstellungen" ? einstellungenHtml() : S.tab === "dateien" ? dateienHtml() : S.tab === "vermietung" ? vermittlungHtml() : S.tab === "mails" ? mailsHtml() : S.tab === "tickets" ? ticketsHtml() : S.tab === "team" ? teamHtml() : S.tab === "handwerker" ? handwerkerHtml() : S.tab === "personen" ? personenHtml() :
       S.ansicht === "formular" ? (!S.bearbeiten && !S.istNeu ? objektAnsichtHtml(S.entwurf) : formularHtml()) : listeHtml();
     if (S.tab === "objekte" && S.ansicht === "formular" && !S.bearbeiten && S.istNeu) sperren();
 
@@ -5597,6 +6175,40 @@ const Objekte = (() => {
       return;
     }
     /* Art der Vorlage umstellen – Verwendungen, die es dort nicht gibt, werden gelöst. */
+    if (t.dataset.org) {
+      if (!istAdmin()) { toast("Das Organigramm ändert nur der Admin."); return; }
+      const [id, feld] = String(t.dataset.org).split("|");
+      const m = S.team.find(x => x.id === id); if (!m) return;
+      if (feld === "chefId" && t.value && orgNachfahre(id, t.value)) { toast("Das ergäbe einen Kreis."); return; }
+      m[feld] = t.value;
+      teamSichern(m);
+      if (feld === "chefId") { render(true); return; }
+      /* Die Karte im Organigramm gleich mitschreiben, ohne die Eingabe zu stören. */
+      const karte = app.querySelector("[data-orgk='" + id + "']");
+      if (karte) karte.textContent = t.value || m.funktion || "";
+      return;
+    }
+    if (t.dataset.dv) {
+      const o = S.entwurf; if (!o) return;
+      const [i, feld] = String(t.dataset.dv).split("|");
+      const d = diensteListe(o)[Number(i)]; if (!d) return;
+      d[feld] = t.value;
+      if (feld === "handwerkerId" && t.value) {
+        const hw = S.handwerker.find(x => x.id === t.value);
+        if (hw) { d.firma = hw.firma || d.firma; d.ansprechpartner = hw.ansprechpartner || d.ansprechpartner;
+          d.telefon = hw.telefon || d.telefon; d.email = hw.email || d.email; }
+        objektSichern(o); render(true); return;
+      }
+      if (feld === "art") { objektSichern(o); render(true); return; }
+      objektSichern(o); return;
+    }
+    if (t.dataset.lv) {
+      const o = S.entwurf; if (!o) return;
+      const [i, j, feld] = String(t.dataset.lv).split("|");
+      const d = diensteListe(o)[Number(i)]; if (!d) return;
+      const x = dienstLeistungen(d)[Number(j)]; if (!x) return;
+      x[feld] = t.value; objektSichern(o); return;
+    }
     if (t.dataset.nf || t.dataset.au) {
       const o = S.entwurf; if (!o) return;
       const nf = !!t.dataset.nf;
@@ -6693,6 +7305,52 @@ const Objekte = (() => {
         toast(d.portal ? "Im Portal sichtbar" : "Aus dem Portal genommen"); break;
       }
       /* ---------- Notfallnummern und Aushänge ---------- */
+      /* ---------- Auswertung ---------- */
+      case "aw-tab": S.awTab = b.dataset.wert; render(); break;
+      case "aw-wer": S.awWer = b.dataset.wert || ""; render(true); break;
+      case "aw-objekt": {
+        const o = S.liste.find(x => x.id === b.dataset.id); if (!o) return;
+        S.entwurf = Objekte.betreuungSicherstellen(Objekte.listeSicherstellen(JSON.parse(JSON.stringify(o))));
+        S.entwurf.beirat = S.entwurf.beirat || [];
+        S.tab = "objekte"; S.ansicht = "formular"; S.bearbeiten = false; S.istNeu = false; S.objTab = "stammdaten"; S.ueEinheit = null;
+        render(); break;
+      }
+      /* ---------- Dienstleistungsverträge ---------- */
+      case "dienst-neu": { const o = S.entwurf; if (!o) return;
+        const d = { id: Objekte.neueId(), art: b.dataset.wert || "hausmeister", firma: "", handwerkerId: "", ansprechpartner: "", telefon: "", email: "",
+          beginn: "", ende: "", kuendigung: "3 Monate zum Quartalsende", verguetung: "", zahlweise: "monatlich", ust: "19",
+          umlage: true, leistungen: [], notizen: "", erstellt: new Date().toISOString() };
+        diensteListe(o).push(d); S.dienstOffen = d.id; S.objTab = "dienste";
+        await objektSichern(o); render(true); break; }
+      case "dienst-auf": { S.dienstOffen = S.dienstOffen === b.dataset.id ? "" : b.dataset.id; S.loeschen = false; render(true); break; }
+      case "dienst-umlage": { const o = S.entwurf; if (!o) return; const d = diensteListe(o)[Number(b.dataset.i)]; if (!d) return;
+        d.umlage = d.umlage === false; await objektSichern(o); render(true); break; }
+      case "dienst-weg": { const o = S.entwurf; if (!o) return; const i = Number(b.dataset.i);
+        if (S.loeschen !== "dv" + i) { S.loeschen = "dv" + i; render(true); return; }
+        diensteListe(o).splice(i, 1); S.loeschen = false; S.dienstOffen = "";
+        await objektSichern(o); render(true); toast("Vertrag gelöscht"); break; }
+      case "lv-neu": { const o = S.entwurf; if (!o) return; const d = diensteListe(o)[Number(b.dataset.i)]; if (!d) return;
+        dienstLeistungen(d).push({ id: Objekte.neueId(), was: "", turnus: "", hinweis: "" });
+        await objektSichern(o); render(true);
+        app.querySelector("[data-lv='" + b.dataset.i + "|" + (d.leistungen.length - 1) + "|was']")?.focus({ preventScroll: true }); break; }
+      case "lv-weg": { const o = S.entwurf; if (!o) return; const i = Number(b.dataset.i); const j = Number(b.dataset.j);
+        const d = diensteListe(o)[i]; if (!d) return;
+        if (S.loeschen !== "lv" + i + "-" + j) { S.loeschen = "lv" + i + "-" + j; render(true); return; }
+        dienstLeistungen(d).splice(j, 1); S.loeschen = false; await objektSichern(o); render(true); break; }
+      case "lv-standard": { const o = S.entwurf; if (!o) return; const d = diensteListe(o)[Number(b.dataset.i)]; if (!d) return;
+        const vorhanden = dienstLeistungen(d).map(x => String(x.was || "").toLowerCase());
+        (LV_STANDARD[d.art] || []).forEach(([was, turnus, hinweis]) => {
+          if (!vorhanden.includes(was.toLowerCase())) d.leistungen.push({ id: Objekte.neueId(), was, turnus, hinweis }); });
+        await objektSichern(o); render(true); toast("Leistungen angehängt – bitte prüfen und anpassen"); break; }
+      case "dienst-vertrag": { const o = S.entwurf; if (!o) return;
+        if (!diensteListe(o).some(x => x.id === b.dataset.id)) return;
+        S.dienstDruck = b.dataset.id; render(); break; }
+      case "dienst-zurueck": { S.dienstDruck = ""; S.objTab = "dienste"; render(); break; }
+      case "dienst-text": { const o = S.entwurf; if (!o) return;
+        const d = diensteListe(o).find(x => x.id === b.dataset.id); if (!d) return;
+        try { await navigator.clipboard.writeText(dienstMailText(o, d)); toast("Anschreiben kopiert – jetzt in Ihre E-Mail einfügen"); }
+        catch (err) { toast("Kopieren hat nicht geklappt."); }
+        break; }
       case "nf-neu": { const o = S.entwurf; if (!o) return; notfallListe(o).push({ id: Objekte.neueId(), was: "", nummer: "", hinweis: "" });
         await objektSichern(o); render(true); app.querySelector("[data-nf='" + (o.notfall.length - 1) + "|was']")?.focus({ preventScroll: true }); break; }
       case "nf-weg": { const o = S.entwurf; if (!o) return; const i = Number(b.dataset.i);
@@ -6744,6 +7402,49 @@ const Objekte = (() => {
         S.tickets.unshift(t);
         try { await Speicher.speichern("tickets", t, S.tickets); } catch (e) {}
         S.ptmNr = t.nr; render(true); break;
+      }
+      /* ---------- SEPA-Mandat ---------- */
+      case "mandat-brief": {
+        const pn = S.personen.find(x => x.id === id); if (!pn) return;
+        S.mandatFuer = pn.id; S.mdMeldung = ""; S.mdOk = false; render(); break;
+      }
+      case "mandat-zurueck": { S.mandatFuer = ""; S.mdMeldung = ""; S.pTab = "konto"; render(); break; }
+      case "mandat-drucken": try { window.print(); } catch (err) { toast("Drucken ist hier nicht möglich – bitte über das Menü des Browsers."); } break;
+      case "mandat-text": {
+        const pn = mandatPerson(); if (!pn) return;
+        try { await navigator.clipboard.writeText(mandatMailText(pn)); toast("Anschreiben kopiert – jetzt in Ihre E-Mail einfügen"); }
+        catch (err) { toast("Kopieren hat nicht geklappt."); }
+        break;
+      }
+      case "mandat-versendet": {
+        const pn = mandatPerson(); if (!pn) return;
+        pn.mandatGesendet = new Date().toISOString();
+        if (!String(pn.mandatRef || "").trim()) pn.mandatRef = mandatRefFuer(pn);
+        S.pDirty.add(pn.id);
+        try { await Speicher.speichern("personen", pn, S.personen); } catch (err) {}
+        S.mdOk = true; S.mdMeldung = "Versand vermerkt. Sobald das unterschriebene Mandat zurück ist, hier hinterlegen.";
+        render(true); break;
+      }
+      case "mandat-hinterlegen": {
+        const pn = mandatPerson(); if (!pn) return;
+        const wert = n => { const el = app.querySelector("[data-md='" + n + "']"); return el ? String(el.value || "").trim() : ""; };
+        const datum = wert("datum"); const ref = wert("ref");
+        S.mdOk = false;
+        if (!datum) { S.mdMeldung = "Bitte tragen Sie ein, wann das Mandat unterschrieben wurde – ohne dieses Datum darf nicht eingezogen werden."; render(true); return; }
+        if (datum > new Date().toISOString().slice(0, 10)) { S.mdMeldung = "Das Unterschriftsdatum darf nicht in der Zukunft liegen."; render(true); return; }
+        if (!ref) { S.mdMeldung = "Bitte eine Mandatsreferenz angeben."; render(true); return; }
+        const doppelt = S.personen.some(x => x.id !== pn.id && String(x.mandatRef || "").trim() === ref);
+        if (doppelt) { S.mdMeldung = "Diese Mandatsreferenz wird schon bei einer anderen Person verwendet."; render(true); return; }
+        pn.mandat = true; pn.mandatDatum = datum; pn.mandatRef = ref;
+        S.pDirty.add(pn.id);
+        try { await Speicher.speichern("personen", pn, S.personen); } catch (err) {}
+        S.mdOk = true; S.mdMeldung = "Mandat hinterlegt. Der Einzug ist damit erlaubt – bitte den Scan noch unter „Dokumente“ ablegen.";
+        render(true); toast("SEPA-Mandat hinterlegt"); break;
+      }
+      case "mandat-dokumente": {
+        const pn = mandatPerson(); if (!pn) return;
+        S.mandatFuer = ""; S.mdMeldung = ""; S.pEntwurf = { ...leerePerson(), ...JSON.parse(JSON.stringify(pn)) };
+        S.pTab = "dok"; S.pBearbeiten = false; S.tab = "personen"; S.ansicht = "liste"; render(); break;
       }
       case "pt-ansehen": { if (!S.personen.some(x => x.id === id)) return; S.portalVorschau = id; render(); break; }
       case "pt-vorschau-zurueck": { S.portalVorschau = ""; S.pTab = "portal"; S.ptmNr = ""; S.ptmMeldung = ""; render(); break; }
