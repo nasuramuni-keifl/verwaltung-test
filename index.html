@@ -788,6 +788,11 @@ a.btn{text-decoration:none;display:inline-block}
 header.kopf[hidden]{display:none}
 body.portal-an{padding-top:18px;padding-bottom:76px}
 body.portal-an .seite{max-width:880px;margin:0 auto}
+.vorschau-band{max-width:880px;margin:0 auto 18px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
+  background:var(--warn-soft);color:var(--warn);border-radius:14px;padding:12px 16px}
+.vorschau-band small{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+.pt-vorgang{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:11px 0;border-top:1px solid var(--line);font-size:14px}
+.pt-vorgang:first-of-type{border-top:0}
 body.nur-lesen input:disabled,body.nur-lesen select:disabled,body.nur-lesen textarea:disabled{opacity:1;color:var(--muted);cursor:not-allowed}
 </style>
 </head>
@@ -1846,7 +1851,9 @@ const Objekte = (() => {
     if (!o) h += "<ul class='meldungen'><li class='m-hinweis'>Diese Person ist noch keinem Objekt zugeordnet. Ohne Objekt gibt es keine Notfallnummern und Aushänge zu zeigen.</li></ul>";
     h += "<div class='schalter-zeile'><div>Portalzugang erlauben<small>" +
       (an ? "Benutzername: " + esc(mail) : "Noch kein Zugang eingerichtet.") + "</small></div>" +
-      "<button type='button' class='schalter' role='switch' aria-checked='" + an + "' aria-label='Portalzugang' data-act='pt-zugang' data-id='" + esc(p.id) + "'></button></div>";
+      "<button type='button' class='schalter' role='switch' aria-checked='" + an + "' aria-label='Portalzugang' data-act='pt-zugang' data-id='" + esc(p.id) + "'></button></div>" +
+      "<div class='leiste'><div><button class='btn klein' data-act='pt-ansehen' data-id='" + esc(p.id) + "'>Portal aus ihrer Sicht ansehen</button>" +
+      "<span class='fuer'>Zum Erklären am Telefon. Dabei lässt sich nichts ändern.</span></div></div>";
     if (an) {
       h += (p.pwStart
         ? "<ul class='meldungen' style='margin-top:12px'><li class='m-hinweis'>Startkennwort steht bereit: <strong>" + esc(portalStart(p)) +
@@ -2017,7 +2024,7 @@ const Objekte = (() => {
   const meineRechte = () => { const m = angemeldet(); return (!m || m.id === ADMIN_ID) ? { gesperrt: [], nurLesen: false } : rechteVon(m); };
   const leseModus = () => meineRechte().nurLesen;
   /* Ansehen, öffnen, drucken, abbrechen bleiben frei – alles andere ändert Daten. */
-  const LESEN_FREI = /^(tab|[a-z0-9]+-tab|oeffnen|[a-z0-9-]+-oeffnen|[a-z0-9-]+-auf|bearbeiten|[a-z0-9-]+-bearbeiten|abbrechen|[a-z0-9-]+-abbrechen|[a-z0-9-]+-abbr|zurueck|[a-z0-9-]+-zurueck|[a-z0-9-]+-zu|drucken|[a-z0-9-]+-drucken|download|[a-z0-9-]+-download|[a-z0-9-]+-pdf|filter|[a-z0-9-]+-filter|kal-[a-z]+|seg|pw-sicht|an-login|an-abmelden|an-pw-ok|an-pw-inline|e-meine|e-ansicht|t-meine|t-ansicht|p-ehemalige|beendete|info-alle|info-gelesen|td-verlauf|bs-ansehen|brief-anzeigen|prot-ordnung|kr-prot)$/;
+  const LESEN_FREI = /^(tab|[a-z0-9]+-tab|oeffnen|[a-z0-9-]+-oeffnen|[a-z0-9-]+-auf|bearbeiten|[a-z0-9-]+-bearbeiten|abbrechen|[a-z0-9-]+-abbrechen|[a-z0-9-]+-abbr|zurueck|[a-z0-9-]+-zurueck|[a-z0-9-]+-zu|drucken|[a-z0-9-]+-drucken|download|[a-z0-9-]+-download|[a-z0-9-]+-pdf|filter|[a-z0-9-]+-filter|kal-[a-z]+|seg|pt-ansehen|pw-sicht|an-login|an-abmelden|an-pw-ok|an-pw-inline|e-meine|e-ansicht|t-meine|t-ansicht|p-ehemalige|beendete|info-alle|info-gelesen|td-verlauf|bs-ansehen|brief-anzeigen|prot-ordnung|kr-prot)$/;
   /* Diese Felder bleiben auch im Nur-Lese-Zugang bedienbar. */
   const feldFrei = el => !!el && (["mz-alt", "mz-neu", "mz-neu2", "suche"].includes(el.id) || el.type === "search" ||
     !!el.closest("#ze") || !!el.closest("#anmeldung"));
@@ -2432,13 +2439,51 @@ const Objekte = (() => {
     return aus.sort((a, b) => (a.datum + a.zeit).localeCompare(b.datum + b.zeit));
   }
   /* Was ein Mieter oder Eigentümer nach der Anmeldung sieht – sonst nichts. */
-  function portalSeiteHtml(p) {
+  /* Schadensmeldung aus dem Portal: wird zu einem Ticket mit Wiedervorlage am nächsten Werktag. */
+  function portalMeldungHtml(p, vorschau) {
+    const o = portalObjekt(p);
+    const gesperrt = vorschau ? " disabled" : "";
+    const meine = S.tickets.filter(t => t.melderWert === "p:" + p.id)
+      .sort((a, b) => String(b.erstellt || "").localeCompare(String(a.erstellt || ""))).slice(0, 8);
+    let h = "<section class='gruppe'><h2>Schaden oder Mangel melden</h2>" +
+      "<p class='unter'>Ihre Meldung geht sofort an die Verwaltung. Bei Gefahr für Menschen rufen Sie bitte zuerst 112 oder die Notfallnummern oben an.</p>";
+    if (!o) return h + "<p class='unter'>Sie sind noch keinem Objekt zugeordnet. Bitte wenden Sie sich an die Verwaltung.</p></section>";
+    if (S.ptmNr) h += "<ul class='meldungen'><li class='m-ok'>Ihre Meldung ist eingegangen – Vorgangsnummer <strong>" + esc(S.ptmNr) +
+      "</strong>. Wir kümmern uns ab dem nächsten Werktag darum und melden uns bei Ihnen.</li></ul>";
+    if (S.ptmMeldung) h += "<ul class='meldungen'><li class='m-fehler'>" + esc(S.ptmMeldung) + "</li></ul>";
+    h += "<p class='unter'>Betrifft: <strong>" + esc(objName(o)) + "</strong>" + (p.einheit ? " · " + esc(p.einheit) : "") + "</p>" +
+      "<div class='felder'><div class='feld breit'><label for='ptm-titel'>Worum geht es?</label>" +
+      "<input type='text' id='ptm-titel' data-ptm='titel' placeholder='z. B. Heizung wird nicht warm'" + gesperrt + "></div>" +
+      "<div class='feld'><label for='ptm-ort'>Wo genau?</label><input type='text' id='ptm-ort' data-ptm='ort' placeholder='z. B. Bad, Küche, Treppenhaus'" + gesperrt + "></div>" +
+      "<div class='feld'><label for='ptm-seit'>Seit wann?</label><input type='date' id='ptm-seit' data-ptm='seit'" + gesperrt + "></div>" +
+      "<div class='feld'><label for='ptm-telefon'>Telefon für Rückfragen</label><input type='tel' id='ptm-telefon' data-ptm='telefon' value='" +
+      esc(p.telefon || "") + "'" + gesperrt + "></div></div>" +
+      "<div class='feld' style='margin-top:14px'><label for='ptm-text'>Was ist passiert?</label>" +
+      "<textarea id='ptm-text' data-ptm='text' rows='4' placeholder='Bitte kurz beschreiben, was nicht in Ordnung ist.'" + gesperrt + "></textarea></div>" +
+      "<label class='re-feld' style='margin-top:12px;max-width:420px'><input type='checkbox' data-ptm='eilt'" + gesperrt +
+      ">Es eilt – es läuft Wasser, es ist kalt oder etwas ist gefährlich</label>" +
+      (vorschau ? "<p class='unter' style='margin-top:12px'>Hier sendet die Person ihre Meldung ab. Sie landet als Ticket „Schadensmeldung“ bei Ihnen.</p>"
+        : "<div class='leiste'><div><button class='btn klein haupt' data-act='pt-meldung'>Meldung absenden</button>" +
+          "<span class='fuer'>Sie bekommen hier eine Vorgangsnummer.</span></div></div>");
+    h += "<h3 style='margin-top:22px'>Ihre Meldungen <span class='fuer'>" + meine.length + "</span></h3>" +
+      (meine.length ? meine.map(t => "<div class='pt-vorgang'><span><strong>" + esc(t.titel || "Meldung") + "</strong><br>" +
+        "<span class='fuer'>Nr. " + esc(t.nr) + " · " + esc(Objekte.datum(String(t.erstellt || "").slice(0, 10))) + "</span></span>" +
+        "<span class='marke s-" + esc(Objekte.ticketStatus(t) === "erledigt" ? "erledigt" : "neu") + "'>" +
+        esc(Objekte.label(Objekte.STATUS, Objekte.ticketStatus(t))) + "</span></div>").join("")
+        : "<p class='unter'>Sie haben noch nichts gemeldet.</p>");
+    return h + "</section>";
+  }
+  function portalSeiteHtml(p, vorschau) {
     const o = portalObjekt(p);
     const heute = new Date().toISOString().slice(0, 10);
     const nf = o ? notfallListe(o).filter(x => String(x.nummer || "").trim()) : [];
     const au = o ? aushangListe(o).filter(x => (!x.bis || x.bis >= heute) && (x.titel || x.text)) : [];
     const dateien = portalDateien(p);
-    let h = "<div class='seite portal'><div class='hero'><h1>Willkommen, " + esc(Objekte.personName(p)) + "</h1>" +
+    let h = vorschau
+      ? "<div class='vorschau-band'><div><strong>Ansicht von " + esc(Objekte.personName(p)) + "</strong>" +
+        "<small>So sieht diese Person ihr Portal. Hier lässt sich nichts ändern.</small></div>" +
+        "<button class='btn klein' data-act='pt-vorschau-zurueck'>Zurück zur Verwaltung</button></div>" : "";
+    h += "<div class='seite portal'><div class='hero'><h1>Willkommen, " + esc(Objekte.personName(p)) + "</h1>" +
       "<p>" + esc(o ? objName(o) : "Ihr Objekt") + (p.einheit ? " · " + esc(p.einheit) : "") + "</p></div>";
 
     h += "<section class='gruppe'><h2>Im Notfall</h2>" +
@@ -2460,8 +2505,10 @@ const Objekte = (() => {
         esc([d.art, zeitstempel(d.hochgeladen)].filter(Boolean).join(" · ")) + "</span></span><span class='fuer'>öffnen</span></a>").join("") + "</div>"
         : "<p class='unter'>Hier erscheinen Schreiben, die wir für Sie freigeben.</p>") + "</section>";
 
+    h += portalMeldungHtml(p, vorschau);
+
     const kf = (n, l, typ, hilfe) => "<div class='feld'><label for='ptk-" + n + "'>" + l + "</label>" +
-      "<input type='" + (typ || "text") + "' id='ptk-" + n + "' data-ptk='" + n + "' value='" + esc(p[n] || "") + "'>" +
+      "<input type='" + (typ || "text") + "' id='ptk-" + n + "' data-ptk='" + n + "' value='" + esc(p[n] || "") + "'" + (vorschau ? " disabled" : "") + ">" +
       (hilfe ? "<small>" + hilfe + "</small>" : "") + "</div>";
     h += "<section class='gruppe'><h2>Ihre Kontaktdaten</h2>" +
       "<p class='unter'>Bitte halten Sie Ihre Angaben aktuell, damit wir Sie im Bedarfsfall erreichen. Name und Wohnung ändert nur die Verwaltung.</p>" +
@@ -2469,19 +2516,25 @@ const Objekte = (() => {
       "<div class='felder'>" + kf("telefon", "Telefon", "tel") + kf("email", "E-Mail", "email", "Damit melden Sie sich an.") + "</div>" +
       "<h3 style='margin-top:20px'>Anschrift für Post</h3><div class='felder'>" +
       kf("strasse", "Straße und Nr.") + kf("plz", "PLZ") + kf("ort", "Ort") + "</div>" +
-      "<div class='leiste'><div><button class='btn klein haupt' data-act='pt-mein-speichern'>Angaben speichern</button>" +
-      (p.kontaktGeaendert ? "<span class='fuer'>Zuletzt von Ihnen geändert am " + esc(Objekte.datum(String(p.kontaktGeaendert).slice(0, 10))) + ".</span>" : "") +
+      "<div class='leiste'><div>" + (vorschau ? "" : "<button class='btn klein haupt' data-act='pt-mein-speichern'>Angaben speichern</button>") +
+      (p.kontaktGeaendert ? "<span class='fuer'>Zuletzt " + (vorschau ? "von der Person" : "von Ihnen") + " geändert am " +
+        esc(Objekte.datum(String(p.kontaktGeaendert).slice(0, 10))) + ".</span>" : "") +
       "</div></div></section>";
 
     h += "<section class='gruppe'><h2>Ihr Zugang</h2>" +
-      "<p class='unter'>Angemeldet als <strong>" + esc(p.email || "") + "</strong>. " +
-      "Ihr Kennwort kann Ihnen niemand anzeigen – vergeben Sie hier bei Bedarf ein neues.</p>" +
-      (S.pwMeldung ? "<ul class='meldungen'><li class='" + (S.pwMeldungOk ? "m-ok" : "m-fehler") + "'>" + esc(S.pwMeldung) + "</li></ul>" : "") +
-      "<div class='felder'>" + pwFeldHtml("mz-alt", "Jetziges Kennwort") + pwFeldHtml("mz-neu", "Neues Kennwort") +
-      pwFeldHtml("mz-neu2", "Neues Kennwort wiederholen") + "</div>" +
-      "<div class='leiste'><div><button class='btn klein haupt' data-act='an-pw-inline'>Kennwort speichern</button>" +
-      "<span class='fuer'>Mindestens 10 Zeichen.</span></div>" +
-      "<button class='btn klein' data-act='an-abmelden'>Abmelden</button></div></section>";
+      "<p class='unter'>" + (vorschau ? "Benutzername" : "Angemeldet als") + " <strong>" + esc(p.email || "noch keine E-Mail-Adresse") + "</strong>. " +
+      (vorschau
+        ? (portalZugang(p) ? "Der Zugang ist eingeschaltet." : "Der Zugang ist noch nicht eingeschaltet.") +
+          (p.pwStart ? " Es gilt noch das Startkennwort." : "") +
+          (p.letzteAnmeldung ? " Zuletzt angemeldet am " + esc(Objekte.datum(String(p.letzteAnmeldung).slice(0, 10))) + "." : " Noch nie angemeldet.") +
+          " An dieser Stelle kann die Person ihr Kennwort selbst ändern.</p>"
+        : "Ihr Kennwort kann Ihnen niemand anzeigen – vergeben Sie hier bei Bedarf ein neues.</p>" +
+          (S.pwMeldung ? "<ul class='meldungen'><li class='" + (S.pwMeldungOk ? "m-ok" : "m-fehler") + "'>" + esc(S.pwMeldung) + "</li></ul>" : "") +
+          "<div class='felder'>" + pwFeldHtml("mz-alt", "Jetziges Kennwort") + pwFeldHtml("mz-neu", "Neues Kennwort") +
+          pwFeldHtml("mz-neu2", "Neues Kennwort wiederholen") + "</div>" +
+          "<div class='leiste'><div><button class='btn klein haupt' data-act='an-pw-inline'>Kennwort speichern</button>" +
+          "<span class='fuer'>Mindestens 10 Zeichen.</span></div>" +
+          "<button class='btn klein' data-act='an-abmelden'>Abmelden</button></div>") + "</section>";
     return h + "</div>";
   }
   function kalenderSeiteHtml() {
@@ -5378,6 +5431,18 @@ const Objekte = (() => {
       window.scrollTo({ top: behalteScroll ? y : 0 });
       return;
     }
+    /* Vorschau: die Verwaltung sieht das Portal einer Person, ohne etwas ändern zu können. */
+    const schau = S.portalVorschau ? S.personen.find(x => x.id === S.portalVorschau) : null;
+    if (schau) {
+      if (kopfLeiste) kopfLeiste.hidden = true;
+      document.body.classList.add("portal-an");
+      $("#neu-knopf").hidden = true; $("#status").hidden = true; $("#lese-hinweis").hidden = true;
+      $("#ze").hidden = true; $("#vv").hidden = true;
+      app.hidden = false;
+      app.innerHTML = portalSeiteHtml(schau, true);
+      window.scrollTo({ top: behalteScroll ? y : 0 });
+      return;
+    }
     $("#status").hidden = false;
     if (ich && ich.id !== ADMIN_ID) S.ichBin = ich.id;
     /* Mitarbeiterverwaltung und Kontenrahmen sind der Verwalterrolle vorbehalten. */
@@ -6652,6 +6717,36 @@ const Objekte = (() => {
         try { await Speicher.speichern("personen", pn, S.personen); } catch (e) {}
         render(true); break;
       }
+      /* Die Meldung aus dem Portal wird zu einem Ticket – Wiedervorlage am nächsten Werktag. */
+      case "pt-meldung": {
+        const pn = portalNutzer(); if (!pn) return;
+        const feld = n => { const el = app.querySelector("[data-ptm='" + n + "']"); return el ? String(el.value || "").trim() : ""; };
+        const titel = feld("titel"); const text = feld("text");
+        S.ptmNr = ""; S.ptmMeldung = "";
+        if (!titel) { S.ptmMeldung = "Bitte tragen Sie kurz ein, worum es geht."; render(true); return; }
+        if (!text) { S.ptmMeldung = "Bitte beschreiben Sie kurz, was passiert ist."; render(true); return; }
+        const eiltFeld = app.querySelector("[data-ptm='eilt']");
+        const eilt = !!(eiltFeld && eiltFeld.checked);
+        const o = portalObjekt(pn);
+        const tel2 = feld("telefon");
+        if (tel2 && tel2 !== pn.telefon) { pn.telefon = tel2; S.pDirty.add(pn.id);
+          try { await Speicher.speichern("personen", pn, S.personen); } catch (e) {} }
+        const wv = geschaeftstagePlus(isoTag(new Date()), 1);
+        const t = { id: Objekte.neueId(), nr: Objekte.ticketNummer(S.tickets),
+          titel: titel, termin: wv, terminZeit: "", objektId: pn.objektId || "", einheitId: pn.einheitId || "",
+          melderWert: "p:" + pn.id, melderName: Objekte.personName(pn), melderTelefon: tel2 || pn.telefon || "", melderEmail: pn.email || "",
+          kategorie: "schaden", dringlichkeit: eilt ? "hoch" : "normal",
+          beschreibung: [feld("ort") ? "Ort: " + feld("ort") : "", feld("seit") ? "Seit: " + Objekte.datum(feld("seit")) : "", text, "",
+            "Über das Portal gemeldet am " + zeitpunkt(new Date().toISOString()) + " von " + Objekte.personName(pn) +
+            (pn.einheit ? " (" + pn.einheit + ")" : "") + "." + (eilt ? " Die Person hat „Es eilt“ angegeben." : "")].filter(Boolean).join("\n"),
+          status: "neu", bearbeiterId: (o && (o.betreuerIds || [])[0]) || (o && o.technikId) || "",
+          verlauf: [], mails: [], quelle: "portal", erstellt: new Date().toISOString() };
+        S.tickets.unshift(t);
+        try { await Speicher.speichern("tickets", t, S.tickets); } catch (e) {}
+        S.ptmNr = t.nr; render(true); break;
+      }
+      case "pt-ansehen": { if (!S.personen.some(x => x.id === id)) return; S.portalVorschau = id; render(); break; }
+      case "pt-vorschau-zurueck": { S.portalVorschau = ""; S.pTab = "portal"; S.ptmNr = ""; S.ptmMeldung = ""; render(); break; }
       /* Mieter und Eigentümer pflegen ihre Kontaktdaten selbst. */
       case "pt-mein-speichern": {
         const pn = portalNutzer(); if (!pn) return;
