@@ -819,6 +819,22 @@ body.portal-an .seite{max-width:880px;margin:0 auto}
 .um-row2 input,.um-row2 select{padding:8px 10px;font-size:13px}
 .um-zusatz{display:grid;grid-template-columns:1fr 110px 44px;gap:10px;align-items:center;padding:7px 0 7px 14px;border-bottom:1px solid var(--line);font-size:13px;color:var(--muted)}
 .um-neu{padding:12px 14px;background:var(--field);border-radius:14px;margin:8px 0}
+.ko-kopf,.ko-row{display:grid;grid-template-columns:150px 1.6fr 1.4fr 130px 54px;gap:10px;align-items:start;padding:9px 0;border-bottom:1px solid var(--line)}
+.ko-kopf{font-size:12px;color:var(--muted)}
+.ko-row input,.ko-row select{padding:8px 10px;font-size:13px}
+.ko-beleg{display:grid;grid-template-columns:1.8fr 1.2fr 120px;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+.ue-tab2{overflow-x:auto}
+.ue-kopf,.ue-row{display:grid;grid-template-columns:1.2fr 1.3fr 1.6fr 110px 140px 120px 150px;gap:9px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);min-width:960px}
+.ue-kopf{font-size:12px;color:var(--muted)}
+.ue-row input{padding:8px 10px;font-size:13px}
+.ue-row.ue-ok{background:var(--ok-soft);border-radius:10px}
+.ue-tasten{display:flex;gap:4px;flex-wrap:wrap}
+.ue-tasten .btn{padding:4px 9px;font-size:12px}
+.abe-kopf,.abe-row{display:grid;grid-template-columns:1fr 1.5fr 1.1fr 1.1fr 1.3fr 110px;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
+.abe-kopf{font-size:12px;color:var(--muted)}
+.abr-tab td,.abr-tab th{padding:7px 10px 7px 0}
+.abr-tab tr.abr-summe td{border-top:1.5px solid #334155;border-bottom:0}
+@media (max-width:760px){.ko-kopf,.abe-kopf,.ko-beleg{display:none}.ko-row,.abe-row{grid-template-columns:1fr 1fr}}
 .abr-kopf,.abr-row{display:grid;grid-template-columns:1.5fr 1.2fr 1fr 1fr .9fr 1fr;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
 .abr-row select,.abr-row input{padding:8px 10px;font-size:13px}
 .abr-row.abr-ok{background:var(--ok-soft);border-radius:10px;padding-left:8px;padding-right:8px}
@@ -857,8 +873,14 @@ body.portal-an .seite{max-width:880px;margin:0 auto}
 .org-karte strong{font-size:14.5px}
 .org-zahl{font-size:11.5px;color:var(--accent)}
 @media (max-width:760px){.aw-kopf,.aw-kopf2,.org-kopf{display:none}.aw-row{grid-template-columns:1fr 1fr}.aw-row2{grid-template-columns:1fr 1fr 1fr}.org-row{grid-template-columns:1fr}}
-.bs-raster{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;margin-top:12px}
-.bs-raster .re-feld .btn{margin-left:auto;padding:2px 7px;font-size:11.5px}
+.bs-liste{display:grid;gap:8px;margin-top:12px}
+.bs-zeile{display:flex;align-items:flex-start;gap:10px;background:var(--field);border:1.5px solid transparent;border-radius:14px;padding:11px 13px}
+.bs-zeile.aus{background:transparent;border-color:var(--line)}
+.bs-wahl{display:flex;align-items:flex-start;gap:10px;flex:1;min-width:0;cursor:pointer;font-size:14px}
+.bs-wahl input{width:17px;height:17px;flex:none;margin-top:2px;accent-color:var(--accent);cursor:pointer}
+.bs-fest{font-size:11px;color:var(--accent);background:var(--accent-soft);border-radius:999px;padding:1px 8px}
+.bs-tasten{display:flex;gap:4px;flex:none}
+.bs-tasten .btn{padding:3px 9px;font-size:12px}
 .bs-schalter{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;margin-top:12px}
 .re-feld.fest{background:var(--accent-soft);color:var(--accent-ink,var(--ink))}
 .dv-liste{display:grid;gap:12px;margin-top:14px}
@@ -1550,51 +1572,14 @@ const Objekte = (() => {
       ["Störungsdienst innerhalb der vereinbarten Reaktionszeit", "nach Bedarf", "Anfahrt und Arbeitszeit nach Aufwand"]],
     sonstiges: []
   };
-  /* Vertragsbausteine wie beim Verwaltervertrag: Pflichtteile stehen fest, der Rest lässt sich zuschalten. */
-  const DIENST_BAUSTEINE = [
-    { id: "gegenstand", titel: "Gegenstand", pflicht: true, fuer: "alle",
-      text: "Der Auftragnehmer erbringt für das Objekt [Objekt] die in diesem Vertrag aufgeführten Leistungen in eigener Verantwortung und mit eigenem Gerät. Ein Arbeitsverhältnis wird nicht begründet." },
-    { id: "anlage", titel: "Gegenstand der Wartung", standard: true, fuer: ["wartung"],
-      text: "Gewartet wird: [Anlage]. Der Auftragnehmer kennt die Anlage, die Herstellervorgaben und die einschlägigen technischen Regeln und setzt ausschließlich sachkundiges Personal ein." },
-    { id: "lv", titel: "Leistungsverzeichnis", pflicht: true, fuer: "alle", lv: true, text: "" },
-    { id: "intervall", titel: "Wartungsintervalle und Protokolle", standard: true, fuer: ["wartung"],
-      text: "Die Wartung erfolgt [Intervall]. Der Auftragnehmer stimmt die Termine rechtzeitig mit der Verwaltung ab und übergibt nach jedem Einsatz ein unterschriebenes Wartungsprotokoll mit Datum, Prüfumfang, Messwerten und festgestellten Mängeln. Die Protokolle sind Grundlage der Betreiberpflichten des Auftraggebers." },
-    { id: "stoerung", titel: "Störungsdienst und Reaktionszeit", standard: false, fuer: ["wartung", "hausmeister", "winter"],
-      text: "Der Auftragnehmer ist unter der vereinbarten Rufnummer erreichbar und beginnt nach einer Störungsmeldung innerhalb von [Reaktionszeit] mit der Entstörung. Bei Gefahr für Personen oder erheblichen Sachschäden wird unverzüglich tätig geworden. Einsätze außerhalb der Wartung werden nach Aufwand abgerechnet." },
-    { id: "ersatzteile", titel: "Ersatzteile und Verschleißmaterial", standard: true, fuer: ["wartung"],
-      text: "Kleinteile und Betriebsstoffe im üblichen Umfang sind mit der Vergütung abgegolten. Darüber hinausgehende Ersatzteile und Instandsetzungen bedürfen der vorherigen Beauftragung durch die Verwaltung; bei Gefahr im Verzug genügt die unverzügliche Unterrichtung." },
-    { id: "verguetung", titel: "Vergütung", pflicht: true, fuer: "alle",
-      text: "Die Vergütung beträgt [Vergütung]. Sie ist nach Rechnungsstellung ohne Abzug fällig. Mit ihr sind sämtliche vereinbarten Leistungen abgegolten; Material und Sonderleistungen werden nur nach vorheriger Beauftragung durch die Verwaltung vergütet." },
-    { id: "preisanpassung", titel: "Preisanpassung", standard: false, fuer: "alle",
-      text: "Eine Anpassung der Vergütung kann frühestens zwölf Monate nach Vertragsbeginn und danach einmal jährlich verlangt werden. Sie ist in Textform zu begründen und orientiert sich an [Index]. Der Auftraggeber kann den Vertrag innerhalb eines Monats nach Zugang der Anpassung zum Ende des Folgemonats kündigen." },
-    { id: "laufzeit", titel: "Laufzeit und Kündigung", pflicht: true, fuer: "alle",
-      text: "Der Vertrag beginnt am [Beginn] [Ende]. Er kann von beiden Seiten mit einer Frist von [Kündigungsfrist] gekündigt werden. Das Recht zur außerordentlichen Kündigung aus wichtigem Grund bleibt unberührt. Kündigungen bedürfen der Textform." },
-    { id: "ausfuehrung", titel: "Ausführung und Personal", standard: true, fuer: "alle",
-      text: "Die Leistungen sind fachgerecht, sorgfältig und zu den üblichen Zeiten zu erbringen. Der Auftragnehmer setzt zuverlässiges Personal ein und beachtet die gesetzlichen Vorgaben, insbesondere das Mindestlohngesetz und die Vorschriften zur Arbeitssicherheit." },
-    { id: "vertretung", titel: "Vertretung bei Urlaub und Krankheit", standard: false, fuer: ["hausmeister", "reinigung", "gaertner", "winter"],
-      text: "Der Auftragnehmer stellt sicher, dass die Leistungen auch bei Urlaub, Krankheit und sonstiger Verhinderung ohne Unterbrechung erbracht werden, und benennt der Verwaltung auf Verlangen die Vertretung." },
-    { id: "nachunternehmer", titel: "Nachunternehmer und Abtretung", standard: false, fuer: "alle",
-      text: "Der Einsatz von Nachunternehmern bedarf der vorherigen Zustimmung der Verwaltung in Textform. Forderungen aus diesem Vertrag dürfen nur mit Zustimmung des Auftraggebers abgetreten werden." },
-    { id: "schluessel", titel: "Schlüssel und Zutritt", standard: false, fuer: "alle",
-      text: "Übergebene Schlüssel und Zutrittsmittel werden einzeln quittiert, sorgfältig verwahrt und bei Vertragsende vollständig zurückgegeben. Für Schäden aus Verlust haftet der Auftragnehmer; die Kosten einer notwendigen Schließanlagenumstellung trägt er im Rahmen seines Verschuldens." },
-    { id: "verkehr", titel: "Verkehrssicherungspflicht", standard: false, fuer: ["winter", "hausmeister", "gaertner"],
-      text: "Soweit dem Auftragnehmer die Verkehrssicherungspflicht übertragen ist, nimmt er sie eigenverantwortlich wahr, dokumentiert jeden Einsatz mit Datum und Uhrzeit und bewahrt die Nachweise mindestens drei Jahre auf. Er meldet erkannte Gefahrenstellen unverzüglich der Verwaltung." },
-    { id: "haftung", titel: "Nachweise und Haftung", standard: true, fuer: "alle",
-      text: "Der Auftragnehmer weist auf Verlangen eine Betriebshaftpflichtversicherung in angemessener Höhe nach. Er haftet für Schäden, die er oder seine Erfüllungsgehilfen schuldhaft verursachen. Mängel zeigt die Verwaltung an; der Auftragnehmer beseitigt sie unverzüglich." },
-    { id: "qualitaet", titel: "Qualitätskontrolle", standard: false, fuer: "alle",
-      text: "Die Verwaltung kann die Leistungen jederzeit kontrollieren und Mängel in Textform rügen. Werden gerügte Mängel nicht innerhalb angemessener Frist beseitigt, kann die Verwaltung die Leistung auf Kosten des Auftragnehmers durch Dritte ausführen lassen." },
-    { id: "umwelt", titel: "Mittel und Umweltschutz", standard: false, fuer: ["reinigung", "gaertner"],
-      text: "Es werden nur handelsübliche, umweltverträgliche Mittel in der vorgesehenen Dosierung verwendet. Der Einsatz von Pflanzenschutz- und Unkrautvernichtungsmitteln auf befestigten Flächen ist unzulässig. Abfälle werden ordnungsgemäß entsorgt." },
-    { id: "datenschutz", titel: "Datenschutz", standard: true, fuer: "alle",
-      text: "Beide Seiten verarbeiten personenbezogene Daten nur, soweit es für die Durchführung dieses Vertrages erforderlich ist (Art. 6 Abs. 1 lit. b DSGVO), und wahren die Vertraulichkeit." },
-    { id: "schluss", titel: "Schlussbestimmungen", pflicht: true, fuer: "alle",
-      text: "Änderungen und Ergänzungen bedürfen der Textform. Sollte eine Bestimmung unwirksam sein, bleibt der Vertrag im Übrigen wirksam. Mündliche Nebenabreden bestehen nicht." }
-  ];
+  /* Die Vertragsbausteine legt der Verwalter selbst an – mitgeliefert wird nichts. */
+  const DIENST_BAUSTEINE = [];
   const eigeneBausteine = () => Array.isArray(S.bausteine) ? S.bausteine : (S.bausteine = []);
   const alleBausteine = () => DIENST_BAUSTEINE.concat(eigeneBausteine());
   const bausteinePasst = (bs, art) => !bs.fuer || bs.fuer === "alle" || (Array.isArray(bs.fuer) && (!bs.fuer.length || bs.fuer.includes(art)));
   const bausteinAn = (d, bs) => bs.pflicht || (d.bausteine && Object.prototype.hasOwnProperty.call(d.bausteine, bs.id) ? !!d.bausteine[bs.id] : !!bs.standard);
-  const bausteineFuer = d => alleBausteine().filter(bs => bausteinePasst(bs, d.art));
+  const bausteineFuer = d => alleBausteine().filter(bs => bausteinePasst(bs, d.art))
+    .sort((a, b) => (Number(a.sortierung) || 0) - (Number(b.sortierung) || 0));
   async function bausteinSichern(bs) {
     const i = eigeneBausteine().findIndex(x => x.id === bs.id); if (i >= 0) S.bausteine[i] = bs; else S.bausteine.push(bs);
     try { await Speicher.speichern("bausteine", bs, S.bausteine); } catch (e) { toast("Speichern im Konto fehlgeschlagen – vorerst nur in diesem Browser gesichert."); }
@@ -1671,36 +1656,39 @@ const Objekte = (() => {
   function bausteineBlockHtml(d, i) {
     const liste = bausteineFuer(d);
     const an = bausteineAktiv(d);
-    const braucht = id => an.some(bs => bs.id === id);
+    const braucht = name => an.some(bs => String(bs.text || "").includes("[" + name + "]"));
     const fe = (feld, l, ph) => "<div class='feld'><label>" + esc(l) + "</label><input type='text' data-dv='" + i + "|" + feld + "' value='" + esc(d[feld] || "") + "' placeholder='" + esc(ph || "") + "'></div>";
-    let h = "<h3 style='margin-top:22px'>Vertragsbausteine <span class='fuer'>" + an.length + " von " + liste.length + "</span></h3>" +
-      "<p class='unter'>Pflichtteile stehen fest. Alles andere schalten Sie zu, wenn Sie es brauchen – genau wie beim Verwaltervertrag.</p>" +
-      "<div class='bs-raster'>" + liste.map(bs => {
-        if (bs.eigen) {
-          const drinE = bausteinAn(d, bs);
-          return "<label class='re-feld" + (drinE ? "" : " aus") + (bs.pflicht ? " fest" : "") + "' title='" + esc(String(bs.text || "").slice(0, 160)) + "'>" +
-            "<input type='checkbox' data-act='dv-baustein' data-i='" + i + "' data-wert='" + esc(bs.id) + "'" + (drinE ? " checked" : "") + (bs.pflicht ? " disabled" : "") + ">" +
-            esc(bs.titel) + (bs.pflicht ? " <span class='fuer'>fest</span>" : "") + " <span class='fuer'>eigener</span>" +
-            "<button class='btn klein' data-act='bs-edit' data-id='" + esc(bs.id) + "' title='ändern'>✎</button></label>";
-        }
-        const drin = bausteinAn(d, bs);
-        return "<label class='re-feld" + (drin ? "" : " aus") + (bs.pflicht ? " fest" : "") + "' title='" + esc(String(bs.text || "").slice(0, 160)) + "'>" +
-          "<input type='checkbox' data-act='dv-baustein' data-i='" + i + "' data-wert='" + bs.id + "'" + (drin ? " checked" : "") + (bs.pflicht ? " disabled" : "") + ">" +
-          esc(bs.titel) + (bs.pflicht ? " <span class='fuer'>fest</span>" : "") + "</label>";
-      }).join("") + "</div>" +
-      "<div class='leiste'><div><button class='btn klein' data-act='bs-neu' data-art='" + esc(d.art) + "'>+ Eigener Baustein</button>" +
-      "<span class='fuer'>Eigene Bausteine stehen danach in allen Verträgen zur Auswahl.</span></div></div>" +
+    let h = "<h3 style='margin-top:22px'>Vertragsbausteine <span class='fuer'>" + (liste.length ? an.length + " von " + liste.length : "noch keine") + "</span></h3>" +
+      "<p class='unter'>Sie schreiben die Bausteine einmal selbst – danach klicken Sie sie je Vertrag nur noch an. " +
+      "Das Leistungsverzeichnis steht immer im Vertrag.</p>";
+    h += liste.length
+      ? "<div class='bs-liste'>" + liste.map((bs, bi) => {
+          const drin = bausteinAn(d, bs);
+          return "<div class='bs-zeile" + (drin ? "" : " aus") + "'>" +
+            "<label class='bs-wahl'><input type='checkbox' data-act='dv-baustein' data-i='" + i + "' data-wert='" + esc(bs.id) + "'" +
+            (drin ? " checked" : "") + (bs.pflicht ? " disabled" : "") + ">" +
+            "<span><strong>" + esc(bs.titel) + "</strong>" + (bs.pflicht ? " <span class='bs-fest'>Pflicht</span>" : "") +
+            (Array.isArray(bs.fuer) && bs.fuer.length ? " <span class='fuer'>nur " + esc(DIENST_KURZ[bs.fuer[0]] || bs.fuer[0]) + "</span>" : "") +
+            "<br><span class='fuer'>" + esc(String(bs.text || "").slice(0, 110)) + (String(bs.text || "").length > 110 ? "…" : "") + "</span></span></label>" +
+            "<span class='bs-tasten'>" +
+            (bi > 0 ? "<button class='btn klein' data-act='bs-hoch' data-id='" + esc(bs.id) + "' title='nach oben'>↑</button>" : "") +
+            (bi < liste.length - 1 ? "<button class='btn klein' data-act='bs-runter' data-id='" + esc(bs.id) + "' title='nach unten'>↓</button>" : "") +
+            "<button class='btn klein' data-act='bs-edit' data-id='" + esc(bs.id) + "' title='ändern'>✎</button></span></div>";
+        }).join("") + "</div>"
+      : "<p class='unter'>Noch keine Bausteine angelegt. Schreiben Sie Ihre eigenen Abschnitte – Pflichtbausteine stehen danach in jedem Vertrag, die übrigen haken Sie je Vertrag an.</p>";
+    h += "<div class='leiste'><div><button class='btn klein" + (liste.length ? "" : " haupt") + "' data-act='bs-neu' data-art='" + esc(d.art) + "'>+ Baustein anlegen</button>" +
+      "<span class='fuer'>Einmal angelegt, stehen sie in allen Verträgen zur Auswahl.</span></div></div>" +
       (S.bsEntwurf ? bausteinFormHtml() : "");
     const zusatz = [];
-    if (braucht("stoerung")) zusatz.push(fe("reaktion", "Reaktionszeit bei Störungen", "z. B. 4 Stunden an Werktagen"));
-    if (braucht("intervall")) zusatz.push(fe("intervall", "Wartungsintervall", "z. B. einmal jährlich im Frühjahr"));
-    if (braucht("preisanpassung")) zusatz.push(fe("index", "Grundlage der Preisanpassung", "z. B. dem Verbraucherpreisindex des Statistischen Bundesamtes"));
-    if (braucht("anlage")) zusatz.push("<div class='feld'><label>Anlage</label><select data-dv='" + i + "|anlageId'>" +
+    if (braucht("Reaktionszeit")) zusatz.push(fe("reaktion", "Reaktionszeit bei Störungen", "z. B. 4 Stunden an Werktagen"));
+    if (braucht("Intervall")) zusatz.push(fe("intervall", "Wartungsintervall", "z. B. einmal jährlich im Frühjahr"));
+    if (braucht("Index")) zusatz.push(fe("index", "Grundlage der Preisanpassung", "z. B. dem Verbraucherpreisindex"));
+    if (braucht("Anlage")) zusatz.push("<div class='feld'><label>Anlage</label><select data-dv='" + i + "|anlageId'>" +
       "<option value=''>– frei eintragen –</option>" +
       ((S.entwurf && S.entwurf.anlagen) || []).map(a => "<option value='" + esc(a.id) + "'" + (d.anlageId === a.id ? " selected" : "") + ">" +
         esc([a.art, a.standort].filter(Boolean).join(" · ")) + "</option>").join("") + "</select></div>" +
-      fe("anlageText", "oder Beschreibung", "z. B. Gasbrennwertkessel Vitodens, Baujahr 2019"));
-    if (zusatz.length) h += "<div class='felder' style='margin-top:12px'>" + zusatz.join("") + "</div>";
+      fe("anlageText", "oder Beschreibung", "z. B. Gasbrennwertkessel, Baujahr 2019"));
+    if (zusatz.length) h += "<h4 class='az-ueber'>Angaben für die Bausteine</h4><div class='felder'>" + zusatz.join("") + "</div>";
     return h;
   }
   /* Maske für einen eigenen Vertragsbaustein. */
@@ -1735,8 +1723,8 @@ const Objekte = (() => {
       : "<p class='unter'>Noch kein Vertrag angelegt. Wählen Sie oben eine Leistung.</p>";
     h += "<ul class='meldungen' style='margin-top:16px'><li class='m-hinweis'>Umlagefähig sind nur die laufenden Kosten (§ 2 BetrKV). " +
       "Instandsetzung und Verwaltungsaufgaben des Hauswarts gehören nicht in die Betriebskostenabrechnung.</li>" +
-      "<li class='m-hinweis'>Der Vertragstext ist ein sorgfältig vorbereiteter Entwurf, aber keine Rechtsberatung. " +
-      "Lassen Sie ihn bei größeren Aufträgen anwaltlich prüfen.</li></ul></section>";
+      "<li class='m-hinweis'>Der Vertrag besteht aus Ihrem Leistungsverzeichnis und den Bausteinen, die Sie selbst geschrieben haben. " +
+      "Lassen Sie den Text bei größeren Aufträgen einmal anwaltlich prüfen.</li></ul></section>";
     return h;
   }
   /* Der fertige Vertrag zum Drucken – zusammengesetzt aus den gewählten Bausteinen. */
@@ -1794,19 +1782,16 @@ const Objekte = (() => {
       "<p class='md-text'><strong>Auftragnehmer:</strong><br>" + luecke(d.firma) +
       (d.ansprechpartner ? "<br>" + esc(d.ansprechpartner) : "") +
       (d.telefon || d.email ? "<br>" + esc([d.telefon, d.email].filter(Boolean).join(" · ")) : "") + "</p>";
-    let nr = 0;
+    let nr = 1;
+    h += "<h2>§ 1 Leistungsverzeichnis</h2>" +
+      (lv.length
+        ? "<table class='lv-tab'><thead><tr><th>Leistung</th><th>Turnus</th><th>Hinweis</th></tr></thead><tbody>" +
+          lv.map(x => "<tr><td>" + esc(x.was || "") + "</td><td>" + esc(x.turnus || "") + "</td><td>" + esc(x.hinweis || "") + "</td></tr>").join("") + "</tbody></table>"
+        : "<p class='md-text'>Noch keine Leistungen erfasst.</p>") +
+      (String(d.notizen || "").trim() ? "<p class='md-text'>" + esc(d.notizen).replace(/\n/g, "<br>") + "</p>" : "");
     bausteineAktiv(d).forEach(bs => {
       nr++;
-      h += "<h2>§ " + nr + " " + esc(bs.titel) + "</h2>";
-      if (bs.lv) {
-        h += lv.length
-          ? "<table class='lv-tab'><thead><tr><th>Leistung</th><th>Turnus</th><th>Hinweis</th></tr></thead><tbody>" +
-            lv.map(x => "<tr><td>" + esc(x.was || "") + "</td><td>" + esc(x.turnus || "") + "</td><td>" + esc(x.hinweis || "") + "</td></tr>").join("") + "</tbody></table>"
-          : "<p class='md-text'>Noch keine Leistungen erfasst.</p>";
-        if (String(d.notizen || "").trim()) h += "<p class='md-text'>" + esc(d.notizen).replace(/\n/g, "<br>") + "</p>";
-      } else {
-        h += "<p class='md-text'>" + bausteinText(bs.text, werte) + "</p>";
-      }
+      h += "<h2>§ " + nr + " " + esc(bs.titel) + "</h2><p class='md-text'>" + bausteinText(bs.text, werte) + "</p>";
     });
     h += "<div class='md-unter'><div>Ort, Datum · Auftraggeber</div><div>Ort, Datum · Auftragnehmer</div></div>" +
       "<p class='md-fuss'>Entwurf der Hausverwaltung. Umlagefähigkeit der Kosten: " + esc(dienstUmlageText(d.art)) +
@@ -2151,7 +2136,8 @@ const Objekte = (() => {
             "<option value='" + w + "'" + ((x.st.status || "offen") === w ? " selected" : "") + ">" + esc(l) + "</option>").join("") + "</select></span>" +
           "<span><input type='date' data-abr='" + esc(x.o.id) + "|" + jahr + "|datum' value='" + esc(x.st.datum || "") + "'></span>" +
           "<span>" + esc(Objekte.datum(x.frist)) + (spaetDran ? "<br><span class='fuer'>überschritten</span>" : "") + "</span>" +
-          "<span>" + esc(teamName(x.wer) || "–") + "</span></div>";
+          "<span>" + esc(teamName(x.wer) || "–") +
+          "<br><button class='btn klein' data-act='abr-oeffnen' data-id='" + esc(x.o.id) + "'>Abrechnung</button></span></div>";
       }).join("") + "</div>";
     const proMa = {};
     liste.forEach(x => { const k = x.wer || "ohne"; if (!proMa[k]) proMa[k] = { wer: x.wer, offen: 0, fertig: 0 };
@@ -2176,6 +2162,378 @@ const Objekte = (() => {
       : tab === "umsatz" ? umsatzHtml() : tab === "abrechnung" ? abrechnungenHtml() : teamLastHtml()) + "</section>";
     return h + "</div>";
   }
+  /* ================= Abrechnung: WEG-Jahresabrechnung (§ 28 WEG) und
+     Betriebskostenabrechnung (§ 556 BGB, BetrKV, HeizkostenV) ================= */
+  const kostenListe = o => Array.isArray(o.kosten) ? o.kosten : (o.kosten = []);
+  const verbrauchMap = o => (o.verbrauch && typeof o.verbrauch === "object") ? o.verbrauch : (o.verbrauch = {});
+  const vbSchluessel = (jahr, nr, eid) => String(jahr) + "|" + String(nr) + "|" + String(eid);
+  const vermoegenVon = (o, jahr) => { o.vermoegen = (o.vermoegen && typeof o.vermoegen === "object") ? o.vermoegen : {};
+    o.vermoegen[String(jahr)] = o.vermoegen[String(jahr)] || {}; return o.vermoegen[String(jahr)]; };
+  const kontoVonNr = (konten, nr) => konten.find(k => String(k.nr || "") === String(nr || "")) || null;
+  const abrJahrVon = () => S.abrJahr || (new Date().getFullYear() - 1);
+  /* Nach Verbrauch oder direkt zugeordnete Kosten trägt der Verwalter je Einheit ein. */
+  const direktSchluessel = sch => sch === "verbrauch" || sch === "direkt";
+  const standardSchluessel = o => istWeg(o) ? "mea" : "flaeche";
+
+  /* Zeitanteil eines Mietverhältnisses am Abrechnungszeitraum (§ 556 BGB). */
+  function mieterImZeitraum(o, e, z) {
+    const tage = (a, b) => Math.max(0, Math.round((new Date(b + "T12:00:00") - new Date(a + "T12:00:00")) / 86400000) + 1);
+    const gesamt = tage(z.von, z.bis);
+    return S.personen.filter(p => p.rolle === "mieter" && p.einheitId === e.id)
+      .map(p => {
+        const von = p.mietbeginn && p.mietbeginn > z.von ? p.mietbeginn : z.von;
+        const bis = p.mietende && p.mietende < z.bis ? p.mietende : z.bis;
+        if (bis < von) return null;
+        const t = tage(von, bis);
+        return { p, von, bis, tage: t, anteil: gesamt ? t / gesamt : 0 };
+      }).filter(Boolean).sort((a, b) => a.von.localeCompare(b.von));
+  }
+
+  /* Alle Kosten des Zeitraums, je Konto zusammengefasst. */
+  function kostenJeKonto(o, jahr) {
+    const z = abrZeitraum(o, jahr);
+    const konten = objektKonten(o);
+    const map = {};
+    kostenListe(o).forEach(k => {
+      const d = String(k.datum || "");
+      if (!d || d < z.von || d > z.bis) return;
+      const nr = String(k.kontoNr || "");
+      const konto = kontoVonNr(konten, nr);
+      const key = nr || "ohne";
+      if (!map[key]) map[key] = { nr, name: konto ? konto.name : "Ohne Konto", schluessel: konto ? (konto.schluessel || "") : "",
+        umlage: konto ? !!konto.umlage : false, par35a: konto ? (konto.par35a || "") : "", summe: 0, posten: [] };
+      map[key].summe = cent(map[key].summe + betragZahl(k.betrag));
+      map[key].posten.push(k);
+    });
+    return Object.values(map).sort((a, b) => String(a.nr).localeCompare(String(b.nr), "de", { numeric: true }));
+  }
+
+  /* Soll-Vorauszahlungen und tatsächliche Zahlungen je Einheit im Zeitraum. */
+  function sollJeEinheit(o, jahr) {
+    const z = abrZeitraum(o, jahr);
+    const konten = objektKonten(o);
+    const vonM = z.von.slice(0, 7), bisM = z.bis.slice(0, 7);
+    const je = {}, jeP = {};
+    const dazu = (t, x) => {
+      (x.positionen || []).forEach(p => {
+        const k = kontoVonNr(konten, p.kontoNr); const rolle = (k && k.rolle) || "sonstiges";
+        t.rollen[rolle] = cent((t.rollen[rolle] || 0) + betragZahl(p.betrag));
+      });
+      t.soll = cent(t.soll + (Number(x.summe) || 0));
+      t.gezahlt = cent(t.gezahlt + gezahltAuf(o, x.id));
+    };
+    sollListe(o).filter(x => !x.storniert && String(x.monat) >= vonM && String(x.monat) <= bisM).forEach(x => {
+      dazu(je[x.einheitId] = je[x.einheitId] || { rollen: {}, soll: 0, gezahlt: 0 }, x);
+      if (x.mieterId) dazu(jeP[x.mieterId] = jeP[x.mieterId] || { rollen: {}, soll: 0, gezahlt: 0 }, x);
+    });
+    return { je, jeP };
+  }
+
+  /* Die eigentliche Rechnung – für WEG und Mietverwaltung gleich aufgebaut. */
+  function abrechnungRechnen(o, jahr) {
+    const z = abrZeitraum(o, jahr);
+    const weg = istWeg(o);
+    const liste = o.einheitenListe || [];
+    const konten = kostenJeKonto(o, jahr);
+    const sollAlles = sollJeEinheit(o, jahr);
+    const soll = sollAlles.je, sollP = sollAlles.jeP;
+    const vb = verbrauchMap(o);
+    const mieter = {}; liste.forEach(e => { mieter[e.id] = mieterImZeitraum(o, e, z); });
+    const hinweise = [];
+    const zeilen = konten.map(k => {
+      const sch = k.schluessel || standardSchluessel(o);
+      const anteile = {};
+      if (direktSchluessel(sch)) {
+        let summe = 0;
+        liste.forEach(e => { const w = betragZahl(vb[vbSchluessel(jahr, k.nr, e.id)]); anteile[e.id] = w; summe = cent(summe + w); });
+        k.erfasst = summe;
+        if (Math.abs(summe - k.summe) > 0.02) hinweise.push("Bei „" + k.name + "“ sind " + eur2(summe) + " € auf die Einheiten verteilt, die Kosten betragen " + eur2(k.summe) + " €.");
+      } else {
+        const v = verteilAnteile(o, sch === "einheiten" ? "einheiten" : sch);
+        liste.forEach(e => { anteile[e.id] = cent(k.summe * (v.anteile[e.id] || 0)); });
+        if (v.ersatz) hinweise.push("Für „" + k.name + "“ fehlen die Werte des Schlüssels „" + (SCHLUESSEL.find(x => x[0] === sch) || [, sch])[1] + "“ – verteilt wurde ersatzweise nach Einheiten.");
+      }
+      return { ...k, sch, anteile };
+    });
+    const einheiten = liste.map(e => {
+      const s2 = soll[e.id] || { rollen: {}, soll: 0, gezahlt: 0 };
+      const posten = zeilen.map(k => ({ nr: k.nr, name: k.name, sch: k.sch, gesamt: k.summe, umlage: k.umlage, par35a: k.par35a,
+        betrag: cent(k.anteile[e.id] || 0) }));
+      const umlagefaehig = cent(posten.filter(p => p.umlage).reduce((n, p) => n + p.betrag, 0));
+      const gesamtAnteil = cent(posten.reduce((n, p) => n + p.betrag, 0));
+      const p35 = cent(posten.filter(p => p.par35a).reduce((n, p) => n + p.betrag, 0));
+      const voraus = weg ? cent((s2.rollen.hgBewirt || 0) + (s2.rollen.hgRuecklage || 0))
+        : cent((s2.rollen.bkVoraus || 0) + (s2.rollen.hkVoraus || 0));
+      const ruecklage = weg ? cent(s2.rollen.hgRuecklage || 0) : 0;
+      const last = weg ? cent(gesamtAnteil + ruecklage) : umlagefaehig;
+      /* Wer nur einen Teil des Zeitraums gemietet hat, zahlt auch nur den zeitanteiligen Betrag. */
+      const mieterZeilen = (mieter[e.id] || []).map(m => {
+        const sm = sollP[m.p.id] || { rollen: {}, soll: 0, gezahlt: 0 };
+        const mp = posten.map(p => ({ ...p, betrag: cent(p.betrag * m.anteil) }));
+        const mu = cent(mp.filter(p => p.umlage).reduce((n, p) => n + p.betrag, 0));
+        const mv = cent((sm.rollen.bkVoraus || 0) + (sm.rollen.hkVoraus || 0));
+        return { ...m, posten: mp, umlagefaehig: mu, p35: cent(mp.filter(p => p.par35a).reduce((n, p) => n + p.betrag, 0)),
+          voraus: mv, gezahlt: sm.gezahlt, soll: sm.soll, rueckstand: cent((sm.soll || 0) - (sm.gezahlt || 0)),
+          ergebnis: cent(mu - mv) };
+      });
+      const getragen = cent(mieterZeilen.reduce((n, m) => n + m.umlagefaehig, 0));
+      return { e, posten, umlagefaehig, gesamtAnteil, p35, voraus, ruecklage, last,
+        soll: s2.soll, gezahlt: s2.gezahlt, mieter: mieter[e.id] || [], mieterZeilen,
+        leerstand: weg ? 0 : cent(umlagefaehig - getragen),
+        ergebnis: cent(last - voraus) };
+    });
+    const kostenGesamt = cent(zeilen.reduce((n, k) => n + k.summe, 0));
+    const umlageGesamt = cent(zeilen.filter(k => k.umlage).reduce((n, k) => n + k.summe, 0));
+    const vorausGesamt = cent(einheiten.reduce((n, x) => n + x.voraus, 0));
+    const ruecklageGesamt = cent(einheiten.reduce((n, x) => n + x.ruecklage, 0));
+    /* Heizkosten müssen zu 50 bis 70 Prozent nach Verbrauch abgerechnet werden (§ 7 HeizkostenV). */
+    if (!weg && zeilen.some(k => /heiz|warmwasser/i.test(k.name) && !direktSchluessel(k.sch)))
+      hinweise.push("Heiz- und Warmwasserkosten sind zu 50 bis 70 Prozent nach Verbrauch abzurechnen (§ 7 HeizkostenV). Tragen Sie die Werte aus der Heizkostenabrechnung je Einheit ein.");
+    if (!weg && einheiten.some(x => x.leerstand > 0.02))
+      hinweise.push("Für Zeiten ohne Mieter bleiben " + eur2(cent(einheiten.reduce((n, x) => n + Math.max(0, x.leerstand), 0))) +
+        " € umlagefähige Kosten beim Eigentümer – sie lassen sich keinem Mietverhältnis zuordnen.");
+    if (!weg && einheiten.some(x => x.mieterZeilen.some(m => m.anteil < 0.999)) && zeilen.some(k => direktSchluessel(k.sch)))
+      hinweise.push("Bei einem Mieterwechsel teilt das Programm auch die verbrauchsabhängigen Kosten nach Tagen. " +
+        "Liegt Ihnen eine Nutzerwechselabrechnung des Messdienstes vor, tragen Sie deren Werte als eigene Kostenpositionen ein.");
+    if (!weg && zeilen.some(k => !k.umlage))
+      hinweise.push("Nicht umlagefähige Kosten bleiben in der Betriebskostenabrechnung außen vor – sie erscheinen nur in der Übersicht.");
+    return { z, weg, zeilen, einheiten, kostenGesamt, umlageGesamt, vorausGesamt, ruecklageGesamt, hinweise };
+  }
+
+  /* ---------- Oberfläche ---------- */
+  function kostenBlockHtml(o, jahr) {
+    const z = abrZeitraum(o, jahr);
+    const konten = objektKonten(o).filter(k => k.art === "ausgabe" && !k.inaktiv);
+    const posten = kostenListe(o).filter(k => String(k.datum || "") >= z.von && String(k.datum || "") <= z.bis)
+      .sort((a, b) => String(a.datum).localeCompare(String(b.datum)));
+    const summe = cent(posten.reduce((n, k) => n + betragZahl(k.betrag), 0));
+    const offeneBelege = (o.dokumente || []).map((d, i) => ({ d, i }))
+      .filter(x => x.d.art === "Rechnung" && x.d.rechnung && !kostenListe(o).some(k => k.belegId === x.d.id)
+        && String(x.d.rechnung.datum || "") >= z.von && String(x.d.rechnung.datum || "") <= z.bis);
+    let h = "<section class='gruppe voll'><h2>Kosten " + esc(Objekte.datum(z.von)) + " – " + esc(Objekte.datum(z.bis)) + "</h2>" +
+      "<p class='unter'>Jede Kostenposition gehört auf ein Ausgabekonto – daraus ergibt sich, nach welchem Schlüssel sie verteilt wird " +
+      "und ob sie auf Mieter umgelegt werden darf.</p>";
+    if (!konten.length) return h + "<ul class='meldungen'><li class='m-hinweis'>Für dieses Objekt gibt es noch keine Ausgabekonten. " +
+      "Legen Sie sie unter „Einstellungen → Kontenrahmen“ an und ordnen Sie den Rahmen oben unter „Buchhaltung“ zu.</li></ul></section>";
+    if (offeneBelege.length) h += "<ul class='meldungen'><li class='m-hinweis'>" + offeneBelege.length +
+      " Rechnung" + (offeneBelege.length === 1 ? "" : "en") + " aus diesem Zeitraum " + (offeneBelege.length === 1 ? "ist" : "sind") + " noch nicht als Kosten erfasst. " +
+      "<button class='btn klein' data-act='ko-belege'>Rechnungen übernehmen</button></li></ul>";
+    if (S.koBelege) h += belegUebernahmeHtml(o, offeneBelege, konten);
+    h += "<div class='ue-tab'><div class='ko-kopf'><span>Datum</span><span>Was</span><span>Konto</span><span>Betrag</span><span></span></div>" +
+      posten.map((k, i) => {
+        const gi = kostenListe(o).indexOf(k);
+        return "<div class='ko-row'>" +
+          "<span><input type='date' data-ko='" + gi + "|datum' value='" + esc(k.datum || "") + "'></span>" +
+          "<span><input type='text' data-ko='" + gi + "|text' value='" + esc(k.text || "") + "' placeholder='z. B. Versicherung 2025'>" +
+          (k.belegId ? "<br><span class='fuer'>aus Rechnung übernommen</span>" : "") + "</span>" +
+          "<span><select data-ko='" + gi + "|kontoNr'><option value=''>– Konto wählen –</option>" +
+          konten.map(x => "<option value='" + esc(x.nr) + "'" + (String(k.kontoNr) === String(x.nr) ? " selected" : "") + ">" +
+            esc(x.nr + " " + x.name) + "</option>").join("") + "</select></span>" +
+          "<span><input type='number' step='0.01' inputmode='decimal' data-ko='" + gi + "|betrag' value='" + esc(k.betrag || "") + "'></span>" +
+          "<span><button class='btn klein gefahr' data-act='ko-weg' data-i='" + gi + "'>" + (S.loeschen === "ko" + gi ? "Wirklich?" : "×") + "</button></span></div>";
+      }).join("") + "</div>" +
+      "<div class='leiste'><div><button class='btn klein haupt' data-act='ko-neu'>+ Kostenposition</button>" +
+      "<span class='fuer'>Summe im Zeitraum: <strong>" + esc(eur2(summe)) + " €</strong></span></div></div></section>";
+    return h;
+  }
+  function belegUebernahmeHtml(o, belege, konten) {
+    if (!belege.length) return "<p class='unter'>Alle Rechnungen dieses Zeitraums sind erfasst.</p>";
+    return "<div class='um-neu'><h4 class='az-ueber' style='margin-top:0'>Rechnungen übernehmen</h4>" +
+      "<p class='unter'>Konto wählen und übernehmen – Betrag und Datum kommen vom Beleg, die Verbindung zum Beleg bleibt erhalten.</p>" +
+      belege.map(x => "<div class='ko-beleg'><span><strong>" + esc(x.d.rechnung.lieferant || x.d.name || "Rechnung") + "</strong>" +
+        "<br><span class='fuer'>" + esc([x.d.rechnung.datum ? Objekte.datum(x.d.rechnung.datum) : "", x.d.rechnung.leistung, (x.d.rechnung.brutto || "") + " €"].filter(Boolean).join(" · ")) + "</span></span>" +
+        "<span><select data-kobeleg='" + esc(x.d.id) + "'><option value=''>– Konto –</option>" +
+        konten.map(k => "<option value='" + esc(k.nr) + "'" + ((S.koKonto || {})[x.d.id] === String(k.nr) ? " selected" : "") + ">" + esc(k.nr + " " + k.name) + "</option>").join("") + "</select></span>" +
+        "<span><button class='btn klein' data-act='ko-uebernehmen' data-id='" + esc(x.d.id) + "'>übernehmen</button></span></div>").join("") +
+      "<div class='leiste'><div><button class='btn klein' data-act='ko-belege-zu'>Schließen</button></div></div></div>";
+  }
+  function verbrauchBlockHtml(o, jahr, erg) {
+    const direkt = erg.zeilen.filter(k => direktSchluessel(k.sch));
+    if (!direkt.length) return "";
+    const liste = o.einheitenListe || [];
+    return "<section class='gruppe voll'><h2>Verbrauch und direkte Zuordnung</h2>" +
+      "<p class='unter'>Diese Konten werden nicht nach einem Schlüssel verteilt. Tragen Sie die Beträge je Einheit ein – " +
+      "bei Heizung und Warmwasser aus der Abrechnung Ihres Messdienstes.</p>" +
+      direkt.map(k => {
+        const summe = cent(liste.reduce((n, e) => n + betragZahl(verbrauchMap(o)[vbSchluessel(jahr, k.nr, e.id)]), 0));
+        const diff = cent(k.summe - summe);
+        return "<h4 class='az-ueber'>" + esc(k.nr + " " + k.name) + " <span class='fuer'>Kosten " + esc(eur2(k.summe)) + " €</span></h4>" +
+          "<div class='felder'>" + liste.map(e => "<div class='feld'><label>" + esc(e.nr || e.art) + "</label>" +
+            "<input type='number' step='0.01' inputmode='decimal' data-vb='" + esc(jahr + "|" + k.nr + "|" + e.id) + "' value='" +
+            esc(verbrauchMap(o)[vbSchluessel(jahr, k.nr, e.id)] || "") + "'></div>").join("") + "</div>" +
+          "<p class='unter'>Verteilt: " + esc(eur2(summe)) + " € · " +
+          (Math.abs(diff) < 0.02 ? "stimmt mit den Kosten überein" : "<strong class='z-minus'>" + esc(eur2(Math.abs(diff))) + " € " + (diff > 0 ? "noch offen" : "zu viel") + "</strong>") + "</p>";
+      }).join("") + "</section>";
+  }
+  function vermoegenBlockHtml(o, jahr, erg) {
+    const v = vermoegenVon(o, jahr);
+    const anfang = betragZahl(v.rlAnfang);
+    const entnahme = betragZahl(v.rlEntnahme);
+    const ende = cent(anfang + erg.ruecklageGesamt - entnahme);
+    const f = (feld, l, hilfe) => "<div class='feld'><label>" + esc(l) + "</label>" +
+      "<input type='number' step='0.01' inputmode='decimal' data-vm='" + esc(jahr + "|" + feld) + "' value='" + esc(v[feld] || "") + "'>" +
+      (hilfe ? "<small>" + esc(hilfe) + "</small>" : "") + "</div>";
+    return "<section class='gruppe voll'><h2>Vermögensbericht (§ 28 Abs. 4 WEG)</h2>" +
+      "<p class='unter'>Stand der Erhaltungsrücklage und der Bankkonten zum Ende des Abrechnungszeitraums. " +
+      "Der Bericht ist den Eigentümern jährlich zur Verfügung zu stellen; beschlossen wird er nicht.</p>" +
+      "<div class='felder'>" + f("rlAnfang", "Erhaltungsrücklage am Anfang") +
+      f("rlEntnahme", "Entnahmen aus der Rücklage", "Für Erhaltungsmaßnahmen im Zeitraum.") +
+      f("bankEnde", "Bankguthaben am Ende") + f("forderungen", "Offene Forderungen", "Rückstände der Eigentümer.") + "</div>" +
+      "<div class='ue-tab' style='margin-top:14px'>" +
+      "<div class='ue-zeile'><span class='ue-l'>Rücklage Anfang</span><span class='ue-w'>" + esc(eur2(anfang)) + " €</span></div>" +
+      "<div class='ue-zeile'><span class='ue-l'>Zuführung laut Plan</span><span class='ue-w'>" + esc(eur2(erg.ruecklageGesamt)) + " €</span></div>" +
+      "<div class='ue-zeile'><span class='ue-l'>Entnahmen</span><span class='ue-w'>− " + esc(eur2(entnahme)) + " €</span></div>" +
+      "<div class='ue-zeile'><span class='ue-l'><strong>Rücklage Ende</strong></span><span class='ue-w'><strong>" + esc(eur2(ende)) + " €</strong></span></div></div>" +
+      "<div class='feld' style='margin-top:14px'><label>Wesentliche Gegenstände des Gemeinschaftsvermögens</label>" +
+      "<textarea rows='2' data-vmtext='" + esc(String(jahr)) + "' placeholder='z. B. Heizungsanlage, Aufzug, Gartengeräte'>" + esc(v.gegenstaende || "") + "</textarea></div></section>";
+  }
+  function abrechnungSeiteHtml(o) {
+    const jahr = abrJahrVon();
+    const erg = abrechnungRechnen(o, jahr);
+    const st = abrStand(o, jahr);
+    let h = "<div class='leiste'><div><label class='fuer' for='abr-jahr'>Abrechnungsjahr</label>" +
+      "<input type='number' id='abr-jahr' data-abrjahr='1' value='" + jahr + "' min='2000' max='2100' style='width:110px'>" +
+      "<span class='fuer'>" + esc(Objekte.datum(erg.z.von) + " – " + Objekte.datum(erg.z.bis)) + " · Frist " + esc(Objekte.datum(erg.z.frist)) + "</span></div>" +
+      "<div><button class='btn klein haupt' data-act='abr-drucken' data-id=''>Gesamtabrechnung</button></div></div>";
+    h += "<div class='kacheln'><div class='kachel'><b>" + esc(eur2(erg.kostenGesamt)) + " €</b><span>Kosten gesamt</span></div>" +
+      (erg.weg
+        ? "<div class='kachel'><b>" + esc(eur2(erg.ruecklageGesamt)) + " €</b><span>Zuführung Rücklage</span></div>"
+        : "<div class='kachel'><b>" + esc(eur2(erg.umlageGesamt)) + " €</b><span>davon umlagefähig</span></div>") +
+      "<div class='kachel'><b>" + esc(eur2(erg.vorausGesamt)) + " €</b><span>" + (erg.weg ? "Vorschüsse laut Plan" : "Vorauszahlungen") + "</span></div>" +
+      "<div class='kachel'><b class='" + (cent(erg.einheiten.reduce((n, x) => n + x.ergebnis, 0)) > 0 ? "z-minus" : "z-plus") + "'>" +
+      esc(eur2(cent(erg.einheiten.reduce((n, x) => n + x.ergebnis, 0)))) + " €</b><span>" + (erg.weg ? "Abrechnungsspitze" : "Nachzahlung gesamt") + "</span></div></div>";
+    h += kostenBlockHtml(o, jahr);
+    h += verbrauchBlockHtml(o, jahr, erg);
+    h += "<section class='gruppe voll'><h2>Ergebnis je Einheit</h2>" +
+      "<div class='ue-tab'><div class='abe-kopf'><span>Einheit</span><span>" + (erg.weg ? "Eigentümer" : "Mieter") + "</span>" +
+      "<span>" + (erg.weg ? "Kostenanteil" : "umlagefähig") + "</span><span>" + (erg.weg ? "Vorschüsse" : "Vorauszahlungen") + "</span>" +
+      "<span>Ergebnis</span><span></span></div>" +
+      erg.einheiten.map(x => {
+        const kopf = "<span><strong>" + esc(x.e.nr || x.e.art) + "</strong>" +
+          (x.e.flaeche ? "<br><span class='fuer'>" + esc(x.e.flaeche) + " m²</span>" : "") + "</span>";
+        const erg2 = (wert, nach) => "<span class='" + (wert > 0 ? "z-minus" : wert < 0 ? "z-plus" : "") + "'><strong>" +
+          esc(wert > 0 ? (nach || "Nachzahlung ") + eur2(wert) + " €" : wert < 0 ? "Guthaben " + eur2(-wert) + " €" : "ausgeglichen") + "</strong></span>";
+        if (erg.weg) {
+          const eig = personVon(x.e.eigentuemerId);
+          return "<div class='abe-row'>" + kopf + "<span>" + esc(eig ? Objekte.personName(eig) : "–") + "</span>" +
+            "<span>" + esc(eur2(x.last)) + " €" + (x.ruecklage ? "<br><span class='fuer'>davon Rücklage " + esc(eur2(x.ruecklage)) + " €</span>" : "") + "</span>" +
+            "<span>" + esc(eur2(x.voraus)) + " €" + (x.gezahlt !== x.soll ? "<br><span class='fuer'>gezahlt " + esc(eur2(x.gezahlt)) + " €</span>" : "") + "</span>" +
+            erg2(x.ergebnis, "Nachschuss ") +
+            "<span><button class='btn klein' data-act='abr-drucken' data-id='" + esc(x.e.id) + "'>Abrechnung</button></span></div>";
+        }
+        if (!x.mieterZeilen.length) return "<div class='abe-row'>" + kopf + "<span>leer stehend</span>" +
+          "<span>" + esc(eur2(x.umlagefaehig)) + " €</span><span>–</span>" +
+          "<span class='fuer'>trägt der Eigentümer</span><span></span></div>";
+        return x.mieterZeilen.map(m => "<div class='abe-row'>" + kopf +
+          "<span>" + esc(Objekte.personName(m.p)) + (m.anteil < 0.999 ? "<br><span class='fuer'>" + esc(Objekte.datum(m.von) + " – " + Objekte.datum(m.bis)) + " · " + m.tage + " Tage</span>" : "") + "</span>" +
+          "<span>" + esc(eur2(m.umlagefaehig)) + " €</span>" +
+          "<span>" + esc(eur2(m.voraus)) + " €" + (m.rueckstand > 0.02 ? "<br><span class='fuer z-minus'>Rückstand " + esc(eur2(m.rueckstand)) + " €</span>" : "") + "</span>" +
+          erg2(m.ergebnis) +
+          "<span><button class='btn klein' data-act='abr-drucken' data-id='" + esc(x.e.id) + "' data-wer='" + esc(m.p.id) + "'>Abrechnung</button></span></div>" +
+          (x.leerstand > 0.02 && m === x.mieterZeilen[x.mieterZeilen.length - 1]
+            ? "<div class='abe-row'>" + kopf + "<span class='fuer'>Zeit ohne Mieter</span><span>" + esc(eur2(x.leerstand)) +
+              " €</span><span>–</span><span class='fuer'>trägt der Eigentümer</span><span></span></div>" : "")).join("");
+      }).join("") + "</div></section>";
+    if (erg.weg) h += vermoegenBlockHtml(o, jahr, erg);
+    h += "<section class='gruppe voll'><h2>Stand</h2>" +
+      "<div class='felder'><div class='feld'><label>Bearbeitungsstand</label><select data-abr='" + esc(o.id) + "|" + jahr + "|status'>" +
+      ABR_STATUS.filter(([w]) => w !== (erg.weg ? "versandt" : "beschlossen")).map(([w, l]) =>
+        "<option value='" + w + "'" + ((st.status || "offen") === w ? " selected" : "") + ">" + esc(l) + "</option>").join("") + "</select></div>" +
+      "<div class='feld'><label>Datum</label><input type='date' data-abr='" + esc(o.id) + "|" + jahr + "|datum' value='" + esc(st.datum || "") + "'></div></div>" +
+      "<ul class='meldungen'>" +
+      erg.hinweise.map(x => "<li class='m-hinweis'>" + esc(x) + "</li>").join("") +
+      (erg.weg
+        ? "<li class='m-hinweis'>Beschlossen wird nach § 28 Abs. 2 WEG nur die Einforderung von Nachschüssen und die Anpassung der Vorschüsse – nicht die Abrechnung als Ganzes.</li>"
+        : "<li class='m-hinweis'>Die Abrechnung muss dem Mieter spätestens zwölf Monate nach Ende des Zeitraums zugehen (§ 556 Abs. 3 BGB), hier also bis zum " +
+          esc(Objekte.datum(erg.z.frist)) + ". Danach sind Nachforderungen grundsätzlich ausgeschlossen.</li>") +
+      "<li class='m-hinweis'>Gerechnet wird mit dem, was hier erfasst ist. Prüfen Sie die Kostenliste gegen Ihre Belege, bevor Sie versenden.</li></ul></section>";
+    return h;
+  }
+  /* ---------- Druckfassung ---------- */
+  function abrechnungDruckHtml(o, jahr, einheitId, personId) {
+    const erg = abrechnungRechnen(o, jahr);
+    const vw = (() => { try { return window.Firmendaten ? window.Firmendaten.daten() : {}; } catch (x) { return {}; } })();
+    const basis = einheitId ? erg.einheiten.find(x => x.e.id === einheitId) : null;
+    const mz = basis && !erg.weg ? (basis.mieterZeilen.find(m => m.p.id === personId) || basis.mieterZeilen[basis.mieterZeilen.length - 1] || null) : null;
+    /* Beim Mieter wird seine zeitanteilige Abrechnung gedruckt, nicht die der ganzen Einheit. */
+    const einzel = basis ? (mz ? { ...basis, posten: mz.posten, umlagefaehig: mz.umlagefaehig, voraus: mz.voraus,
+      gezahlt: mz.gezahlt, p35: mz.p35, last: mz.umlagefaehig, ergebnis: mz.ergebnis, mieter: [mz] } : basis) : null;
+    const titel = erg.weg ? (einzel ? "Einzelabrechnung" : "Jahresabrechnung") : "Betriebskostenabrechnung";
+    let h = "<div class='seite'>";
+    h += "<div class='md-werkzeug'><div><button class='btn klein' data-act='abr-zurueck'>‹ Zurück</button>" +
+      "<button class='btn klein haupt' data-act='mandat-drucken'>Drucken / als PDF speichern</button></div>" +
+      "<span class='fuer'>" + esc(Objekte.datum(erg.z.von) + " – " + Objekte.datum(erg.z.bis)) + "</span></div>";
+    h += "<div class='md-blatt'><header class='md-kopf'>" +
+      (vw.logo ? "<img class='md-logo' src='" + esc(vw.logo) + "' alt='" + esc(vw.name || "Logo") + "'>"
+        : "<div class='md-firma'>" + esc(vw.name || "Hausverwaltung") + "</div>") +
+      "<div class='fuer'>" + esc(Objekte.datum(new Date().toISOString().slice(0, 10))) + "</div></header>";
+    if (einzel) {
+      const empf = erg.weg ? personVon(einzel.e.eigentuemerId) : (mz ? mz.p : (einzel.mieter.slice(-1)[0] || {}).p);
+      h += "<div class='md-empf'>" + esc([empf ? Objekte.personName(empf) : "", empf ? empf.strasse : "",
+        empf ? [empf.plz, empf.ort].filter(Boolean).join(" ") : ""].filter(Boolean).join("\n")) + "</div>";
+    }
+    h += "<h1>" + esc(titel) + " " + esc(String(jahr)) + "</h1>" +
+      "<p class='md-art'>" + esc(objName(o)) + (einzel ? " · " + esc(einzel.e.nr || einzel.e.art) : "") +
+      " · Zeitraum " + esc(Objekte.datum(erg.z.von)) + " bis " + esc(Objekte.datum(erg.z.bis)) + "</p>";
+    if (einzel) {
+      const zeilen = einzel.posten.filter(p => (erg.weg || p.umlage) && (p.betrag || p.gesamt));
+      h += "<table class='lv-tab abr-tab'><thead><tr><th>Kostenart</th><th>Gesamt</th><th>Schlüssel</th><th>Ihr Anteil</th></tr></thead><tbody>" +
+        zeilen.map(p => "<tr><td>" + esc((p.nr ? p.nr + " " : "") + p.name) + "</td><td>" + esc(eur2(p.gesamt)) + " €</td>" +
+          "<td>" + esc((SCHLUESSEL.find(x => x[0] === p.sch) || [, p.sch])[1] || "–") + "</td>" +
+          "<td><strong>" + esc(eur2(p.betrag)) + " €</strong></td></tr>").join("") +
+        "<tr class='abr-summe'><td>" + (erg.weg ? "Summe Bewirtschaftung" : "Summe umlagefähige Kosten") + "</td><td></td><td></td>" +
+        "<td><strong>" + esc(eur2(erg.weg ? einzel.gesamtAnteil : einzel.umlagefaehig)) + " €</strong></td></tr>" +
+        (erg.weg && einzel.ruecklage ? "<tr><td>Zuführung zur Erhaltungsrücklage</td><td></td><td>laut Wirtschaftsplan</td><td><strong>" +
+          esc(eur2(einzel.ruecklage)) + " €</strong></td></tr>" : "") +
+        "</tbody></table>";
+      h += "<table class='lv-tab abr-tab'><tbody>" +
+        "<tr><td>" + (erg.weg ? "Ihre Gesamtbelastung" : "Umlagefähige Kosten") + "</td><td><strong>" + esc(eur2(einzel.last)) + " €</strong></td></tr>" +
+        "<tr><td>" + (erg.weg ? "Vorschüsse laut Wirtschaftsplan" : "Ihre Vorauszahlungen") + "</td><td>− " + esc(eur2(einzel.voraus)) + " €</td></tr>" +
+        "<tr class='abr-summe'><td><strong>" + (einzel.ergebnis > 0 ? (erg.weg ? "Nachschuss" : "Nachzahlung") : einzel.ergebnis < 0 ? "Guthaben" : "Ergebnis") +
+        "</strong></td><td><strong>" + esc(eur2(Math.abs(einzel.ergebnis))) + " €</strong></td></tr></tbody></table>";
+      if (!erg.weg && einzel.mieter.length && einzel.mieter[0].anteil < 0.999)
+        h += "<p class='md-text'>Abgerechnet wurde zeitanteilig für " + esc(einzel.mieter.map(m => Objekte.datum(m.von) + " bis " + Objekte.datum(m.bis)).join(", ")) + ".</p>";
+      if (einzel.p35) h += "<p class='md-text'><strong>Steuerlich begünstigt nach § 35a EStG:</strong> " + esc(eur2(einzel.p35)) +
+        " € Ihres Anteils entfallen auf haushaltsnahe Dienstleistungen und Handwerkerleistungen (Arbeitslohnanteil). " +
+        "Den Betrag können Sie in Ihrer Steuererklärung geltend machen.</p>";
+      h += erg.weg
+        ? "<p class='md-text'>Die Eigentümerversammlung beschließt nach § 28 Abs. 2 WEG über die Einforderung von Nachschüssen und die Anpassung der Vorschüsse. " +
+          "Der Zahlbetrag wird mit dem Beschluss fällig.</p>"
+        : "<p class='md-text'>Einwendungen gegen diese Abrechnung sind spätestens bis zum Ablauf des zwölften Monats nach Zugang mitzuteilen (§ 556 Abs. 3 Satz 5 BGB). " +
+          "Die Belege können Sie nach Terminabsprache einsehen.</p>";
+    } else {
+      h += "<table class='lv-tab abr-tab'><thead><tr><th>Konto</th><th>Kostenart</th><th>Schlüssel</th><th>Betrag</th></tr></thead><tbody>" +
+        erg.zeilen.map(k => "<tr><td>" + esc(k.nr) + "</td><td>" + esc(k.name) + (k.umlage ? "" : " <span class='fuer'>nicht umlagefähig</span>") + "</td>" +
+          "<td>" + esc((SCHLUESSEL.find(x => x[0] === k.sch) || [, k.sch])[1] || "–") + "</td>" +
+          "<td><strong>" + esc(eur2(k.summe)) + " €</strong></td></tr>").join("") +
+        "<tr class='abr-summe'><td></td><td><strong>Kosten gesamt</strong></td><td></td><td><strong>" + esc(eur2(erg.kostenGesamt)) + " €</strong></td></tr></tbody></table>";
+      h += "<h2>Verteilung auf die Einheiten</h2><table class='lv-tab abr-tab'><thead><tr><th>Einheit</th><th>" +
+        (erg.weg ? "Eigentümer" : "Mieter") + "</th><th>Anteil</th><th>" + (erg.weg ? "Vorschüsse" : "Vorauszahlungen") + "</th><th>Ergebnis</th></tr></thead><tbody>" +
+        erg.einheiten.map(x => {
+          const wer = erg.weg ? (personVon(x.e.eigentuemerId) ? Objekte.personName(personVon(x.e.eigentuemerId)) : "–")
+            : (x.mieter.length ? x.mieter.map(m => Objekte.personName(m.p)).join(", ") : "leer stehend");
+          return "<tr><td>" + esc(x.e.nr || x.e.art) + "</td><td>" + esc(wer) + "</td>" +
+            "<td>" + esc(eur2(erg.weg ? x.last : x.umlagefaehig)) + " €</td><td>" + esc(eur2(x.voraus)) + " €</td>" +
+            "<td><strong>" + esc((x.ergebnis > 0 ? "+ " : x.ergebnis < 0 ? "− " : "") + eur2(Math.abs(x.ergebnis))) + " €</strong></td></tr>";
+        }).join("") + "</tbody></table>";
+      if (erg.weg) {
+        const v = vermoegenVon(o, jahr);
+        const ende = cent(betragZahl(v.rlAnfang) + erg.ruecklageGesamt - betragZahl(v.rlEntnahme));
+        h += "<h2>Vermögensbericht (§ 28 Abs. 4 WEG)</h2><table class='lv-tab abr-tab'><tbody>" +
+          "<tr><td>Erhaltungsrücklage am Anfang</td><td>" + esc(eur2(betragZahl(v.rlAnfang))) + " €</td></tr>" +
+          "<tr><td>Zuführung im Zeitraum</td><td>" + esc(eur2(erg.ruecklageGesamt)) + " €</td></tr>" +
+          "<tr><td>Entnahmen</td><td>− " + esc(eur2(betragZahl(v.rlEntnahme))) + " €</td></tr>" +
+          "<tr class='abr-summe'><td><strong>Erhaltungsrücklage am Ende</strong></td><td><strong>" + esc(eur2(ende)) + " €</strong></td></tr>" +
+          "<tr><td>Bankguthaben am Ende</td><td>" + esc(eur2(betragZahl(v.bankEnde))) + " €</td></tr>" +
+          "<tr><td>Offene Forderungen</td><td>" + esc(eur2(betragZahl(v.forderungen))) + " €</td></tr></tbody></table>" +
+          (String(v.gegenstaende || "").trim() ? "<p class='md-text'><strong>Wesentliche Gegenstände des Gemeinschaftsvermögens:</strong> " +
+            esc(v.gegenstaende) + "</p>" : "");
+      }
+    }
+    h += "<p class='md-fuss'>" + esc(vw.name || "Hausverwaltung") + " · erstellt am " + esc(Objekte.datum(new Date().toISOString().slice(0, 10))) +
+      ". Rechnerisch geprüft; maßgeblich sind die Belege, die bei der Verwaltung eingesehen werden können.</p></div>";
+    return h + "</div>";
+  }
   function objektAnsichtHtml(o) {
     const weg = o.art === "weg"; const liste = o.einheitenListe || []; const summe = Objekte.meaSumme(liste);
     const zeile = (l, w) => w ? "<div class='ue-zeile'><span class='ue-l'>" + l + "</span><span class='ue-w'>" + w + "</span></div>" : "";
@@ -2184,13 +2542,17 @@ const Objekte = (() => {
       .sort((a, b) => ["notfall", "hoch", "normal", "niedrig"].indexOf(a.dringlichkeit) - ["notfall", "hoch", "normal", "niedrig"].indexOf(b.dringlichkeit));
     const anlagen = (o.anlagen || []);
     const dok = (o.dokumente || []);
-    const unter = [["stammdaten", "Stammdaten"], ["buchhaltung", "Buchhaltung"], ["dienste", "Dienstleister"], ["portal", "Portal"], ["rund", "Rundschreiben"], ["erhoehung", "Mieterhöhung"]]
+    const unter = [["stammdaten", "Stammdaten"], ["buchhaltung", "Buchhaltung"], ["abrechnung", "Abrechnung"], ["dienste", "Dienstleister"], ["portal", "Portal"], ["rund", "Rundschreiben"], ["erhoehung", "Mieterhöhung"]]
       .concat(o.art === "weg" ? [["etv", "Eigentümerversammlung"]] : []);
     let h = "<div class='seite'><div class='hero'><h1>" + (o.nummer ? "<span class='obj-nr'>" + esc(o.nummer) + "</span> " : "") + esc(objName(o)) + "</h1>" +
       "<p>" + esc(Objekte.ARTEN[o.art] ? Objekte.ARTEN[o.art].name : "") + " · " + esc([o.strasse, [o.plz, o.ort].filter(Boolean).join(" ")].filter(Boolean).join(", ")) +
       (o.beendet ? " · beendet" : "") + "</p></div>" +
       "<nav class='reiter obj-reiter'>" + unter.map(([w, l]) => "<button data-act='obj-tab' data-wert='" + w + "'" + (S.objTab === w ? " aria-current='page'" : "") + ">" + l + "</button>").join("") + "</nav>";
     if (S.objTab === "buchhaltung") return h + buchhaltungHtml(o) +
+      "<div class='leiste'><div><button class='btn' data-act='abbrechen'>Zurück zur Übersicht</button></div></div></div>";
+    if (S.objTab === "abrechnung") return h + (["miet", "weg", "garantie"].includes(o.art)
+      ? abrechnungSeiteHtml(o)
+      : "<p class='unter' style='margin:14px 0 0'>Eine Abrechnung gibt es in der Miet- und in der WEG-Verwaltung.</p>") +
       "<div class='leiste'><div><button class='btn' data-act='abbrechen'>Zurück zur Übersicht</button></div></div></div>";
     if (S.objTab === "dienste") return h + objektDiensteHtml(o) +
       "<div class='leiste'><div><button class='btn' data-act='abbrechen'>Zurück zur Übersicht</button></div></div></div>";
@@ -5240,8 +5602,14 @@ const Objekte = (() => {
       h += offen.length
         ? "<div class='leiste'><div><select id='wp-konto' aria-label='Konto wählen' style='max-width:320px'>" +
           offen.map(k => "<option value='" + esc(k.id) + "'>" + esc((k.nr ? k.nr + " · " : "") + k.name) + "</option>").join("") + "</select>" +
-          "<button class='btn klein haupt' data-act='wp-pos-neu'>+ Konto in den Plan</button></div></div>"
-        : "<p class='unter' style='margin:10px 0 0'>Alle Ausgabekonten dieses Objekts stehen im Plan.</p>";
+          "<button class='btn klein haupt' data-act='wp-pos-neu'>+ Konto in den Plan</button>" +
+          (kostenJeKonto(o, String(Number(wp.jahr) - 1)).length
+            ? "<button class='btn klein' data-act='wp-aus-kosten'>Aus den Kosten " + esc(String(Number(wp.jahr) - 1)) + " vorbelegen</button>" : "") +
+          "</div></div>"
+        : (kostenJeKonto(o, String(Number(wp.jahr) - 1)).length && !wplanFest(wp)
+            ? "<div class='leiste'><div><button class='btn klein' data-act='wp-aus-kosten'>Aus den Kosten " + esc(String(Number(wp.jahr) - 1)) + " vorbelegen</button>" +
+              "<span class='fuer'>Trägt die Beträge des Vorjahres in die vorhandenen Positionen ein.</span></div></div>"
+            : "<p class='unter' style='margin:10px 0 0'>Alle Ausgabekonten dieses Objekts stehen im Plan.</p>");
     }
     h += "<h3 style='margin-top:20px'>Zuführung zur Erhaltungsrücklage</h3>" +
       "<p class='unter'>Keine Kosten, sondern Vermögen der Gemeinschaft (§ 19 Abs. 2 Nr. 4 WEG). Sie erscheint getrennt im Hausgeld und im Vermögensbericht.</p>" +
@@ -5277,18 +5645,123 @@ const Objekte = (() => {
       "<span class='fuer'>Danach ist der Plan gesperrt und die Hausgelder werden daraus gebildet.</span></div></div>";
     return h + "</section>";
   }
+  /* ---------- Rechnungen bezahlen (SEPA-Überweisung, pain.001) ----------
+     Erfassen, freigeben, Datei erzeugen. Später übernimmt der Server die Einreichung
+     über EBICS – die Freigabe bleibt in jedem Fall beim Menschen. */
+  const UE_STAND = [["erfasst", "erfasst"], ["frei", "freigegeben"], ["eingereicht", "eingereicht"], ["bezahlt", "bezahlt"]];
+  const ueberweisungen = o => Array.isArray(o.ueberweisungen) ? o.ueberweisungen : (o.ueberweisungen = []);
+  const ueStandText = w => (UE_STAND.find(x => x[0] === w) || ["", "erfasst"])[1];
+  const ueZahlbar = x => x.status === "frei" && Objekte.ibanGueltig(x.iban) && betragZahl(x.betrag) > 0;
+  function ueAusBeleg(o, d) {
+    const r = d.rechnung || {};
+    const hw = S.handwerker.find(h => String(h.firma || "").trim() && String(h.firma).trim().toLowerCase() === String(r.lieferant || "").trim().toLowerCase());
+    return { id: Objekte.neueId(), belegId: d.id, empfaenger: r.lieferant || d.name || "",
+      iban: hw ? (hw.iban || "") : "", bic: hw ? (hw.bic || "") : "",
+      betrag: String(r.brutto || "").replace(/\./g, "").replace(",", "."),
+      zweck: ["Rechnung " + (r.nummer || ""), objName(o)].filter(x => String(x).trim()).join(" · "),
+      faellig: geschaeftstagePlus(isoTag(new Date()), 3), status: "erfasst", erstellt: new Date().toISOString() };
+  }
+  function ueberweisungXml(o, posten, ausfuehrung) {
+    const b = objektBank(o);
+    const neun = b.painVersion !== "02";
+    const ns = neun ? "pain.001.001.09" : "pain.001.001.03";
+    const bicTag = neun ? "BICFI" : "BIC";
+    const jetzt = new Date().toISOString().slice(0, 19);
+    const msgId = sepaText("UE-" + (o.nummer || "OBJ") + "-" + Date.now().toString(36), 35).replace(/\s/g, "-");
+    const summe = posten.reduce((a, x) => a + betragZahl(x.betrag), 0);
+    const z = n => n.toFixed(2);
+    const kopf = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+      "<Document xmlns=\"urn:iso:std:iso:20022:tech:xsd:" + ns + "\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">\n" +
+      "<CstmrCdtTrfInitn>\n<GrpHdr><MsgId>" + msgId + "</MsgId><CreDtTm>" + jetzt + "</CreDtTm>" +
+      "<NbOfTxs>" + posten.length + "</NbOfTxs><CtrlSum>" + z(summe) + "</CtrlSum>" +
+      "<InitgPty><Nm>" + xmlText(sepaText(b.inhaber, 70)) + "</Nm></InitgPty></GrpHdr>\n" +
+      "<PmtInf><PmtInfId>" + msgId + "-1</PmtInfId><PmtMtd>TRF</PmtMtd><BtchBookg>true</BtchBookg>" +
+      "<NbOfTxs>" + posten.length + "</NbOfTxs><CtrlSum>" + z(summe) + "</CtrlSum>" +
+      "<PmtTpInf><SvcLvl><Cd>SEPA</Cd></SvcLvl></PmtTpInf>" +
+      "<ReqdExctnDt>" + (neun ? "<Dt>" + ausfuehrung + "</Dt>" : ausfuehrung) + "</ReqdExctnDt>" +
+      "<Dbtr><Nm>" + xmlText(sepaText(b.inhaber, 70)) + "</Nm></Dbtr>" +
+      "<DbtrAcct><Id><IBAN>" + Objekte.ibanRoh(b.iban) + "</IBAN></Id></DbtrAcct>" +
+      (b.bic ? "<DbtrAgt><FinInstnId><" + bicTag + ">" + xmlText(String(b.bic).trim()) + "</" + bicTag + "></FinInstnId></DbtrAgt>" : "") +
+      "<ChrgBr>SLEV</ChrgBr>\n";
+    const zeilen = posten.map((x, i) => "<CdtTrfTxInf><PmtId><EndToEndId>" +
+        sepaText(msgId + "-" + (i + 1), 35).replace(/\s/g, "-") + "</EndToEndId></PmtId>" +
+        "<Amt><InstdAmt Ccy=\"EUR\">" + z(betragZahl(x.betrag)) + "</InstdAmt></Amt>" +
+        (x.bic ? "<CdtrAgt><FinInstnId><" + bicTag + ">" + xmlText(String(x.bic).trim()) + "</" + bicTag + "></FinInstnId></CdtrAgt>" : "") +
+        "<Cdtr><Nm>" + xmlText(sepaText(x.empfaenger, 70)) + "</Nm></Cdtr>" +
+        "<CdtrAcct><Id><IBAN>" + Objekte.ibanRoh(x.iban) + "</IBAN></Id></CdtrAcct>" +
+        "<RmtInf><Ustrd>" + xmlText(sepaText(x.zweck, 140)) + "</Ustrd></RmtInf></CdtTrfTxInf>\n").join("");
+    return kopf + zeilen + "</PmtInf>\n</CstmrCdtTrfInitn>\n</Document>\n";
+  }
+  function zahlungslaufHtml(o) {
+    if (!["miet", "garantie", "weg"].includes(o.art)) return "";
+    const b = objektBank(o);
+    const alle = ueberweisungen(o).slice().sort((a, c) => String(a.faellig).localeCompare(String(c.faellig)));
+    const erledigt = alle.filter(x => x.status === "bezahlt");
+    const liste = alle.filter(x => x.status !== "bezahlt").concat(erledigt.slice(-6));
+    const versteckt = erledigt.length - Math.min(erledigt.length, 6);
+    const offeneBelege = (o.dokumente || []).filter(d => d.art === "Rechnung" && d.rechnung &&
+      !ueberweisungen(o).some(x => x.belegId === d.id));
+    const frei = alle.filter(ueZahlbar);
+    const summeFrei = cent(frei.reduce((n, x) => n + betragZahl(x.betrag), 0));
+    const offenSumme = cent(alle.filter(x => x.status !== "bezahlt").reduce((n, x) => n + betragZahl(x.betrag), 0));
+    let h = "<section class='gruppe voll'><h2>Rechnungen bezahlen</h2>" +
+      "<p class='unter'>Zahlungen werden erst erfasst, dann freigegeben und erst danach als Datei an die Bank gegeben. " +
+      "Später erledigt das der Server über EBICS – die Freigabe bleibt bei Ihnen.</p>";
+    if (!Objekte.ibanGueltig(b.iban)) h += "<ul class='meldungen'><li class='m-hinweis'>Für dieses Objekt ist noch kein gültiges Bankkonto hinterlegt – " +
+      "ohne Auftraggeberkonto lässt sich keine Überweisung erzeugen.</li></ul>";
+    if (offeneBelege.length) h += "<div class='leiste'><div>" + offeneBelege.slice(0, 8).map(d =>
+      "<button class='btn klein' data-act='zl-ausbeleg' data-id='" + esc(d.id) + "'>+ " +
+      esc(((d.rechnung.lieferant || d.name || "Rechnung") + " · " + (d.rechnung.brutto || "?") + " €").slice(0, 46)) + "</button>").join("") +
+      "</div><span class='fuer'>offene Rechnungen ohne Zahlung</span></div>";
+    h += "<div class='ue-tab2'><div class='ue-kopf'><span>Empfänger</span><span>IBAN</span><span>Verwendungszweck</span>" +
+      "<span>Betrag</span><span>Fällig</span><span>Stand</span><span></span></div>" +
+      (liste.length ? liste.map(x => {
+        const i = ueberweisungen(o).indexOf(x);
+        const fest = x.status === "eingereicht" || x.status === "bezahlt";
+        const ibanOk = !x.iban || Objekte.ibanGueltig(x.iban);
+        return "<div class='ue-row" + (x.status === "bezahlt" ? " ue-ok" : "") + "'>" +
+          "<span><input type='text' data-ue='" + i + "|empfaenger' value='" + esc(x.empfaenger || "") + "'" + (fest ? " disabled" : "") + "></span>" +
+          "<span><input type='text' data-ue='" + i + "|iban' value='" + esc(x.iban || "") + "' placeholder='DE…'" + (fest ? " disabled" : "") +
+            (ibanOk ? "" : " style='box-shadow:inset 0 0 0 1.5px var(--err)'") + "></span>" +
+          "<span><input type='text' data-ue='" + i + "|zweck' value='" + esc(x.zweck || "") + "'" + (fest ? " disabled" : "") + "></span>" +
+          "<span><input type='number' step='0.01' inputmode='decimal' data-ue='" + i + "|betrag' value='" + esc(x.betrag || "") + "'" + (fest ? " disabled" : "") + "></span>" +
+          "<span><input type='date' data-ue='" + i + "|faellig' value='" + esc(x.faellig || "") + "'" + (fest ? " disabled" : "") + "></span>" +
+          "<span><span class='marke " + (x.status === "bezahlt" ? "s-erledigt" : x.status === "erfasst" ? "s-neu" : "s-warten") + "'>" +
+            esc(ueStandText(x.status)) + "</span>" + (x.freigabeWer ? "<br><span class='fuer'>" + esc(x.freigabeWer) + "</span>" : "") + "</span>" +
+          "<span class='ue-tasten'>" +
+          (x.status === "erfasst" ? "<button class='btn klein' data-act='zl-frei' data-i='" + i + "'>freigeben</button>" : "") +
+          (x.status === "frei" ? "<button class='btn klein' data-act='zl-zurueck' data-i='" + i + "'>zurück</button>" : "") +
+          (x.status === "eingereicht" ? "<button class='btn klein' data-act='zl-bezahlt' data-i='" + i + "'>bezahlt</button>" : "") +
+          (fest ? "" : "<button class='btn klein gefahr' data-act='zl-weg' data-i='" + i + "'>" + (S.loeschen === "zl" + i ? "Wirklich?" : "×") + "</button>") +
+          "</span></div>";
+      }).join("") : "<p class='unter'>Noch keine Zahlung erfasst.</p>") + "</div>" +
+      (versteckt ? "<p class='fuer'>" + versteckt + " ältere bezahlte Zahlungen sind weiter gespeichert, werden hier aber nicht mehr angezeigt.</p>" : "");
+    h += "<div class='leiste'><div><button class='btn klein' data-act='zl-neu'>+ Zahlung von Hand</button>" +
+      (frei.length ? "<button class='btn klein haupt' data-act='zl-datei'>Überweisungsdatei erzeugen · " + esc(eur2(summeFrei)) + " €</button>" : "") +
+      "</div><span class='fuer'>" + (offenSumme ? "offen: " + esc(eur2(offenSumme)) + " €" : "nichts offen") + "</span></div>";
+    h += "<ul class='meldungen'><li class='m-hinweis'>Die Datei im Format " +
+      esc(b.painVersion !== "02" ? "pain.001.001.09" : "pain.001.001.03") +
+      " laden Sie bis zur Serveranbindung im Online-Banking hoch. Eingereichte Zahlungen lassen sich hier nicht mehr ändern – " +
+      "das verlangt die Nachvollziehbarkeit (GoBD).</li></ul></section>";
+    return h;
+  }
   function buchhaltungHtml(o) {
     const konten = objektKonten(o);
     const liste = rahmenListe();
     const start = o.sollAb || heuteMonat();
-    let h = "<section class='gruppe voll' style='margin-top:14px'><h2>Kontenrahmen</h2>";
+    let h = "";
+    const kopfTeil0 = "<section class='gruppe voll' style='margin-top:14px'><h2>Kontenrahmen</h2>";
+    h = kopfTeil0;
     if (!konten.length) {
-      h += "<p class='unter'>Diesem Objekt ist noch kein Kontenrahmen zugeordnet.</p>" +
+      const nav = "<nav class='reiter e-reiter' style='margin-top:14px'>" +
+        [["bank", "Bankkonto"], ["konten", "Buchungskonten"]].map(([w, l]) =>
+          "<button data-act='bh-tab' data-wert='" + w + "'" + ((S.bhTab === "bank" ? "bank" : "konten") === w ? " aria-current='page'" : "") + ">" + l + "</button>").join("") + "</nav>";
+      if (S.bhTab === "bank") return nav + objektBankHtml(o) + zahlungslaufHtml(o);
+      return nav + kopfTeil0 + "<p class='unter'>Diesem Objekt ist noch kein Kontenrahmen zugeordnet.</p>" +
         "<div class='leiste'><div><button class='btn haupt' data-act='ob-rahmen-neu'>Standard zuordnen" +
         (rahmenStandard(o.art) ? " · " + esc(rahmenStandard(o.art).name) : "") + "</button></div></div></section>";
-      return h;
     }
-    h += "<p class='unter'>Gilt für dieses Objekt: <strong>" + esc(o.rahmenName || "eigener Rahmen") + "</strong>" +
+    const kopfTeil = kopfTeil0 + "<p class='unter'>Gilt für dieses Objekt: <strong>" + esc(o.rahmenName || "eigener Rahmen") + "</strong>" +
       (o.rahmenStand ? " · übernommen am " + Objekte.datum(String(o.rahmenStand).slice(0, 10)) : "") + "</p>" +
       "<div class='felder' style='margin-top:12px'>" +
       "<div class='feld'><label for='ob-rahmen'>Vorlage wechseln</label><select id='ob-rahmen' data-obrahmen='1'>" +
@@ -5296,7 +5769,14 @@ const Objekte = (() => {
       "</select><small>Ersetzt die Konten dieses Objekts. Gebuchte Beträge bleiben erhalten.</small></div>" +
       "<div class='feld'><label for='ob-sollab'>Sollstellungen ab</label><input type='month' id='ob-sollab' data-obsollab='1' value='" + esc(start) + "'>" +
       "<small>Ab diesem Monat erzeugt das Programm Sollstellungen.</small></div></div>";
-    h += "</section>" + objektBankHtml(o) + wirtschaftsplanHtml(o) + rueckstandHtml(o) + lastschriftHtml(o) + berichtigungHtml(o) + "<section class='gruppe voll'><h2>Konten dieses Objekts</h2>";
+    h = "";
+    /* Bankkonto und Buchungskonten sind zwei Welten – deshalb zwei Unterreiter. */
+    const bhTab = S.bhTab === "bank" ? "bank" : "konten";
+    h += "<nav class='reiter e-reiter' style='margin-top:14px'>" +
+      [["bank", "Bankkonto"], ["konten", "Buchungskonten"]].map(([w, l]) =>
+        "<button data-act='bh-tab' data-wert='" + w + "'" + (bhTab === w ? " aria-current='page'" : "") + ">" + l + "</button>").join("") + "</nav>";
+    if (bhTab === "bank") return h + objektBankHtml(o) + zahlungslaufHtml(o) + lastschriftHtml(o);
+    h += kopfTeil + "</section>" + wirtschaftsplanHtml(o) + rueckstandHtml(o) + berichtigungHtml(o) + "<section class='gruppe voll'><h2>Konten dieses Objekts</h2>";
     const gruppen = [["einnahme", "Einnahmen"], ["ausgabe", "Ausgaben"], ["bestand", "Bestandskonten"]];
     h += gruppen.map(([art, titel]) => {
       const teil = konten.filter(k => k.art === art);
@@ -5878,6 +6358,9 @@ const Objekte = (() => {
         f("firma", "Firma") + f("gewerk", "Gewerk", "text", "list='gewerke'") + f("ansprechpartner", "Ansprechpartner") + f("telefon", "Telefon", "tel") + f("notfall", "Notdienst-Nummer", "tel") + f("email", "E-Mail", "email") +
         "</div>" + hwKontakteHtml(w) +
         "<div class='felder' style='margin-top:18px'>" + f("strasse", "Straße und Nr.") + f("plz", "PLZ") + f("ort", "Ort") + "</div>" +
+        "<div class='felder' style='margin-top:14px'>" + f("iban", "IBAN", "text", "autocomplete='off' spellcheck='false' placeholder='DE…'") +
+        f("bic", "BIC (optional)", "text", "autocomplete='off' spellcheck='false'") + "</div>" +
+        "<p class='unter'>Mit der Bankverbindung lassen sich Rechnungen dieses Betriebs später direkt zur Zahlung vormerken.</p>" +
         "<div class='feld' style='margin-top:14px'><label for='h-notizen'>Notiz</label><textarea id='h-notizen' data-hw='notizen'>" + esc(w.notizen || "") + "</textarea></div>" +
         hwFuss + "</section>";
       return h + "</div>";
@@ -6319,7 +6802,15 @@ const Objekte = (() => {
     /* Das Mandat füllt die ganze Seite, damit es sauber gedruckt werden kann. */
     const mdP = S.mandatFuer ? mandatPerson() : null;
     const dvD = (!mdP && S.dienstDruck && S.entwurf) ? diensteListe(S.entwurf).find(x => x.id === S.dienstDruck) : null;
-    document.body.classList.toggle("mandat-an", !!mdP || !!dvD);
+    const abrD = (!mdP && !dvD && S.abrDruck && S.entwurf) ? S.abrDruck : null;
+    document.body.classList.toggle("mandat-an", !!mdP || !!dvD || !!abrD);
+    if (abrD) {
+      $("#neu-knopf").hidden = true; $("#status").hidden = true; $("#lese-hinweis").hidden = true;
+      $("#ze").hidden = true; $("#vv").hidden = true; app.hidden = false;
+      app.innerHTML = abrechnungDruckHtml(S.entwurf, abrD.jahr, abrD.einheitId || "", abrD.personId || "");
+      window.scrollTo({ top: behalteScroll ? y : 0 });
+      return;
+    }
     if (dvD) {
       $("#neu-knopf").hidden = true; $("#status").hidden = true; $("#lese-hinweis").hidden = true;
       $("#ze").hidden = true; $("#vv").hidden = true; app.hidden = false;
@@ -6514,6 +7005,45 @@ const Objekte = (() => {
       if (t.dataset.bs === "fuer") S.bsEntwurf.fuer = t.value ? [t.value] : [];
       else S.bsEntwurf[t.dataset.bs] = t.value;
       return;
+    }
+    if (t.dataset.abrjahr) { const j = Number(t.value); if (j > 1999 && j < 2101) { S.abrJahr = j;
+      clearTimeout(window.__abrT); window.__abrT = setTimeout(() => render(true), 500); } return; }
+    if (t.dataset.ue) {
+      const o = S.entwurf; if (!o) return;
+      const [i, feld] = String(t.dataset.ue).split("|");
+      const x = ueberweisungen(o)[Number(i)]; if (!x || x.status === "eingereicht" || x.status === "bezahlt") return;
+      x[feld] = feld === "iban" ? Objekte.ibanFormat(t.value) : t.value;
+      if (feld === "iban") { const el = app.querySelector("[data-ue='" + i + "|iban']"); if (el) el.value = x.iban; }
+      objektSichern(o);
+      clearTimeout(window.__ueT); window.__ueT = setTimeout(() => render(true), 900);
+      return;
+    }
+    if (t.dataset.ko) {
+      const o = S.entwurf; if (!o) return;
+      const [i, feld] = String(t.dataset.ko).split("|");
+      const k = kostenListe(o)[Number(i)]; if (!k) return;
+      k[feld] = t.value; objektSichern(o);
+      if (feld === "kontoNr") render(true);
+      else { clearTimeout(window.__abrT); window.__abrT = setTimeout(() => render(true), 900); }
+      return;
+    }
+    if (t.dataset.kobeleg) { S.koKonto = { ...(S.koKonto || {}) }; S.koKonto[t.dataset.kobeleg] = t.value; return; }
+    if (t.dataset.vb) {
+      const o = S.entwurf; if (!o) return;
+      verbrauchMap(o)[t.dataset.vb] = t.value; objektSichern(o);
+      clearTimeout(window.__abrT); window.__abrT = setTimeout(() => render(true), 900);
+      return;
+    }
+    if (t.dataset.vm) {
+      const o = S.entwurf; if (!o) return;
+      const [jahr, feld] = String(t.dataset.vm).split("|");
+      vermoegenVon(o, jahr)[feld] = t.value; objektSichern(o);
+      clearTimeout(window.__abrT); window.__abrT = setTimeout(() => render(true), 900);
+      return;
+    }
+    if (t.dataset.vmtext) {
+      const o = S.entwurf; if (!o) return;
+      vermoegenVon(o, t.dataset.vmtext).gegenstaende = t.value; objektSichern(o); return;
     }
     if (t.dataset.wj) {
       const o = S.liste.find(x => x.id === t.dataset.wj); if (!o) return;
@@ -6828,7 +7358,7 @@ const Objekte = (() => {
     const b = e.target.closest("[data-act]"); if (!b || e.composedPath().some(n => n.id === "vv")) return; const act = b.dataset.act; const id = b.dataset.id;
     if (!["loeschen", "hw-loeschen", "p-loeschen", "m-loeschen", "td-loeschen", "v-weg", "mail-weg", "dok-weg", "mail-loeschen", "abl-weg",
       "bh-fest", "za-weg", "kk-weg", "kr-weg", "kr-klasse-weg", "kr-leeren",
-      "nf-weg", "au-weg", "dienst-weg", "lv-weg", "org-weg", "hon-weg", "bs-weg"].includes(act)) S.loeschen = false;
+      "nf-weg", "au-weg", "dienst-weg", "lv-weg", "org-weg", "hon-weg", "bs-weg", "ko-weg", "zl-weg"].includes(act)) S.loeschen = false;
     switch (act) {
       case "tab": S.tab = b.dataset.tab; S.ansicht = "liste"; S.entwurf = null; S.hwEntwurf = null; S.pEntwurf = null; S.tEntwurf = null; S.tEntwurfTicket = null; S.ticketOffen = null;
         S.vermOffen = null; S.mailOffenId = null; S.mailImport = null; render(); break;
@@ -6992,6 +7522,33 @@ const Objekte = (() => {
         const jahr = b.dataset.wert; wplanAnlegen(o, jahr); S.wpJahr = jahr;
         bhProtokoll(o, "Wirtschaftsplan " + jahr + " angelegt");
         await objektSichern(o); render(true); toast("Wirtschaftsplan " + jahr + " angelegt"); break;
+      }
+      /* Den neuen Plan aus den tatsächlichen Kosten des Vorjahres vorbelegen. */
+      case "wp-aus-kosten": {
+        const o = S.entwurf; if (!o) return;
+        const jahr = S.wpJahr || String(new Date().getFullYear());
+        const wp = wplanVon(o, jahr); if (!wp || wplanFest(wp)) return;
+        const vorjahr = String(Number(jahr) - 1);
+        const kosten = kostenJeKonto(o, vorjahr);
+        if (!kosten.length) { toast("Für " + vorjahr + " sind keine Kosten erfasst."); return; }
+        const konten = objektKonten(o);
+        let neu = 0, gesetzt = 0;
+        wp.positionen = wp.positionen || [];
+        kosten.forEach(k => {
+          const konto = konten.find(x => String(x.nr || "") === String(k.nr || ""));
+          if (!konto || konto.art !== "ausgabe") return;
+          let pos = wp.positionen.find(x => x.kontoId === konto.id);
+          if (!pos) { pos = { id: Objekte.neueId(), kontoId: konto.id,
+            schluessel: konto.schluessel === "flaeche" || konto.schluessel === "personen" ? konto.schluessel : "mea" };
+            wp.positionen.push(pos); neu++; }
+          pos.betrag = String(cent(k.summe)).replace(".", ",");
+          gesetzt++;
+        });
+        bhProtokoll(o, "Wirtschaftsplan " + jahr + " aus den Kosten " + vorjahr + " vorbelegt", "",
+          "", gesetzt + " Positionen");
+        await objektSichern(o); render(true);
+        toast(gesetzt + " Positionen übernommen" + (neu ? ", davon " + neu + " neu" : "") + " – bitte prüfen und anpassen");
+        break;
       }
       case "wp-pos-neu": {
         const o = S.entwurf; if (!o) return;
@@ -7739,6 +8296,14 @@ const Objekte = (() => {
       /* ---------- Auswertung ---------- */
       case "aw-tab": S.awTab = b.dataset.wert; render(); break;
       case "aw-wer": S.awWer = b.dataset.wert || ""; render(true); break;
+      case "abr-oeffnen": {
+        const o = S.liste.find(x => x.id === b.dataset.id); if (!o) return;
+        S.entwurf = Objekte.betreuungSicherstellen(Objekte.listeSicherstellen(JSON.parse(JSON.stringify(o))));
+        S.entwurf.beirat = S.entwurf.beirat || [];
+        S.abrJahr = S.awJahr || (new Date().getFullYear() - 1);
+        S.tab = "objekte"; S.ansicht = "formular"; S.bearbeiten = false; S.istNeu = false; S.objTab = "abrechnung"; S.ueEinheit = null;
+        render(); break;
+      }
       case "aw-objekt": {
         const o = S.liste.find(x => x.id === b.dataset.id); if (!o) return;
         S.entwurf = Objekte.betreuungSicherstellen(Objekte.listeSicherstellen(JSON.parse(JSON.stringify(o))));
@@ -7746,6 +8311,81 @@ const Objekte = (() => {
         S.tab = "objekte"; S.ansicht = "formular"; S.bearbeiten = false; S.istNeu = false; S.objTab = "stammdaten"; S.ueEinheit = null;
         render(); break;
       }
+      case "bh-tab": S.bhTab = b.dataset.wert; render(true); break;
+      /* ---------- Rechnungen bezahlen ---------- */
+      case "zl-neu": { const o = S.entwurf; if (!o) return;
+        ueberweisungen(o).push({ id: Objekte.neueId(), empfaenger: "", iban: "", bic: "", betrag: "", zweck: objName(o),
+          faellig: geschaeftstagePlus(isoTag(new Date()), 3), status: "erfasst", erstellt: new Date().toISOString() });
+        await objektSichern(o); render(true);
+        app.querySelector("[data-ue='" + (o.ueberweisungen.length - 1) + "|empfaenger']")?.focus({ preventScroll: true }); break; }
+      case "zl-ausbeleg": { const o = S.entwurf; if (!o) return;
+        const d = (o.dokumente || []).find(x => x.id === b.dataset.id); if (!d) return;
+        ueberweisungen(o).push(ueAusBeleg(o, d));
+        bhProtokoll(o, "Zahlung aus Rechnung erfasst", "", "", (d.rechnung || {}).lieferant || d.name || "");
+        await objektSichern(o); render(true); toast("Zahlung vorgemerkt – bitte IBAN prüfen"); break; }
+      case "zl-frei": { const o = S.entwurf; if (!o) return;
+        const x = ueberweisungen(o)[Number(b.dataset.i)]; if (!x) return;
+        if (!Objekte.ibanGueltig(x.iban)) { toast("Ohne gültige IBAN keine Freigabe."); return; }
+        if (!(betragZahl(x.betrag) > 0)) { toast("Bitte einen Betrag eintragen."); return; }
+        x.status = "frei"; x.freigabeWer = teamName(S.ichBin) || (angemeldet() && angemeldet().id === ADMIN_ID ? "Admin" : "");
+        x.freigabeAm = new Date().toISOString();
+        bhProtokoll(o, "Zahlung freigegeben", "", "", x.empfaenger + " " + eur2(betragZahl(x.betrag)) + " €");
+        await objektSichern(o); render(true); break; }
+      case "zl-zurueck": { const o = S.entwurf; if (!o) return;
+        const x = ueberweisungen(o)[Number(b.dataset.i)]; if (!x) return;
+        x.status = "erfasst"; x.freigabeWer = ""; x.freigabeAm = "";
+        bhProtokoll(o, "Freigabe zurückgenommen", "", "", x.empfaenger || "");
+        await objektSichern(o); render(true); break; }
+      case "zl-bezahlt": { const o = S.entwurf; if (!o) return;
+        const x = ueberweisungen(o)[Number(b.dataset.i)]; if (!x) return;
+        x.status = "bezahlt"; x.bezahltAm = isoTag(new Date());
+        bhProtokoll(o, "Zahlung als bezahlt vermerkt", "", "", x.empfaenger || "");
+        await objektSichern(o); render(true); break; }
+      case "zl-weg": { const o = S.entwurf; if (!o) return; const i = Number(b.dataset.i);
+        if (S.loeschen !== "ue" + i) { S.loeschen = "ue" + i; render(true); return; }
+        ueberweisungen(o).splice(i, 1); S.loeschen = false; await objektSichern(o); render(true); break; }
+      case "zl-datei": {
+        const o = S.entwurf; if (!o) return;
+        const bk = objektBank(o);
+        if (!Objekte.ibanGueltig(bk.iban)) { toast("Für dieses Objekt fehlt ein gültiges Bankkonto."); return; }
+        const gut = ueberweisungen(o).filter(ueZahlbar);
+        if (!gut.length) { toast("Es ist nichts freigegeben."); return; }
+        const tag = geschaeftstagePlus(isoTag(new Date()), 1);
+        const faellige = gut.map(x => x.faellig).filter(Boolean).sort();
+        const frueh = faellige.length && faellige[0] > tag ? faellige[0] : tag;
+        const xml = ueberweisungXml(o, gut, frueh);
+        const name = "Ueberweisung-" + (o.nummer || "Objekt") + "-" + isoTag(new Date()) + ".xml";
+        const a3 = document.createElement("a"); a3.href = URL.createObjectURL(new Blob([xml], { type: "application/xml" }));
+        a3.download = name; a3.click(); setTimeout(() => URL.revokeObjectURL(a3.href), 2000);
+        gut.forEach(x => { x.status = "eingereicht"; x.eingereicht = new Date().toISOString(); });
+        bhProtokoll(o, "Überweisungsdatei erzeugt", "", "", gut.length + " Zahlungen · " +
+          eur2(cent(gut.reduce((n, x) => n + betragZahl(x.betrag), 0))) + " €");
+        await objektSichern(o); render(true); toast(gut.length + " Zahlungen in die Datei übernommen"); break;
+      }
+      /* ---------- Abrechnung ---------- */
+      case "ko-neu": { const o = S.entwurf; if (!o) return;
+        const z = abrZeitraum(o, abrJahrVon());
+        kostenListe(o).push({ id: Objekte.neueId(), datum: z.bis, text: "", betrag: "", kontoNr: "", erfasst: new Date().toISOString() });
+        await objektSichern(o); render(true);
+        app.querySelector("[data-ko='" + (o.kosten.length - 1) + "|text']")?.focus({ preventScroll: true }); break; }
+      case "ko-weg": { const o = S.entwurf; if (!o) return; const i = Number(b.dataset.i);
+        if (S.loeschen !== "ko" + i) { S.loeschen = "ko" + i; render(true); return; }
+        kostenListe(o).splice(i, 1); S.loeschen = false; await objektSichern(o); render(true); break; }
+      case "ko-belege": S.koBelege = true; render(true); break;
+      case "ko-belege-zu": S.koBelege = false; render(true); break;
+      case "ko-uebernehmen": {
+        const o = S.entwurf; if (!o) return;
+        const d = (o.dokumente || []).find(x => x.id === b.dataset.id); if (!d || !d.rechnung) return;
+        const nr = (S.koKonto || {})[d.id] || "";
+        if (!nr) { toast("Bitte zuerst ein Konto wählen."); return; }
+        kostenListe(o).push({ id: Objekte.neueId(), datum: d.rechnung.datum || "", kontoNr: nr,
+          text: [d.rechnung.lieferant, d.rechnung.leistung].filter(Boolean).join(" · ") || d.name || "Rechnung",
+          betrag: String(d.rechnung.brutto || "").replace(".", "").replace(",", "."), belegId: d.id, erfasst: new Date().toISOString() });
+        await objektSichern(o); render(true); toast("Rechnung als Kosten übernommen"); break;
+      }
+      case "abr-drucken": { const o = S.entwurf; if (!o) return;
+        S.abrDruck = { jahr: abrJahrVon(), einheitId: b.dataset.id || "", personId: b.dataset.wer || "" }; render(); break; }
+      case "abr-zurueck": { S.abrDruck = null; S.objTab = "abrechnung"; render(); break; }
       /* ---------- Dienstleistungsverträge ---------- */
       case "dienst-neu": { const o = S.entwurf; if (!o) return;
         const d = { id: Objekte.neueId(), art: b.dataset.wert || "hausmeister", firma: "", handwerkerId: "", ansprechpartner: "", telefon: "", email: "",
@@ -7753,11 +8393,22 @@ const Objekte = (() => {
           umlage: true, leistungen: [], notizen: "", erstellt: new Date().toISOString() };
         diensteListe(o).push(d); S.dienstOffen = d.id; S.objTab = "dienste";
         await objektSichern(o); render(true); break; }
-      case "bs-neu": S.bsEntwurf = { id: Objekte.neueId(), titel: "", text: "", fuer: [], pflicht: false, standard: true, eigen: true, neu: true };
+      case "bs-neu": S.bsEntwurf = { id: Objekte.neueId(), titel: "", text: "", fuer: [], pflicht: false, standard: true, eigen: true, neu: true,
+        sortierung: eigeneBausteine().reduce((n, x) => Math.max(n, Number(x.sortierung) || 0), 0) + 1 };
         render(true); app.querySelector("[data-bs='titel']")?.focus({ preventScroll: true }); break;
       case "bs-edit": { const bs = eigeneBausteine().find(x => x.id === b.dataset.id); if (!bs) return;
         S.bsEntwurf = { ...bs, neu: false }; S.loeschen = false; render(true); break; }
       case "bs-abbr": S.bsEntwurf = null; S.loeschen = false; render(true); break;
+      case "bs-hoch": case "bs-runter": {
+        const reihe = eigeneBausteine().slice().sort((x, y) => (Number(x.sortierung) || 0) - (Number(y.sortierung) || 0));
+        const k = reihe.findIndex(x => x.id === b.dataset.id);
+        const z = act === "bs-hoch" ? k - 1 : k + 1;
+        if (k < 0 || z < 0 || z >= reihe.length) return;
+        const a2 = reihe[k], b2 = reihe[z];
+        const sa = Number(a2.sortierung) || k + 1, sb = Number(b2.sortierung) || z + 1;
+        a2.sortierung = sb; b2.sortierung = sa;
+        await bausteinSichern(a2); await bausteinSichern(b2); render(true); break;
+      }
       case "bs-pflicht": { const e = S.bsEntwurf; if (!e) return; e.pflicht = !e.pflicht; if (e.pflicht) e.standard = true; render(true); break; }
       case "bs-standard": { const e = S.bsEntwurf; if (!e) return; if (e.pflicht) return; e.standard = !e.standard; render(true); break; }
       case "bs-ok": {
@@ -7765,7 +8416,9 @@ const Objekte = (() => {
         if (!String(e.titel || "").trim()) { toast("Bitte eine Überschrift eintragen."); return; }
         if (!String(e.text || "").trim()) { toast("Bitte den Text des Bausteins eintragen."); return; }
         const bs = { id: e.id, titel: e.titel.trim(), text: e.text, fuer: Array.isArray(e.fuer) ? e.fuer : [],
-          pflicht: !!e.pflicht, standard: !!e.standard, eigen: true, geaendert: new Date().toISOString() };
+          pflicht: !!e.pflicht, standard: !!e.standard, eigen: true,
+          sortierung: Number(e.sortierung) || (eigeneBausteine().reduce((n, x) => Math.max(n, Number(x.sortierung) || 0), 0) + 1),
+          geaendert: new Date().toISOString() };
         await bausteinSichern(bs);
         S.bsEntwurf = null; render(true); toast("Baustein gespeichert"); break;
       }
@@ -10924,8 +11577,11 @@ const Pruefung = (() => {
           "<option value='" + w + "'" + (a.typ === w ? " selected" : "") + ">" + l + "</option>").join("") + "</select></div>" +
         "<div class='feld'><label>Von</label><input type='date' data-zantrag='von' value='" + esc(a.von) + "'></div>" +
         "<div class='feld'><label>Bis</label><input type='date' data-zantrag='bis' value='" + esc(a.bis) + "'></div>" +
-        "<div class='feld'><label>Arbeitstage</label><div class='prot-erg'>" + tage + "</div></div></div>" +
+        "<div class='feld'><label>Arbeitstage</label><div class='prot-erg' data-ztage='1'>" +
+          (!a.von || !a.bis ? "–" : a.bis < a.von ? "Ende vor Beginn" : tage ? tage + (tage === 1 ? " Tag" : " Tage") : "kein Arbeitstag") + "</div></div></div>" +
         "<div class='feld' style='margin-top:10px'><label>Notiz</label><input type='text' data-zantrag='notiz' value='" + esc(a.notiz) + "'></div>" +
+        "<p class='unter' data-zantragtext='1' style='margin-top:6px'>Von und Bis eintragen – die Arbeitstage rechnet das Programm daraus. " +
+        "Für einen einzelnen Tag genügt „Von“.</p>" +
         "<div class='leiste'><div><button class='btn haupt klein' data-zact='antrag-speichern'>Eintragen</button>" +
         "<button class='btn klein' data-zact='antrag-abbrechen'>Abbrechen</button></div></div></div>";
     }
@@ -11124,7 +11780,8 @@ const Pruefung = (() => {
       if (zeile.tage) p.uebertrag.push(zeile);
       personSichern(S.mid); return;
     }
-    if (t.dataset.zantrag && S.antragNeu) { S.antragNeu[t.dataset.zantrag] = t.value; if (["von", "bis", "typ"].includes(t.dataset.zantrag)) render(); return; }
+    /* Datumsfelder dürfen beim Tippen nicht neu gezeichnet werden – sonst springt die Eingabe. */
+    if (t.dataset.zantrag && S.antragNeu) { S.antragNeu[t.dataset.zantrag] = t.value; antragAnzeige(p); return; }
     if (t.dataset.ztagf && S.tagEntwurf) { S.tagEntwurf[t.dataset.ztagf] = t.classList.contains("z-zeit") ? t.value : t.value;
       clearTimeout(window.__zeT); window.__zeT = setTimeout(render, 700); return; }
     if (t.dataset.zpause && S.tagEntwurf) { const [i, f2] = t.dataset.zpause.split("|"); (S.tagEntwurf.pausen[Number(i)] || {})[f2] = t.value;
@@ -11140,9 +11797,42 @@ const Pruefung = (() => {
       return;
     }
   });
+  /* Zeigt Arbeitstage und Hinweise zum Antrag an, ohne die Eingabe zu stören. */
+  /* Während des Tippens steht in einem Datumsfeld kurzzeitig ein Unsinnsjahr – das wird ignoriert. */
+  const datumFertig = d => /^\d{4}-\d{2}-\d{2}$/.test(String(d || "")) && Number(String(d).slice(0, 4)) > 1900;
+  function antragAnzeige(p) {
+    const roh = S.antragNeu; if (!roh) return;
+    const a = { von: datumFertig(roh.von) ? roh.von : "", bis: datumFertig(roh.bis) ? roh.bis : "" };
+    const feld = document.querySelector("[data-ztage]");
+    const text = document.querySelector("[data-zantragtext]");
+    let tage = 0, hinweis = "";
+    if (!a.von && !a.bis) hinweis = "Von und Bis eintragen – die Arbeitstage rechnet das Programm daraus. Für einen einzelnen Tag genügt „Von“.";
+    else if (!a.von) hinweis = "Bitte noch den Beginn eintragen.";
+    else if (!a.bis) hinweis = "Ohne „Bis“ wird nur der eine Tag eingetragen.";
+    else if (a.bis < a.von) hinweis = "Das Ende liegt vor dem Beginn.";
+    else { tage = arbeitstageJahre(p, a.von, a.bis).length;
+      hinweis = tage ? "" : "In diesem Zeitraum liegt kein Arbeitstag – prüfen Sie die Sollstunden des Mitarbeiters."; }
+    if (feld) feld.textContent = !a.von ? "–" : !a.bis ? "offen" : a.bis < a.von ? "Ende vor Beginn"
+      : tage ? tage + (tage === 1 ? " Tag" : " Tage") : "kein Arbeitstag";
+    if (text) { text.textContent = hinweis; text.hidden = !hinweis;
+      text.className = "unter" + (a.von && a.bis && a.bis < a.von ? " z-minus" : ""); }
+  }
+  /* Erst beim Verlassen des Feldes wird für einen einzelnen Tag das Ende vorgeschlagen. */
+  document.addEventListener("focusout", e => {
+    const t = e.target; if (!t || !t.dataset || !S.antragNeu) return;
+    const a = S.antragNeu;
+    if (t.dataset.zantrag === "von" && datumFertig(a.von) && !datumFertig(a.bis)) {
+      a.bis = a.von; const bis = document.querySelector("[data-zantrag='bis']"); if (bis) bis.value = a.bis;
+    } else if (t.dataset.zantrag === "bis" && datumFertig(a.bis) && !datumFertig(a.von)) {
+      a.von = a.bis; const von = document.querySelector("[data-zantrag='von']"); if (von) von.value = a.von;
+    } else if (!t.dataset.zantrag) return;
+    antragAnzeige(S.mid ? personVon(S.mid) : null);
+  });
   /* Beim Verlassen eines Zeitfelds sauber formatieren. */
   document.addEventListener("change", e => {
-    const t = e.target; const imForm = !!formMid(t); const ze = document.getElementById("ze");
+    const t = e.target;
+    if (t.dataset && t.dataset.zantrag && S.antragNeu) { antragAnzeige(S.mid ? personVon(S.mid) : null); return; }
+    const imForm = !!formMid(t); const ze = document.getElementById("ze");
     if ((!imForm && (!ze || ze.hidden)) || !t.classList || !t.classList.contains("z-zeit")) return;
     const wert = zeitNormal(t.value); t.value = wert;
     if (imForm) { const mid = formMid(t); if (mid && t.dataset.zperson) { personVon(mid)[t.dataset.zperson] = wert; personSichern(mid); } return; }
