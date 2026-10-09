@@ -1256,7 +1256,7 @@ const Objekte = (() => {
   const tel = t => String(t || "").replace(/[^\d+]/g, "");
   const S = { hwTab: "stamm", rgStapel: [], rgEntwurf: null, rgZu: {}, rahmen: [], rahmenOffen: "", kkAuf: {}, kkDetail: false, krProtAuf: false, krVorher: null, bank: null, lsMonat: "", lsDatum: "", sitzung: "", anFehler: "", anMail: "", pwWechsel: false, pwMeldung: "", pwMeldungOk: false, wpJahr: "", wpDatum: "", wpTop: "",
     sollOffen: "", zaNeu: "", zaEntwurf: null, bhFrei: "", bhGrund: "", infoAlle: false, vmtTab: "miete", vkOffen: null, vkWahl: false, vkSuche: "", bonOffen: null, bonHinweis: "", tObjSuche: "", anruferTreffer: null, tdTab: "vorgang", briefAnzeige: null, datFilter: { suche: "", quelle: "" }, eTab: "stamm", pTab: "stamm", pBearbeiten: false, eaHinweis: "", vermTab: "frei", vermOffen: null, vermFeedback: null, kiLaeuft: false, kiHinweis: "", kiStop: null, mails: [], mailTab: "eingang", mailFilter: { suche: "" }, mailImport: null, mailOffenId: null, mailRichtung: "ein",
-    objTab: "stammdaten", ueEinheit: null, tickets: [], tAnsicht: "liste", kalDatum: "", kalModus: "monat", kalWer: [], tEntwurfTicket: null, ticketOffen: null, ticketBearbeiten: false, ticketVorher: null, mailNeuFuer: null, mailOffen: null, mailVerschieben: null, mailRichtung: "ein", ichBin: "", einst: { ichBin: "", zeitraum: "woche", nurMeine: true, ansicht: "liste", kalModus: "monat" }, tFilter: { status: "", suche: "", nurMeine: true, zeitraum: "woche" }, bearbeiten: false, uOffen: null, anlageOffen: null, team: [], tEntwurf: null, eigNeuFuer: null, mieterNeuFuer: null, pObjekte: {}, pDirty: new Set(), tab: "vertraege", liste: [], handwerker: [], personen: [], pEntwurf: null, pFilter: { rolle: "", suche: "", ehemalige: false }, ansicht: "liste", entwurf: null, istNeu: false, hwEntwurf: null, hwNeuFuer: null,
+    objTab: "stammdaten", bhTab: "konten", rundTab: "rund", ueEinheit: null, tickets: [], tAnsicht: "liste", kalDatum: "", kalModus: "monat", kalWer: [], tEntwurfTicket: null, ticketOffen: null, ticketBearbeiten: false, ticketVorher: null, mailNeuFuer: null, mailOffen: null, mailVerschieben: null, mailRichtung: "ein", ichBin: "", einst: { ichBin: "", zeitraum: "woche", nurMeine: true, ansicht: "liste", kalModus: "monat" }, tFilter: { status: "", suche: "", nurMeine: true, zeitraum: "woche" }, bearbeiten: false, uOffen: null, anlageOffen: null, team: [], tEntwurf: null, eigNeuFuer: null, mieterNeuFuer: null, pObjekte: {}, pDirty: new Set(), tab: "vertraege", liste: [], handwerker: [], personen: [], pEntwurf: null, pFilter: { rolle: "", suche: "", ehemalige: false }, ansicht: "liste", entwurf: null, istNeu: false, hwEntwurf: null, hwNeuFuer: null,
     filter: { art: "", suche: "", beendete: false }, loeschen: false };
   const app = $("#app");
   $("#anlagenarten").innerHTML = Object.keys(Objekte.ANLAGEN).map(a => "<option value='" + esc(a) + "'>").join("");
@@ -2542,7 +2542,7 @@ const Objekte = (() => {
       .sort((a, b) => ["notfall", "hoch", "normal", "niedrig"].indexOf(a.dringlichkeit) - ["notfall", "hoch", "normal", "niedrig"].indexOf(b.dringlichkeit));
     const anlagen = (o.anlagen || []);
     const dok = (o.dokumente || []);
-    const unter = [["stammdaten", "Stammdaten"], ["buchhaltung", "Buchhaltung"], ["abrechnung", "Abrechnung"], ["dienste", "Dienstleister"], ["portal", "Portal"], ["rund", "Rundschreiben"], ["erhoehung", "Mieterhöhung"]]
+    const unter = [["stammdaten", "Stammdaten"], ["buchhaltung", "Buchhaltung"], ["dienste", "Dienstleister"], ["portal", "Portal"], ["rund", "Rundschreiben"]]
       .concat(o.art === "weg" ? [["etv", "Eigentümerversammlung"]] : []);
     let h = "<div class='seite'><div class='hero'><h1>" + (o.nummer ? "<span class='obj-nr'>" + esc(o.nummer) + "</span> " : "") + esc(objName(o)) + "</h1>" +
       "<p>" + esc(Objekte.ARTEN[o.art] ? Objekte.ARTEN[o.art].name : "") + " · " + esc([o.strasse, [o.plz, o.ort].filter(Boolean).join(" ")].filter(Boolean).join(", ")) +
@@ -2550,18 +2550,20 @@ const Objekte = (() => {
       "<nav class='reiter obj-reiter'>" + unter.map(([w, l]) => "<button data-act='obj-tab' data-wert='" + w + "'" + (S.objTab === w ? " aria-current='page'" : "") + ">" + l + "</button>").join("") + "</nav>";
     if (S.objTab === "buchhaltung") return h + buchhaltungHtml(o) +
       "<div class='leiste'><div><button class='btn' data-act='abbrechen'>Zurück zur Übersicht</button></div></div></div>";
-    if (S.objTab === "abrechnung") return h + (["miet", "weg", "garantie"].includes(o.art)
-      ? abrechnungSeiteHtml(o)
-      : "<p class='unter' style='margin:14px 0 0'>Eine Abrechnung gibt es in der Miet- und in der WEG-Verwaltung.</p>") +
-      "<div class='leiste'><div><button class='btn' data-act='abbrechen'>Zurück zur Übersicht</button></div></div></div>";
     if (S.objTab === "dienste") return h + objektDiensteHtml(o) +
       "<div class='leiste'><div><button class='btn' data-act='abbrechen'>Zurück zur Übersicht</button></div></div></div>";
     if (S.objTab === "portal") return h + objektPortalHtml(o) +
       "<div class='leiste'><div><button class='btn' data-act='abbrechen'>Zurück zur Übersicht</button></div></div></div>";
-    if (S.objTab === "erhoehung") return h + "<p class='unter' style='margin:14px 0 0'>Mieterhöhung für eine Wohnung dieses Objekts vorbereiten.</p>" +
-      "<div class='leiste'><div><button class='btn' data-act='abbrechen'>Zurück zur Übersicht</button></div></div></div>";
-    if (S.objTab === "rund") return h + "<p class='unter' style='margin:14px 0 0'>Schreiben an alle Eigentümer oder Mieter dieses Objekts.</p>" +
-      "<div class='leiste'><div><button class='btn' data-act='abbrechen'>Zurück zur Übersicht</button></div></div></div>";
+    if (S.objTab === "rund") {
+      const rt = rundReiter();
+      return h + "<nav class='reiter e-reiter' style='margin-top:14px'>" +
+        [["rund", "Rundschreiben"], ["erhoehung", "Mieterhöhung"]].map(([w, l]) =>
+          "<button data-act='rund-tab' data-wert='" + w + "'" + (rt === w ? " aria-current='page'" : "") + ">" + l + "</button>").join("") + "</nav>" +
+        "<p class='unter' style='margin:14px 0 0'>" + (rt === "erhoehung"
+          ? "Mieterhöhung für eine Wohnung dieses Objekts vorbereiten."
+          : "Schreiben an alle Eigentümer oder Mieter dieses Objekts.") + "</p>" +
+        "<div class='leiste'><div><button class='btn' data-act='abbrechen'>Zurück zur Übersicht</button></div></div></div>";
+    }
     if (S.objTab === "etv") return h + "<p class='unter' style='margin:14px 0 0'>Die Einladung wird mit den Daten dieses Objekts vorbereitet.</p>" +
       "<div class='leiste'><div><button class='btn' data-act='abbrechen'>Zurück zur Übersicht</button></div></div></div>";
     h += "<div class='formular-raster'>";
@@ -5745,6 +5747,12 @@ const Objekte = (() => {
       "das verlangt die Nachvollziehbarkeit (GoBD).</li></ul></section>";
     return h;
   }
+  const rundReiter = () => S.rundTab === "erhoehung" ? "erhoehung" : "rund";
+  /* Welcher Unterreiter der Buchhaltung gerade offen ist. */
+  const bhReiter = () => ["bank", "abrechnung"].includes(S.bhTab) ? S.bhTab : "konten";
+  const abrechnungTeilHtml = o => ["miet", "weg", "garantie"].includes(o.art)
+    ? abrechnungSeiteHtml(o)
+    : "<p class='unter' style='margin:14px 0 0'>Eine Abrechnung gibt es in der Miet- und in der WEG-Verwaltung.</p>";
   function buchhaltungHtml(o) {
     const konten = objektKonten(o);
     const liste = rahmenListe();
@@ -5754,9 +5762,10 @@ const Objekte = (() => {
     h = kopfTeil0;
     if (!konten.length) {
       const nav = "<nav class='reiter e-reiter' style='margin-top:14px'>" +
-        [["bank", "Bankkonto"], ["konten", "Buchungskonten"]].map(([w, l]) =>
-          "<button data-act='bh-tab' data-wert='" + w + "'" + ((S.bhTab === "bank" ? "bank" : "konten") === w ? " aria-current='page'" : "") + ">" + l + "</button>").join("") + "</nav>";
-      if (S.bhTab === "bank") return nav + objektBankHtml(o) + zahlungslaufHtml(o);
+        [["bank", "Bankkonto"], ["konten", "Buchungskonten"], ["abrechnung", "Abrechnung"]].map(([w, l]) =>
+          "<button data-act='bh-tab' data-wert='" + w + "'" + (bhReiter() === w ? " aria-current='page'" : "") + ">" + l + "</button>").join("") + "</nav>";
+      if (bhReiter() === "bank") return nav + objektBankHtml(o) + zahlungslaufHtml(o);
+      if (bhReiter() === "abrechnung") return nav + abrechnungTeilHtml(o);
       return nav + kopfTeil0 + "<p class='unter'>Diesem Objekt ist noch kein Kontenrahmen zugeordnet.</p>" +
         "<div class='leiste'><div><button class='btn haupt' data-act='ob-rahmen-neu'>Standard zuordnen" +
         (rahmenStandard(o.art) ? " · " + esc(rahmenStandard(o.art).name) : "") + "</button></div></div></section>";
@@ -5771,11 +5780,12 @@ const Objekte = (() => {
       "<small>Ab diesem Monat erzeugt das Programm Sollstellungen.</small></div></div>";
     h = "";
     /* Bankkonto und Buchungskonten sind zwei Welten – deshalb zwei Unterreiter. */
-    const bhTab = S.bhTab === "bank" ? "bank" : "konten";
+    const bhTab = bhReiter();
     h += "<nav class='reiter e-reiter' style='margin-top:14px'>" +
-      [["bank", "Bankkonto"], ["konten", "Buchungskonten"]].map(([w, l]) =>
+      [["bank", "Bankkonto"], ["konten", "Buchungskonten"], ["abrechnung", "Abrechnung"]].map(([w, l]) =>
         "<button data-act='bh-tab' data-wert='" + w + "'" + (bhTab === w ? " aria-current='page'" : "") + ">" + l + "</button>").join("") + "</nav>";
     if (bhTab === "bank") return h + objektBankHtml(o) + zahlungslaufHtml(o) + lastschriftHtml(o);
+    if (bhTab === "abrechnung") return h + abrechnungTeilHtml(o);
     h += kopfTeil + "</section>" + wirtschaftsplanHtml(o) + rueckstandHtml(o) + berichtigungHtml(o) + "<section class='gruppe voll'><h2>Konten dieses Objekts</h2>";
     const gruppen = [["einnahme", "Einnahmen"], ["ausgabe", "Ausgaben"], ["bestand", "Bestandskonten"]];
     h += gruppen.map(([art, titel]) => {
@@ -6855,8 +6865,12 @@ const Objekte = (() => {
     const zeitAn = S.tab === "zeit";
     $("#ze").hidden = !zeitAn;
     if (zeitAn && window.Zeiterfassung) window.Zeiterfassung.zeigen();
-    const rundAn = S.tab === "objekte" && S.ansicht === "formular" && !S.bearbeiten && !S.istNeu && S.objTab === "rund";
-    const erhAn = S.tab === "objekte" && S.ansicht === "formular" && !S.bearbeiten && !S.istNeu && S.objTab === "erhoehung";
+    /* Frühere eigene Reiter sind jetzt Unterreiter – alte Sprungziele werden umgelenkt. */
+    if (S.objTab === "abrechnung") { S.objTab = "buchhaltung"; S.bhTab = "abrechnung"; }
+    if (S.objTab === "erhoehung") { S.objTab = "rund"; S.rundTab = "erhoehung"; }
+    const imObjekt = S.tab === "objekte" && S.ansicht === "formular" && !S.bearbeiten && !S.istNeu;
+    const rundAn = imObjekt && S.objTab === "rund" && rundReiter() === "rund";
+    const erhAn = imObjekt && S.objTab === "rund" && rundReiter() === "erhoehung";
     const etvAn = S.tab === "etv" || S.tab === "schreiben" || rundAn || erhAn || (S.tab === "objekte" && S.ansicht === "formular" && !S.bearbeiten && !S.istNeu && S.objTab === "etv");
     $("#vv").hidden = !vv && !dok && !etvAn; $("#vv").classList.toggle("nur-daten", dok); $("#vv").classList.toggle("nur-etv", etvAn);
     app.hidden = vv || S.tab === "etv" || S.tab === "schreiben" || zeitAn; $("#neu-knopf").hidden = vv || dok || etvAn || rechte.nurLesen; $("#status").hidden = vv || dok || etvAn;
@@ -8312,6 +8326,7 @@ const Objekte = (() => {
         render(); break;
       }
       case "bh-tab": S.bhTab = b.dataset.wert; render(true); break;
+      case "rund-tab": S.rundTab = b.dataset.wert; render(); break;
       /* ---------- Rechnungen bezahlen ---------- */
       case "zl-neu": { const o = S.entwurf; if (!o) return;
         ueberweisungen(o).push({ id: Objekte.neueId(), empfaenger: "", iban: "", bic: "", betrag: "", zweck: objName(o),
@@ -11396,6 +11411,57 @@ const Pruefung = (() => {
   const jahrSichern = (mid, jahr) => ZSpeicher.speichern(jahrKey(mid, jahr), S.jahre[jahrKey(mid, jahr)]);
   const mitarbeiterName = m => [m.vorname, m.nachname].filter(Boolean).join(" ") || "Ohne Namen";
 
+  /* ---------- Abwesenheiten für den Outlook-Kalender ---------- */
+  /* Termine werden als iCalendar-Datei (.ics) erzeugt – Outlook, Google und Apple lesen dieses Format. */
+  const icsEsc = t => String(t == null ? "" : t).replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n");
+  const icsTag = d => String(d || "").replace(/-/g, "");
+  const icsStempel = () => new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d+/, "");
+  const icsNachTag = d => { const x = ausIso(d); x.setDate(x.getDate() + 1); return iso(x); };
+  function icsFalten(z) {
+    if (z.length <= 73) return z;
+    const teile = [z.slice(0, 73)]; let rest = z.slice(73);
+    while (rest.length > 72) { teile.push(" " + rest.slice(0, 72)); rest = rest.slice(72); }
+    if (rest) teile.push(" " + rest);
+    return teile.join("\r\n");
+  }
+  const ABW_TITEL = { urlaub: "Urlaub", krank: "Krank", frei: "Unbezahlt frei" };
+  function icsAus(eintraege) {
+    const z = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Hausverwaltung//Abwesenheiten//DE",
+      "CALSCALE:GREGORIAN", "METHOD:PUBLISH", "X-WR-CALNAME:Abwesenheiten"];
+    eintraege.forEach(a => {
+      const titel = (ABW_TITEL[a.typ] || "Abwesend") + (a.wer ? " – " + a.wer : "");
+      z.push("BEGIN:VEVENT",
+        "UID:" + icsEsc(a.id || String(Math.random()).slice(2)) + "@hausverwaltung",
+        "DTSTAMP:" + icsStempel(),
+        "DTSTART;VALUE=DATE:" + icsTag(a.von),
+        "DTEND;VALUE=DATE:" + icsTag(icsNachTag(a.bis || a.von)),
+        "SUMMARY:" + icsEsc(titel),
+        "CATEGORIES:" + icsEsc(ABW_TITEL[a.typ] || "Abwesend"),
+        "TRANSP:TRANSPARENT",
+        "X-MICROSOFT-CDO-ALLDAYEVENT:TRUE",
+        "X-MICROSOFT-CDO-BUSYSTATUS:OOF",
+        "STATUS:CONFIRMED");
+      if (a.notiz) z.push("DESCRIPTION:" + icsEsc(a.notiz));
+      z.push("END:VEVENT");
+    });
+    z.push("END:VCALENDAR");
+    return z.map(icsFalten).join("\r\n") + "\r\n";
+  }
+  function icsLaden(eintraege, dateiname) {
+    if (!eintraege.length) { toast("Es ist nichts Genehmigtes zum Übertragen da."); return; }
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([icsAus(eintraege)], { type: "text/calendar;charset=utf-8" }));
+    a.download = dateiname; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    toast(eintraege.length === 1 ? "Termin heruntergeladen – Datei öffnen, Outlook trägt ihn ein"
+      : eintraege.length + " Termine heruntergeladen – Datei öffnen und in Outlook importieren");
+  }
+  /* Alle genehmigten Abwesenheiten eines Mitarbeiters in einem Jahr. */
+  const abwesenheitenVon = (mid, jahr) => (jahrVon(mid, jahr).antraege || [])
+    .filter(a => a.status === "genehmigt")
+    .sort((a, b) => String(a.von).localeCompare(String(b.von)))
+    .map(a => ({ ...a, wer: mitarbeiterName(team().find(m => m.id === mid) || {}) }));
+  const dateiName = t => String(t || "Abwesenheiten").replace(/[^A-Za-z0-9ÄÖÜäöüß \-]/g, "").replace(/\s+/g, "-") || "Abwesenheiten";
+
   /* ---------- Oberfläche ---------- */
   const MONATE = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
   const TAGE = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"];
@@ -11567,9 +11633,14 @@ const Pruefung = (() => {
     const jetzt = new Date();
     if (S.jahr >= 2027 && jetzt.getMonth() === 9) hinweise.push("Fristen für die Planung " + (jetzt.getFullYear() + 1) + ": Resturlaub bis 01.11., Januar-Urlaub bis 05.11., Planung bis 13.11., Rückmeldung bis 27.11.");
     if (hinweise.length) h += "<ul class='meldungen'>" + hinweise.map(x => "<li class='m-hinweis'>" + esc(x) + "</li>").join("") + "</ul>";
+    const abwJahr = (jd.antraege || []).filter(a => a.status === "genehmigt");
     h += "<section class='gruppe'><h2>Anträge und Abwesenheiten</h2>" +
       "<div class='leiste'><div><button class='btn haupt klein' data-zact='antrag-neu'>+ Eintrag</button>" +
-      (offeneA.length ? "<span class='fuer'>" + offeneA.length + " offen</span>" : "") + "</div></div>";
+      (abwJahr.length ? "<button class='btn klein' data-zact='ics-jahr'>Outlook-Kalender " + S.jahr + " (" + abwJahr.length + ")</button>" : "") +
+      "<button class='btn klein' data-zact='ics-team'>Ganzes Team " + S.jahr + "</button>" +
+      (offeneA.length ? "<span class='fuer'>" + offeneA.length + " offen</span>" : "") + "</div></div>" +
+      "<p class='unter'>Genehmigte Abwesenheiten lassen sich als Kalenderdatei herunterladen. " +
+      "Die Datei anklicken – Outlook fragt, ob der Termin in den Kalender soll. Sobald die Serververbindung zu Microsoft 365 steht, geht das automatisch.</p>";
     if (S.antragNeu) {
       const a = S.antragNeu; const tage = arbeitstageJahre(p, a.von, a.bis).length;
       h += "<div class='u-block'><div class='felder'>" +
@@ -11593,6 +11664,7 @@ const Pruefung = (() => {
       "<span class='fuer'>" + (a.status === "genehmigt" ? "genehmigt" : a.status === "abgelehnt" ? "abgelehnt" : "offen") + "</span></div>" +
       (a.notiz ? "<p class='t-vorschau'>" + esc(a.notiz) + "</p>" : "") +
       "<div class='aktionen'>" + (a.status !== "genehmigt" ? "<button class='btn klein haupt' data-zact='antrag-ok' data-id='" + esc(a.id) + "'>Genehmigen</button>" : "") +
+      (a.status === "genehmigt" ? "<button class='btn klein' data-zact='antrag-ics' data-id='" + esc(a.id) + "'>In Outlook eintragen</button>" : "") +
       (a.status !== "abgelehnt" && a.typ !== "krank" ? "<button class='btn klein' data-zact='antrag-nein' data-id='" + esc(a.id) + "'>Ablehnen</button>" : "") +
       "<button class='btn klein gefahr' data-zact='antrag-weg' data-id='" + esc(a.id) + "'>Löschen</button></div></div>").join("") + "</div>"
       : "<p class='unter'>Noch keine Einträge.</p>";
@@ -11732,6 +11804,21 @@ const Pruefung = (() => {
         a.status = "genehmigt";
         arbeitstageJahre(p, a.von, a.bis).forEach(d => tagSetzen(S.mid, d, { status: a.typ }));
         jahrSichern(S.mid, S.jahr); render(); toast("Genehmigt und eingetragen"); break;
+      }
+      case "antrag-ics": {
+        const a = jd.antraege.find(x => x.id === id); if (!a) return;
+        const wer = mitarbeiterName(team().find(m => m.id === S.mid) || {});
+        icsLaden([{ ...a, wer }], dateiName((ABW_TITEL[a.typ] || "Abwesend") + " " + wer + " " + dmy(a.von)) + ".ics"); break;
+      }
+      case "ics-jahr": {
+        const wer = mitarbeiterName(team().find(m => m.id === S.mid) || {});
+        icsLaden(abwesenheitenVon(S.mid, S.jahr), dateiName("Abwesenheiten " + wer + " " + S.jahr) + ".ics"); break;
+      }
+      case "ics-team": {
+        const alle = team().filter(m => !m.ausgeschieden)
+          .reduce((l, m) => l.concat(abwesenheitenVon(m.id, S.jahr)), [])
+          .sort((a, b) => String(a.von).localeCompare(String(b.von)));
+        icsLaden(alle, dateiName("Abwesenheiten Team " + S.jahr) + ".ics"); break;
       }
       case "antrag-nein": {
         const a = jd.antraege.find(x => x.id === id); if (!a) return;
