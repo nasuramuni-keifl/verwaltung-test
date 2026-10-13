@@ -1256,7 +1256,7 @@ const Objekte = (() => {
   const tel = t => String(t || "").replace(/[^\d+]/g, "");
   const S = { hwTab: "stamm", rgStapel: [], rgEntwurf: null, rgZu: {}, rahmen: [], rahmenOffen: "", kkAuf: {}, kkDetail: false, krProtAuf: false, krVorher: null, bank: null, lsMonat: "", lsDatum: "", sitzung: "", anFehler: "", anMail: "", pwWechsel: false, pwMeldung: "", pwMeldungOk: false, wpJahr: "", wpDatum: "", wpTop: "",
     sollOffen: "", zaNeu: "", zaEntwurf: null, bhFrei: "", bhGrund: "", infoAlle: false, vmtTab: "miete", vkOffen: null, vkWahl: false, vkSuche: "", bonOffen: null, bonHinweis: "", tObjSuche: "", anruferTreffer: null, tdTab: "vorgang", briefAnzeige: null, datFilter: { suche: "", quelle: "" }, eTab: "stamm", pTab: "stamm", pBearbeiten: false, eaHinweis: "", vermTab: "frei", vermOffen: null, vermFeedback: null, kiLaeuft: false, kiHinweis: "", kiStop: null, mails: [], mailTab: "eingang", mailFilter: { suche: "" }, mailImport: null, mailOffenId: null, mailRichtung: "ein",
-    objTab: "stammdaten", bhTab: "konten", rundTab: "rund", ueEinheit: null, tickets: [], tAnsicht: "liste", kalDatum: "", kalModus: "monat", kalWer: [], tEntwurfTicket: null, ticketOffen: null, ticketBearbeiten: false, ticketVorher: null, mailNeuFuer: null, mailOffen: null, mailVerschieben: null, mailRichtung: "ein", ichBin: "", einst: { ichBin: "", zeitraum: "woche", nurMeine: true, ansicht: "liste", kalModus: "monat" }, tFilter: { status: "", suche: "", nurMeine: true, zeitraum: "woche" }, bearbeiten: false, uOffen: null, anlageOffen: null, team: [], tEntwurf: null, eigNeuFuer: null, mieterNeuFuer: null, pObjekte: {}, pDirty: new Set(), tab: "vertraege", liste: [], handwerker: [], personen: [], pEntwurf: null, pFilter: { rolle: "", suche: "", ehemalige: false }, ansicht: "liste", entwurf: null, istNeu: false, hwEntwurf: null, hwNeuFuer: null,
+    objTab: "stammdaten", bhTab: "konten", rundTab: "rund", ueEinheit: null, mvBausteine: [], mvOffen: "", mvDruck: null, mvbsEntwurf: null, tickets: [], tAnsicht: "liste", kalDatum: "", kalModus: "monat", kalWer: [], tEntwurfTicket: null, ticketOffen: null, ticketBearbeiten: false, ticketVorher: null, mailNeuFuer: null, mailOffen: null, mailVerschieben: null, mailRichtung: "ein", ichBin: "", einst: { ichBin: "", zeitraum: "woche", nurMeine: true, ansicht: "liste", kalModus: "monat" }, tFilter: { status: "", suche: "", nurMeine: true, zeitraum: "woche" }, bearbeiten: false, uOffen: null, anlageOffen: null, team: [], tEntwurf: null, eigNeuFuer: null, mieterNeuFuer: null, pObjekte: {}, pDirty: new Set(), tab: "vertraege", liste: [], handwerker: [], personen: [], pEntwurf: null, pFilter: { rolle: "", suche: "", ehemalige: false }, ansicht: "liste", entwurf: null, istNeu: false, hwEntwurf: null, hwNeuFuer: null,
     filter: { art: "", suche: "", beendete: false }, loeschen: false };
   const app = $("#app");
   $("#anlagenarten").innerHTML = Object.keys(Objekte.ANLAGEN).map(a => "<option value='" + esc(a) + "'>").join("");
@@ -1441,9 +1441,10 @@ const Objekte = (() => {
     const schluessel = Objekte.KOSTENARTEN.map(([f, l]) => l + ": " + Objekte.SCHLUESSEL[Objekte.schluesselFuer(o, e, f)]).join(" · ");
     const zaehler = [["zKalt", "Kaltwasser"], ["zWarm", "Warmwasser"], ["zHeiz", "Heizung"], ["zStrom", "Strom"]].filter(([k]) => e[k]).map(([k, l]) => l + " " + e[k]).join(" · ");
     const vmA = vermVon(e, o); const freiA = vmA.status !== "vermietet";
-    const eTabsA = "<nav class='reiter e-reiter'>" + [["stamm", "Stammdaten"], ["buch", "Buchhaltung"], ["dok", "Dokumente"]].map(([w, l]) =>
+    const eTabsA = "<nav class='reiter e-reiter'>" + [["stamm", "Stammdaten"], ["buch", "Buchhaltung"], ["miete", "Mietvertrag"], ["dok", "Dokumente"]].map(([w, l]) =>
       "<button data-act='e-tab' data-wert='" + w + "'" + (S.eTab === w ? " aria-current='page'" : "") + ">" + l + "</button>").join("") + "</nav>";
     if (S.eTab === "buch") return "<div class='we-detail'>" + eTabsA + "</div>" + sollstellungHtml(o, e);
+    if (S.eTab === "miete") return "<div class='we-detail'>" + eTabsA + "</div>" + mvSeiteHtml(o, e);
     if (S.eTab === "dok") return "<div class='we-detail'>" + eTabsA + ablageHtml("einheit:" + e.id, "Dateien zur Wohnung", "Mietvertrag, Übergabeprotokoll, Grundriss, Fotos.") + "</div>";
     return "<div class='we-detail'>" + eTabsA +
       "<div class='we-verm'><div><strong>" + (freiA ? "Zur Neuvermietung freigegeben" : "Vermietet") + "</strong>" +
@@ -1710,6 +1711,346 @@ const Objekte = (() => {
       (e.neu ? "" : "<button class='btn klein gefahr' data-act='bs-weg' data-id='" + esc(e.id) + "'>" +
         (S.loeschen === "bs" + e.id ? "Wirklich löschen?" : "Baustein löschen") + "</button>") + "</div></div>";
   }
+  /* ===================== Mietvertrag ======================
+     Die Angaben zur Wohnung, zur Miete und zur Kaution setzt das Programm aus den
+     gespeicherten Daten zusammen. Die Vertragsklauseln schreibt der Verwalter selbst
+     und hakt sie je Vertrag nur noch an – wie bei den Dienstleisterverträgen. */
+  const MV_ARTEN = [["wohnraum", "Wohnraum"], ["gewerbe", "Gewerbe"], ["stellplatz", "Stellplatz / Garage"]];
+  const MV_ZUSTAND = [["renoviert", "renoviert übergeben"], ["unrenoviert", "unrenoviert übergeben"], ["teil", "teilrenoviert übergeben"]];
+  const MV_ANPASSUNG = [["", "keine – Erhöhung nur nach § 558 BGB"], ["staffel", "Staffelmiete (§ 557a BGB)"], ["index", "Indexmiete (§ 557b BGB)"]];
+  const mvListe = o => Array.isArray(o.mietvertraege) ? o.mietvertraege : (o.mietvertraege = []);
+  const mvFuerEinheit = (o, eid) => mvListe(o).filter(x => x.einheitId === eid)
+    .sort((a, b) => String(b.beginn || "").localeCompare(String(a.beginn || "")));
+  const mvEigene = () => Array.isArray(S.mvBausteine) ? S.mvBausteine : (S.mvBausteine = []);
+  const mvBsPasst = (bs, art) => !Array.isArray(bs.fuer) || !bs.fuer.length || bs.fuer.includes(art);
+  const mvBsAn = (v, bs) => bs.pflicht || (v.bausteine && Object.prototype.hasOwnProperty.call(v.bausteine, bs.id) ? !!v.bausteine[bs.id] : !!bs.standard);
+  const mvBsFuer = v => mvEigene().filter(bs => mvBsPasst(bs, v.art))
+    .sort((a, b) => (Number(a.sortierung) || 0) - (Number(b.sortierung) || 0));
+  const mvBsAktiv = v => mvBsFuer(v).filter(bs => mvBsAn(v, bs));
+  async function mvBsSichern(bs) {
+    const i = mvEigene().findIndex(x => x.id === bs.id); if (i >= 0) S.mvBausteine[i] = bs; else S.mvBausteine.push(bs);
+    try { await Speicher.speichern("mietbausteine", bs, S.mvBausteine); } catch (e) { toast("Speichern im Konto fehlgeschlagen – vorerst nur in diesem Browser gesichert."); }
+  }
+  const mvStaffel = v => Array.isArray(v.staffel) ? v.staffel : (v.staffel = []);
+  const mvSchluessel = v => Array.isArray(v.schluessel) ? v.schluessel : (v.schluessel = []);
+  const mvGesamt = v => eurZahl(v.kaltmiete) + eurZahl(v.bkVoraus) + eurZahl(v.hkVoraus) + eurZahl(v.stellplatzMiete);
+
+  function mvNeu(o, e) {
+    const mie = mieterVon(e.id, o); const vm = vermVon(e, o);
+    return { id: Objekte.neueId(), einheitId: e.id, personId: mie ? mie.id : "", art: "wohnraum",
+      beginn: "", befristet: false, ende: "", befristungsgrund: "",
+      kaltmiete: vm.kaltmiete || e.sollmiete || "", bkVoraus: vm.nebenkosten || "", hkVoraus: vm.heizkosten || "",
+      stellplatzMiete: "", anpassung: "", staffel: [], indexBasis: "",
+      kaution: vm.kaution || "", kautionRaten: "3", uebergabe: "", zustand: "renoviert", schoenheit: false,
+      kleinrepEinzel: "", kleinrepJahr: "", personenzahl: "", schluessel: [],
+      zubehoer: "", energieausweis: false, rauchmelder: false,
+      bausteine: {}, notizen: "", erstellt: new Date().toISOString() };
+  }
+
+  /* Prüfpunkte: was rechtlich schiefgehen kann, steht hier als Meldung. */
+  function mvPruefen(o, e, v) {
+    const m = []; const kalt = eurZahl(v.kaltmiete);
+    const mie = v.personId ? personVon(v.personId) : null;
+    if (!mie) m.push(["m-fehler", "Es ist noch kein Mieter ausgewählt. Ohne Mieter kann der Vertrag nicht erstellt werden."]);
+    if (!v.beginn) m.push(["m-fehler", "Der Mietbeginn fehlt."]);
+    if (!kalt) m.push(["m-fehler", "Die Kaltmiete fehlt."]);
+    if (v.befristet && !String(v.befristungsgrund || "").trim())
+      m.push(["m-fehler", "Eine Befristung ist nur mit einem der Gründe aus § 575 Abs. 1 BGB wirksam – und der Grund muss bei Vertragsschluss schriftlich genannt werden. Ohne Grund gilt der Vertrag als unbefristet."]);
+    if (eurZahl(v.kaution) > kalt * 3 && kalt)
+      m.push(["m-fehler", "Die Kaution darf höchstens drei Nettokaltmieten betragen (§ 551 Abs. 1 BGB) – hier wären das " + eurText(kalt * 3) + "."]);
+    if (v.anpassung === "staffel" && mvStaffel(v).length && mvStaffel(v).some((x, i) => i > 0 && x.ab && mvStaffel(v)[i - 1].ab && mvMonateZwischen(mvStaffel(v)[i - 1].ab, x.ab) < 12))
+      m.push(["m-fehler", "Bei der Staffelmiete muss die Miete jeweils mindestens ein Jahr unverändert bleiben (§ 557a Abs. 2 BGB)."]);
+    if (v.anpassung === "staffel" && v.beginn && mvStaffel(v)[0] && mvStaffel(v)[0].ab && mvMonateZwischen(v.beginn, mvStaffel(v)[0].ab) < 12)
+      m.push(["m-fehler", "Die erste Staffel darf frühestens ein Jahr nach Mietbeginn greifen (§ 557a Abs. 2 BGB)."]);
+    if (v.anpassung === "index")
+      m.push(["m-hinweis", "Bei der Indexmiete muss die Miete jeweils mindestens ein Jahr unverändert bleiben; Erhöhungen nach § 559 BGB wegen Modernisierung sind daneben ausgeschlossen (§ 557b BGB)."]);
+    if (v.schoenheit && v.zustand === "unrenoviert")
+      m.push(["m-fehler", "Schönheitsreparaturen lassen sich bei einer unrenoviert übergebenen Wohnung nicht ohne angemessenen Ausgleich abwälzen – eine solche Klausel ist unwirksam (BGH VIII ZR 185/14)."]);
+    if (v.schoenheit)
+      m.push(["m-hinweis", "Starre Fristen für Schönheitsreparaturen machen die Klausel unwirksam. Formulieren Sie den Baustein mit „in der Regel“ und nach tatsächlichem Bedarf."]);
+    if (eurZahl(v.kleinrepEinzel) > 120)
+      m.push(["m-hinweis", "Für Kleinreparaturen gelten Grenzen von etwa 100 bis 120 € je Fall als zulässig; höhere Beträge werden von Gerichten regelmäßig gekippt."]);
+    if (eurZahl(v.kleinrepEinzel) && !eurZahl(v.kleinrepJahr))
+      m.push(["m-hinweis", "Eine Kleinreparaturklausel braucht neben der Einzelgrenze auch eine Jahreshöchstgrenze, sonst ist sie unwirksam."]);
+    if (!v.energieausweis)
+      m.push(["m-hinweis", "Der Energieausweis muss dem Mieter spätestens bei Vertragsschluss vorgelegt und übergeben werden (§ 80 GEG). Das Versäumnis ist bußgeldbewehrt."]);
+    if (!v.rauchmelder)
+      m.push(["m-hinweis", "Halten Sie fest, dass Rauchwarnmelder vorhanden und funktionsfähig übergeben wurden."]);
+    if (!eurZahl(v.bkVoraus) && !eurZahl(v.hkVoraus))
+      m.push(["m-hinweis", "Ohne vereinbarte Umlage trägt der Vermieter die Betriebskosten (§ 556 Abs. 1 BGB). Tragen Sie die Vorauszahlungen ein und regeln Sie die Umlage in einem Baustein."]);
+    if (v.befristet && v.beginn && v.ende && mvMonateZwischen(v.beginn, v.ende) > 12)
+      m.push(["m-hinweis", "Ein Mietvertrag über mehr als ein Jahr braucht die Schriftform (§ 550 BGB) – beide Seiten unterschreiben dieselbe Urkunde."]);
+    if (!mvBsFuer(v).length)
+      m.push(["m-hinweis", "Sie haben noch keine Vertragsbausteine geschrieben. Ohne sie enthält der Vertrag nur die Angaben zu Wohnung, Miete und Kaution."]);
+    m.push(["m-hinweis", "Die Miete ist spätestens am dritten Werktag des Monats im Voraus zu zahlen (§ 556b Abs. 1 BGB). Die Betriebskosten rechnen Sie jährlich innerhalb von zwölf Monaten ab (§ 556 Abs. 3 BGB)."]);
+    return m;
+  }
+  const mvMonateZwischen = (a, b) => {
+    if (!a || !b) return 0;
+    const d1 = new Date(a + "T12:00:00"), d2 = new Date(b + "T12:00:00");
+    return (d2.getFullYear() - d1.getFullYear()) * 12 + (d2.getMonth() - d1.getMonth());
+  };
+
+  /* ---------- Oberfläche ---------- */
+  function mvSeiteHtml(o, e) {
+    const liste = mvFuerEinheit(o, e.id);
+    const offen = liste.find(x => x.id === S.mvOffen) || null;
+    let h = "<section class='gruppe voll' style='margin-top:14px'><h2>Mietvertrag</h2>" +
+      "<p class='unter'>Vertrag für diese Wohnung. Wohnung, Miete und Kaution kommen aus den gespeicherten Daten, " +
+      "die Klauseln schreiben Sie einmal selbst und haken sie danach nur noch an.</p>" +
+      "<div class='leiste'><div><button class='btn klein haupt' data-act='mv-neu' data-e='" + esc(e.id) + "'>+ Mietvertrag anlegen</button>" +
+      (liste.length ? "<span class='fuer'>" + liste.length + (liste.length === 1 ? " Vertrag" : " Verträge") + " zu dieser Wohnung</span>" : "") + "</div></div>";
+    if (!liste.length && !offen) return h + "<p class='unter'>Noch kein Vertrag angelegt.</p></section>";
+    h += "<div class='dv-liste'>" + liste.map(v => {
+      const mie = v.personId ? personVon(v.personId) : null;
+      const auf = offen && offen.id === v.id;
+      return "<div class='u-block'><div class='t-oben'>" +
+        "<span class='marke " + (v.unterschrieben ? "s-erledigt" : "s-neu") + "'>" + (v.unterschrieben ? "unterschrieben" : "Entwurf") + "</span>" +
+        "<strong>" + esc(mie ? Objekte.personName(mie) : "ohne Mieter") + "</strong>" +
+        "<span class='fuer'>" + esc(Objekte.label(MV_ARTEN, v.art)) + (v.beginn ? " · ab " + Objekte.datum(v.beginn) : "") +
+        (eurZahl(v.kaltmiete) ? " · " + eurText(eurZahl(v.kaltmiete)) + " kalt" : "") + "</span>" +
+        "<button class='btn klein' data-act='mv-auf' data-id='" + esc(v.id) + "'>" + (auf ? "Schließen" : "Öffnen") + "</button>" +
+        "<button class='btn klein haupt' data-act='mv-drucken' data-id='" + esc(v.id) + "'>Vertrag</button></div>" +
+        (auf ? mvFormHtml(o, e, v) : "") + "</div>";
+    }).join("") + "</div>";
+    return h + "</section>";
+  }
+
+  function mvFormHtml(o, e, v) {
+    const f = (feld, label, typ, hilfe) => "<div class='feld'><label>" + label + "</label><input type='" + (typ || "text") + "'" +
+      (typ === "number" ? " step='0.01' inputmode='decimal'" : "") + " data-mv='" + esc(v.id) + "|" + feld + "' value='" + esc(v[feld] || "") + "'>" +
+      (hilfe ? "<small>" + hilfe + "</small>" : "") + "</div>";
+    const mieter = S.personen.filter(x => x.rolle === "mieter").sort((a, b) => Objekte.personName(a).localeCompare(Objekte.personName(b), "de"));
+    const kalt = eurZahl(v.kaltmiete);
+    let h = "<div class='felder' style='margin-top:14px'>" +
+      "<div class='feld'><label>Mieter</label><select data-mv='" + esc(v.id) + "|personId'><option value=''>– bitte wählen –</option>" +
+      mieter.map(p => "<option value='" + esc(p.id) + "'" + (v.personId === p.id ? " selected" : "") + ">" + esc(Objekte.personName(p)) + "</option>").join("") +
+      "</select><small>Steht der neue Mieter noch nicht in der Liste, legen Sie ihn zuerst unter „Eigentümer/Mieter“ an.</small></div>" +
+      "<div class='feld'><label>Art des Vertrags</label><select data-mv='" + esc(v.id) + "|art'>" +
+      MV_ARTEN.map(([w, l]) => "<option value='" + w + "'" + (v.art === w ? " selected" : "") + ">" + l + "</option>").join("") + "</select></div>" +
+      f("beginn", "Mietbeginn", "date") +
+      f("personenzahl", "Personen im Haushalt", "number") + "</div>";
+    h += "<div class='schalter-zeile' style='margin-top:12px'><div>Befristeter Vertrag<small>Nur mit einem Grund nach § 575 BGB wirksam.</small></div>" +
+      "<button type='button' class='schalter' role='switch' aria-checked='" + (!!v.befristet) + "' aria-label='befristet' data-act='mv-schalter' data-id='" + esc(v.id) + "' data-feld='befristet'></button></div>" +
+      (v.befristet ? "<div class='felder' style='margin-top:12px'>" + f("ende", "Mietende", "date") +
+        "<div class='feld breit'><label>Grund der Befristung</label><input type='text' data-mv='" + esc(v.id) + "|befristungsgrund' value='" + esc(v.befristungsgrund || "") +
+        "' placeholder='z. B. Eigenbedarf für die Tochter des Eigentümers ab 01.09.2028'><small>Eigenbedarf, geplante Beseitigung oder Vermietung an einen Betriebsangehörigen (§ 575 Abs. 1 BGB).</small></div></div>" : "");
+    h += "<h3 style='margin-top:20px'>Miete</h3><div class='felder'>" +
+      f("kaltmiete", "Nettokaltmiete €", "text") + f("bkVoraus", "Betriebskosten-Vorauszahlung €", "text") +
+      f("hkVoraus", "Heizkosten-Vorauszahlung €", "text") + f("stellplatzMiete", "Stellplatz €", "text") + "</div>" +
+      "<p class='unter' data-mvsumme='" + esc(v.id) + "'>" + mvSummeText(v) + "</p>";
+    h += "<div class='felder' style='margin-top:12px'>" +
+      "<div class='feld'><label>Mietanpassung</label><select data-mv='" + esc(v.id) + "|anpassung'>" +
+      MV_ANPASSUNG.map(([w, l]) => "<option value='" + w + "'" + ((v.anpassung || "") === w ? " selected" : "") + ">" + l + "</option>").join("") + "</select></div>" +
+      (v.anpassung === "index" ? "<div class='feld breit'><label>Grundlage</label><input type='text' data-mv='" + esc(v.id) + "|indexBasis' value='" + esc(v.indexBasis || "") +
+        "' placeholder='Verbraucherpreisindex für Deutschland, Basis 2020 = 100'></div>" : "") + "</div>";
+    if (v.anpassung === "staffel") {
+      h += "<div class='ue-tab' style='margin-top:12px'><div class='aw-kopf2'><span>ab</span><span>neue Kaltmiete €</span><span></span></div>" +
+        (mvStaffel(v).length ? mvStaffel(v).map((x, i) =>
+          "<div class='ue-row'><span><input type='date' data-mvst='" + esc(v.id) + "|" + i + "|ab' value='" + esc(x.ab || "") + "'></span>" +
+          "<span><input type='text' data-mvst='" + esc(v.id) + "|" + i + "|betrag' value='" + esc(x.betrag || "") + "'></span>" +
+          "<span><button class='btn klein gefahr' data-act='mvst-weg' data-id='" + esc(v.id) + "' data-i='" + i + "'>×</button></span></div>").join("")
+          : "<p class='unter'>Noch keine Staffel eingetragen.</p>") + "</div>" +
+        "<div class='leiste'><div><button class='btn klein' data-act='mvst-neu' data-id='" + esc(v.id) + "'>+ Staffel</button>" +
+        "<span class='fuer'>Jede Stufe muss mindestens ein Jahr halten.</span></div></div>";
+    }
+    h += "<h3 style='margin-top:20px'>Kaution und Übergabe</h3><div class='felder'>" +
+      f("kaution", "Kaution €", "text", kalt ? "Höchstens " + eurText(kalt * 3) + " (§ 551 BGB)." : "") +
+      "<div class='feld'><label>Zahlung der Kaution</label><select data-mv='" + esc(v.id) + "|kautionRaten'>" +
+      [["3", "in drei Monatsraten (§ 551 Abs. 2 BGB)"], ["1", "in einer Summe zu Mietbeginn"]].map(([w, l]) =>
+        "<option value='" + w + "'" + (String(v.kautionRaten || "3") === w ? " selected" : "") + ">" + l + "</option>").join("") + "</select></div>" +
+      f("uebergabe", "Übergabe am", "date") +
+      "<div class='feld'><label>Zustand bei Übergabe</label><select data-mv='" + esc(v.id) + "|zustand'>" +
+      MV_ZUSTAND.map(([w, l]) => "<option value='" + w + "'" + ((v.zustand || "renoviert") === w ? " selected" : "") + ">" + l + "</option>").join("") + "</select></div>" +
+      f("zubehoer", "Mitvermietet", "text", "z. B. Keller Nr. 4, Stellplatz 7, Einbauküche") + "</div>";
+    h += "<div class='ue-tab' style='margin-top:12px'><div class='aw-kopf2'><span>Schlüssel</span><span>Anzahl</span><span></span></div>" +
+      (mvSchluessel(v).length ? mvSchluessel(v).map((x, i) =>
+        "<div class='ue-row'><span><input type='text' data-mvs='" + esc(v.id) + "|" + i + "|art' value='" + esc(x.art || "") + "' placeholder='z. B. Wohnungstür'></span>" +
+        "<span><input type='number' data-mvs='" + esc(v.id) + "|" + i + "|anzahl' value='" + esc(x.anzahl || "") + "'></span>" +
+        "<span><button class='btn klein gefahr' data-act='mvs-weg' data-id='" + esc(v.id) + "' data-i='" + i + "'>×</button></span></div>").join("")
+        : "<p class='unter'>Noch keine Schlüssel erfasst.</p>") + "</div>" +
+      "<div class='leiste'><div><button class='btn klein' data-act='mvs-neu' data-id='" + esc(v.id) + "'>+ Schlüssel</button></div></div>";
+    h += "<h3 style='margin-top:20px'>Pflichten des Mieters</h3><div class='felder'>" +
+      f("kleinrepEinzel", "Kleinreparaturen bis € je Fall", "text", "Üblich sind 100 bis 120 €.") +
+      f("kleinrepJahr", "höchstens € im Jahr", "text", "Ohne Jahresgrenze ist die Klausel unwirksam.") + "</div>" +
+      "<div class='schalter-zeile' style='margin-top:12px'><div>Schönheitsreparaturen trägt der Mieter<small>Nur bei renoviert übergebener Wohnung und ohne starre Fristen.</small></div>" +
+      "<button type='button' class='schalter' role='switch' aria-checked='" + (!!v.schoenheit) + "' aria-label='Schönheitsreparaturen' data-act='mv-schalter' data-id='" + esc(v.id) + "' data-feld='schoenheit'></button></div>" +
+      "<div class='schalter-zeile'><div>Energieausweis vorgelegt und übergeben<small>Pflicht spätestens bei Vertragsschluss (§ 80 GEG).</small></div>" +
+      "<button type='button' class='schalter' role='switch' aria-checked='" + (!!v.energieausweis) + "' aria-label='Energieausweis' data-act='mv-schalter' data-id='" + esc(v.id) + "' data-feld='energieausweis'></button></div>" +
+      "<div class='schalter-zeile'><div>Rauchwarnmelder vorhanden und geprüft<small>Wird im Übergabeprotokoll festgehalten.</small></div>" +
+      "<button type='button' class='schalter' role='switch' aria-checked='" + (!!v.rauchmelder) + "' aria-label='Rauchwarnmelder' data-act='mv-schalter' data-id='" + esc(v.id) + "' data-feld='rauchmelder'></button></div>" +
+      "<div class='schalter-zeile'><div>Vertrag ist unterschrieben<small>Danach ändern Sie nur noch mit einem Nachtrag.</small></div>" +
+      "<button type='button' class='schalter' role='switch' aria-checked='" + (!!v.unterschrieben) + "' aria-label='unterschrieben' data-act='mv-schalter' data-id='" + esc(v.id) + "' data-feld='unterschrieben'></button></div>";
+    h += mvBausteineBlockHtml(v);
+    h += "<div class='feld' style='margin-top:14px'><label>Weitere Vereinbarungen</label><textarea data-mv='" + esc(v.id) + "|notizen' rows='3'>" + esc(v.notizen || "") + "</textarea></div>";
+    h += "<div data-mvpruef='" + esc(v.id) + "'>" + mvPruefHtml(o, e, v) + "</div>";
+    h += "<div class='leiste'><div><button class='btn klein haupt' data-act='mv-drucken' data-id='" + esc(v.id) + "'>Vertrag erstellen</button>" +
+      "<button class='btn klein gefahr' data-act='mv-weg' data-id='" + esc(v.id) + "'>" + (S.loeschen === "mv" + v.id ? "Wirklich löschen?" : "Vertrag löschen") + "</button></div></div>";
+    return h;
+  }
+
+  /* Summe und Prüfpunkte werden beim Tippen an Ort und Stelle aufgefrischt – ohne die Eingabe zu stören. */
+  const mvSummeText = v => "Gesamtmiete im Monat: <strong>" + esc(eurText(mvGesamt(v))) + "</strong>" +
+    (eurZahl(v.kaltmiete) ? " · höchstzulässige Kaution " + esc(eurText(eurZahl(v.kaltmiete) * 3)) : "");
+  function mvPruefHtml(o, e, v) {
+    const pr = mvPruefen(o, e, v);
+    return pr.length ? "<ul class='meldungen' style='margin-top:14px'>" + pr.map(([k, t]) => "<li class='" + k + "'>" + esc(t) + "</li>").join("") + "</ul>" : "";
+  }
+  function mvAnzeige(o, v) {
+    const e = (o.einheitenListe || []).find(x => x.id === v.einheitId); if (!e) return;
+    const s = document.querySelector("[data-mvsumme='" + v.id + "']"); if (s) s.innerHTML = mvSummeText(v);
+    const p = document.querySelector("[data-mvpruef='" + v.id + "']"); if (p) p.innerHTML = mvPruefHtml(o, e, v);
+  }
+  /* Öffnet die Wohnung im Objekt und legt bei Bedarf gleich einen Vertrag an. */
+  function mvStarten(o, e) {
+    const voll = S.liste.find(x => x.id === o.id) || o;
+    S.entwurf = Objekte.betreuungSicherstellen(Objekte.listeSicherstellen(JSON.parse(JSON.stringify(voll))));
+    S.entwurf.beirat = S.entwurf.beirat || [];
+    const ziel = S.entwurf;
+    let v = mvFuerEinheit(ziel, e.id)[0];
+    if (!v) { const e2 = (ziel.einheitenListe || []).find(x => x.id === e.id);
+      if (e2) { v = mvNeu(ziel, e2); mvListe(ziel).push(v); objektSichern(ziel); } }
+    S.mvOffen = v ? v.id : "";
+    S.tab = "objekte"; S.ansicht = "formular"; S.bearbeiten = false; S.istNeu = false;
+    S.objTab = "stammdaten"; S.ueEinheit = e.id; S.eTab = "miete"; S.vermOffen = null;
+    render();
+  }
+  function mvBausteineBlockHtml(v) {
+    const liste = mvBsFuer(v); const an = mvBsAktiv(v);
+    let h = "<h3 style='margin-top:22px'>Vertragsbausteine <span class='fuer'>" + (liste.length ? an.length + " von " + liste.length : "noch keine") + "</span></h3>" +
+      "<p class='unter'>Ihre eigenen Klauseln – einmal geschrieben, danach je Vertrag nur noch angehakt. " +
+      "Wohnung, Miete, Kaution und Übergabe stehen immer im Vertrag.</p>";
+    h += liste.length
+      ? "<div class='bs-liste'>" + liste.map((bs, bi) => {
+          const drin = mvBsAn(v, bs);
+          return "<div class='bs-zeile" + (drin ? "" : " aus") + "'>" +
+            "<label class='bs-wahl'><input type='checkbox' data-act='mv-baustein' data-id='" + esc(v.id) + "' data-wert='" + esc(bs.id) + "'" +
+            (drin ? " checked" : "") + (bs.pflicht ? " disabled" : "") + ">" +
+            "<span><strong>" + esc(bs.titel) + "</strong>" + (bs.pflicht ? " <span class='bs-fest'>Pflicht</span>" : "") +
+            (Array.isArray(bs.fuer) && bs.fuer.length ? " <span class='fuer'>nur " + esc(Objekte.label(MV_ARTEN, bs.fuer[0])) + "</span>" : "") +
+            "<br><span class='fuer'>" + esc(String(bs.text || "").slice(0, 110)) + (String(bs.text || "").length > 110 ? "…" : "") + "</span></span></label>" +
+            "<span class='bs-tasten'>" +
+            (bi > 0 ? "<button class='btn klein' data-act='mvbs-hoch' data-id='" + esc(bs.id) + "' title='nach oben'>↑</button>" : "") +
+            (bi < liste.length - 1 ? "<button class='btn klein' data-act='mvbs-runter' data-id='" + esc(bs.id) + "' title='nach unten'>↓</button>" : "") +
+            "<button class='btn klein' data-act='mvbs-edit' data-id='" + esc(bs.id) + "' title='ändern'>✎</button></span></div>";
+        }).join("") + "</div>"
+      : "<p class='unter'>Noch keine Bausteine angelegt. Schreiben Sie Ihre Klauseln einmal – Pflichtbausteine stehen danach in jedem Vertrag, die übrigen haken Sie je Vertrag an.</p>";
+    h += "<div class='leiste'><div><button class='btn klein" + (liste.length ? "" : " haupt") + "' data-act='mvbs-neu'>+ Baustein anlegen</button>" +
+      "<span class='fuer'>Einmal angelegt, stehen sie in allen Mietverträgen zur Auswahl.</span></div></div>" +
+      (S.mvbsEntwurf ? mvBausteinFormHtml() : "");
+    return h;
+  }
+
+  function mvBausteinFormHtml() {
+    const e = S.mvbsEntwurf || {};
+    const arten = Array.isArray(e.fuer) ? e.fuer : [];
+    return "<div class='um-neu'><h4 class='az-ueber' style='margin-top:0'>" + (e.neu ? "Eigener Baustein" : "Baustein ändern") + "</h4>" +
+      "<div class='felder'><div class='feld breit'><label>Überschrift</label>" +
+      "<input type='text' data-mvbs='titel' value='" + esc(e.titel || "") + "' placeholder='z. B. Betriebskosten'></div>" +
+      "<div class='feld'><label>Gilt für</label><select data-mvbs='fuer'>" +
+      "<option value=''" + (arten.length ? "" : " selected") + ">alle Vertragsarten</option>" +
+      MV_ARTEN.map(([w, l]) => "<option value='" + w + "'" + (arten.includes(w) ? " selected" : "") + ">nur " + esc(l) + "</option>").join("") + "</select></div></div>" +
+      "<div class='feld' style='margin-top:12px'><label>Text des Bausteins</label>" +
+      "<textarea rows='4' data-mvbs='text' placeholder='Ausformulierter Absatz. Mit [Mieter], [Vermieter], [Verwaltung], [Objekt], [Wohnung], [Fläche], [Beginn], [Ende], [Kaltmiete], [Nebenkosten], [Heizkosten], [Gesamtmiete], [Kaution], [Schlüssel], [Personen] oder [Übergabe] setzen Sie Werte aus dem Vertrag ein.'>" + esc(e.text || "") + "</textarea></div>" +
+      "<div class='bs-schalter'><label class='re-feld" + (e.pflicht ? "" : " aus") + "'><input type='checkbox' data-act='mvbs-pflicht'" + (e.pflicht ? " checked" : "") + ">Pflichtbaustein – steht immer im Vertrag</label>" +
+      "<label class='re-feld" + (e.standard ? "" : " aus") + "'><input type='checkbox' data-act='mvbs-standard'" + (e.standard ? " checked" : "") + (e.pflicht ? " disabled" : "") + ">bei neuen Verträgen schon angehakt</label></div>" +
+      "<div class='leiste'><div><button class='btn klein haupt' data-act='mvbs-ok'>Speichern</button>" +
+      "<button class='btn klein' data-act='mvbs-abbr'>Abbrechen</button></div>" +
+      (e.neu ? "" : "<button class='btn klein gefahr' data-act='mvbs-weg' data-id='" + esc(e.id) + "'>" +
+        (S.loeschen === "mvbs" + e.id ? "Wirklich löschen?" : "Baustein löschen") + "</button>") + "</div></div>";
+  }
+
+  /* ---------- Der fertige Vertrag ---------- */
+  function mvWerte(o, e, v) {
+    const vw = (() => { try { return window.Firmendaten ? window.Firmendaten.daten() : {}; } catch (x) { return {}; } })();
+    const mie = v.personId ? personVon(v.personId) : null;
+    const eig = e.eigentuemerId ? personVon(e.eigentuemerId) : null;
+    return {
+      Objekt: objName(o),
+      Wohnung: [e.nr, e.lage].filter(Boolean).join(", ") || e.art || "",
+      "Fläche": e.flaeche ? e.flaeche + " m²" : "",
+      Mieter: mie ? Objekte.personName(mie) : "",
+      Vermieter: (eig ? Objekte.personName(eig) : "") || o.auftraggeber || "",
+      Verwaltung: vw.name || "",
+      Beginn: v.beginn ? Objekte.datum(v.beginn) : "",
+      Ende: v.befristet && v.ende ? Objekte.datum(v.ende) : "unbestimmte Zeit",
+      Kaltmiete: eurZahl(v.kaltmiete) ? eurText(eurZahl(v.kaltmiete)) : "",
+      Nebenkosten: eurZahl(v.bkVoraus) ? eurText(eurZahl(v.bkVoraus)) : "",
+      Heizkosten: eurZahl(v.hkVoraus) ? eurText(eurZahl(v.hkVoraus)) : "",
+      Gesamtmiete: mvGesamt(v) ? eurText(mvGesamt(v)) : "",
+      Kaution: eurZahl(v.kaution) ? eurText(eurZahl(v.kaution)) : "",
+      "Kündigungsfrist": "drei Monate",
+      "Schlüssel": mvSchluessel(v).filter(x => x.art).map(x => (x.anzahl || "") + " " + x.art).join(", "),
+      Personen: v.personenzahl || "",
+      "Übergabe": v.uebergabe ? Objekte.datum(v.uebergabe) : ""
+    };
+  }
+  function mvDruckHtml(o, e, v) {
+    const vw = (() => { try { return window.Firmendaten ? window.Firmendaten.daten() : {}; } catch (x) { return {}; } })();
+    const mie = v.personId ? personVon(v.personId) : null;
+    const eig = e.eigentuemerId ? personVon(e.eigentuemerId) : null;
+    const werte = mvWerte(o, e, v);
+    const luecke = w => String(w || "").trim() ? esc(w) : "<span class='md-luecke'></span>";
+    const adr = p => p ? [Objekte.personName(p), [p.strasse, [p.plz, p.ort].filter(Boolean).join(" ")].filter(Boolean).join(", ")].filter(Boolean).join("<br>") : "";
+    let h = "<div class='seite'>";
+    h += "<div class='md-werkzeug'><div><button class='btn klein' data-act='mv-zurueck'>‹ Zurück</button>" +
+      "<button class='btn klein haupt' data-act='mandat-drucken'>Drucken / als PDF speichern</button></div>" +
+      "<span class='fuer'>Zweifach ausdrucken – beide Seiten unterschreiben dieselbe Urkunde (§ 550 BGB).</span></div>";
+    h += "<div class='md-blatt'><header class='md-kopf'>" +
+      (vw.logo ? "<img class='md-logo' src='" + esc(vw.logo) + "' alt='" + esc(vw.name || "Logo") + "'>"
+        : "<div class='md-firma'>" + esc(vw.name || "Hausverwaltung") + "</div>") +
+      "<div class='fuer'>" + esc(Objekte.datum(new Date().toISOString().slice(0, 10))) + "</div></header>" +
+      "<h1>" + esc(v.art === "gewerbe" ? "Gewerbemietvertrag" : v.art === "stellplatz" ? "Stellplatzmietvertrag" : "Mietvertrag über Wohnraum") + "</h1>" +
+      "<p class='md-art'>" + esc(objName(o)) + (e.nr ? " · " + esc(e.nr) : "") + "</p>" +
+      "<p class='md-text'><strong>Vermieter:</strong><br>" + (adr(eig) ? adr(eig) : luecke(o.auftraggeber)) +
+      "<br>vertreten durch " + esc(vw.name || "die Hausverwaltung") + "</p>" +
+      "<p class='md-text'><strong>Mieter:</strong><br>" + (adr(mie) ? adr(mie) : "<span class='md-luecke'></span>") + "</p>";
+    const zeilen = [];
+    zeilen.push(["Wohnung", [e.nr, e.lage].filter(Boolean).join(", ")]);
+    if (e.flaeche) zeilen.push(["Wohnfläche", e.flaeche + " m²"]);
+    if (e.zimmer) zeilen.push(["Zimmer", String(e.zimmer)]);
+    if (v.zubehoer) zeilen.push(["Mitvermietet", v.zubehoer]);
+    if (werte["Schlüssel"]) zeilen.push(["Schlüssel", werte["Schlüssel"]]);
+    if (v.personenzahl) zeilen.push(["Personen im Haushalt", String(v.personenzahl)]);
+    h += "<h2>§ 1 Mietsache</h2><p class='md-text'>Vermietet wird im Objekt " + esc([o.strasse, [o.plz, o.ort].filter(Boolean).join(" ")].filter(Boolean).join(", ")) + ":</p>" +
+      "<table class='lv-tab'><tbody>" + zeilen.map(([l, w]) => "<tr><td>" + esc(l) + "</td><td>" + (w ? esc(w) : "<span class='md-luecke'></span>") + "</td></tr>").join("") + "</tbody></table>";
+    h += "<h2>§ 2 Mietzeit</h2><p class='md-text'>Das Mietverhältnis beginnt am " + luecke(werte.Beginn) + " und läuft " +
+      (v.befristet && v.ende
+        ? "befristet bis zum " + esc(Objekte.datum(v.ende)) + ". Die Befristung beruht auf folgendem Grund im Sinne des § 575 Abs. 1 BGB: " + luecke(v.befristungsgrund) + "."
+        : "auf unbestimmte Zeit. Die Kündigungsfristen richten sich nach § 573c BGB.") + "</p>";
+    const mz = [["Nettokaltmiete", eurZahl(v.kaltmiete)], ["Betriebskosten-Vorauszahlung", eurZahl(v.bkVoraus)],
+      ["Heizkosten-Vorauszahlung", eurZahl(v.hkVoraus)], ["Stellplatz", eurZahl(v.stellplatzMiete)]].filter(x => x[1]);
+    h += "<h2>§ 3 Miete und Nebenkosten</h2><table class='lv-tab'><tbody>" +
+      mz.map(([l, w]) => "<tr><td>" + esc(l) + "</td><td>" + esc(eurText(w)) + "</td></tr>").join("") +
+      "<tr><td><strong>Gesamtmiete im Monat</strong></td><td><strong>" + esc(eurText(mvGesamt(v))) + "</strong></td></tr></tbody></table>" +
+      "<p class='md-text'>Die Miete ist monatlich im Voraus, spätestens am dritten Werktag des Monats, zu zahlen (§ 556b Abs. 1 BGB). " +
+      "Über die Betriebskosten wird jährlich abgerechnet; die Abrechnung geht dem Mieter spätestens zwölf Monate nach Ende des Abrechnungszeitraums zu (§ 556 Abs. 3 BGB).</p>";
+    if (v.anpassung === "staffel" && mvStaffel(v).length)
+      h += "<p class='md-text'>Es ist eine Staffelmiete nach § 557a BGB vereinbart:</p><table class='lv-tab'><thead><tr><th>ab</th><th>Nettokaltmiete</th></tr></thead><tbody>" +
+        mvStaffel(v).map(x => "<tr><td>" + (x.ab ? esc(Objekte.datum(x.ab)) : "<span class='md-luecke'></span>") + "</td><td>" +
+          (eurZahl(x.betrag) ? esc(eurText(eurZahl(x.betrag))) : "<span class='md-luecke'></span>") + "</td></tr>").join("") + "</tbody></table>";
+    if (v.anpassung === "index")
+      h += "<p class='md-text'>Es ist eine Indexmiete nach § 557b BGB vereinbart. Grundlage ist " + luecke(v.indexBasis) +
+        ". Die Miete bleibt jeweils mindestens ein Jahr unverändert.</p>";
+    h += "<h2>§ 4 Kaution</h2><p class='md-text'>" +
+      (eurZahl(v.kaution)
+        ? "Der Mieter leistet eine Sicherheit von " + esc(eurText(eurZahl(v.kaution))) + ". Sie ist " +
+          (String(v.kautionRaten || "3") === "1" ? "zu Mietbeginn in einer Summe" : "in drei gleichen Monatsraten; die erste Rate ist zu Mietbeginn") +
+          " zu zahlen (§ 551 Abs. 2 BGB). Der Vermieter legt die Kaution getrennt von seinem Vermögen zu dem für Spareinlagen mit dreimonatiger Kündigungsfrist üblichen Zinssatz an; die Zinsen stehen dem Mieter zu (§ 551 Abs. 3 BGB)."
+        : "Eine Kaution ist nicht vereinbart.") + "</p>";
+    h += "<h2>§ 5 Übergabe</h2><p class='md-text'>Die Wohnung wird am " + luecke(werte["Übergabe"]) + " " +
+      esc(Objekte.label(MV_ZUSTAND, v.zustand || "renoviert")) + ". Über die Übergabe wird ein Protokoll erstellt, das beide Seiten unterzeichnen." +
+      (v.rauchmelder ? " Rauchwarnmelder sind vorhanden und wurden funktionsfähig übergeben." : "") +
+      (v.energieausweis ? " Der Energieausweis wurde dem Mieter vorgelegt und übergeben (§ 80 GEG)." : "") + "</p>";
+    let nr = 5;
+    mvBsAktiv(v).forEach(bs => { nr++; h += "<h2>§ " + nr + " " + esc(bs.titel) + "</h2><p class='md-text'>" + bausteinText(bs.text, werte) + "</p>"; });
+    if (String(v.notizen || "").trim()) { nr++; h += "<h2>§ " + nr + " Weitere Vereinbarungen</h2><p class='md-text'>" + esc(v.notizen).replace(/\n/g, "<br>") + "</p>"; }
+    h += "<div class='md-unter'><div>Ort, Datum · Vermieter</div><div>Ort, Datum · Mieter</div></div>" +
+      "<p class='md-fuss'>Entwurf der Hausverwaltung. Die Angaben zu Wohnung, Miete und Kaution stammen aus den gespeicherten Daten, " +
+      "die Klauseln aus Ihren eigenen Bausteinen. Lassen Sie den Text einmal anwaltlich prüfen.</p></div>";
+    return h + "</div>";
+  }
+
   function objektDiensteHtml(o) {
     const liste = diensteListe(o);
     const summe = liste.filter(d => dienstAktiv(d) && d.umlage !== false).reduce((n, d) => n + dienstJahr(d), 0);
@@ -4634,6 +4975,7 @@ const Objekte = (() => {
         (i.status === "absage" ? "<li class='m-fehler'>Absage erteilt – bitte Einkommensnachweise und Auskunft jetzt löschen.</li>" : "") +
         (i.loeschen && i.loeschen <= new Date().toISOString().slice(0, 10) ? "<li class='m-fehler'>Löschdatum erreicht – Unterlagen entfernen.</li>" : "") + "</ul>";
       k += "<div class='leiste'><div><button class='btn klein' data-act='bon-uebernehmen' data-i='" + idx + "'>Als Mieter übernehmen</button>" +
+        (i.status === "vertrag" || i.status === "zusage" ? "<button class='btn klein haupt' data-act='mv-start'>Mietvertrag schreiben</button>" : "") +
         "<button class='btn klein gefahr' data-act='bon-weg' data-i='" + idx + "'>" + (S.loeschen === "bon" + idx ? "Wirklich löschen?" : "Interessent löschen") + "</button></div></div>";
       return k + "</div>";
     }).join("");
@@ -6813,7 +7155,19 @@ const Objekte = (() => {
     const mdP = S.mandatFuer ? mandatPerson() : null;
     const dvD = (!mdP && S.dienstDruck && S.entwurf) ? diensteListe(S.entwurf).find(x => x.id === S.dienstDruck) : null;
     const abrD = (!mdP && !dvD && S.abrDruck && S.entwurf) ? S.abrDruck : null;
-    document.body.classList.toggle("mandat-an", !!mdP || !!dvD || !!abrD);
+    const mvD = (!mdP && !dvD && !abrD && S.mvDruck && S.entwurf) ? mvListe(S.entwurf).find(x => x.id === S.mvDruck) : null;
+    document.body.classList.toggle("mandat-an", !!mdP || !!dvD || !!abrD || !!mvD);
+    if (mvD) {
+      const eMv = (S.entwurf.einheitenListe || []).find(x => x.id === mvD.einheitId);
+      if (eMv) {
+        $("#neu-knopf").hidden = true; $("#status").hidden = true; $("#lese-hinweis").hidden = true;
+        $("#ze").hidden = true; $("#vv").hidden = true; app.hidden = false;
+        app.innerHTML = mvDruckHtml(S.entwurf, eMv, mvD);
+        window.scrollTo({ top: behalteScroll ? y : 0 });
+        return;
+      }
+      S.mvDruck = null;
+    }
     if (abrD) {
       $("#neu-knopf").hidden = true; $("#status").hidden = true; $("#lese-hinweis").hidden = true;
       $("#ze").hidden = true; $("#vv").hidden = true; app.hidden = false;
@@ -7084,6 +7438,28 @@ const Objekte = (() => {
       if (feld === "mitarbeiterId") { orgSichern(k); render(true); return; }
       orgSichern(k);
       return;
+    }
+    if (t.dataset.mvbs) {
+      if (!S.mvbsEntwurf) return;
+      if (t.dataset.mvbs === "fuer") S.mvbsEntwurf.fuer = t.value ? [t.value] : [];
+      else S.mvbsEntwurf[t.dataset.mvbs] = t.value;
+      return;
+    }
+    if (t.dataset.mv) {
+      const o = S.entwurf; if (!o) return;
+      const [id, feld] = String(t.dataset.mv).split("|");
+      const v = mvListe(o).find(x => x.id === id); if (!v) return;
+      v[feld] = t.value;
+      if (["art", "anpassung", "personId", "zustand", "kautionRaten"].includes(feld)) { objektSichern(o); render(true); return; }
+      mvAnzeige(o, v); objektSichern(o); return;
+    }
+    if (t.dataset.mvst || t.dataset.mvs) {
+      const o = S.entwurf; if (!o) return;
+      const roh = String(t.dataset.mvst || t.dataset.mvs).split("|");
+      const v = mvListe(o).find(x => x.id === roh[0]); if (!v) return;
+      const reihe = t.dataset.mvst ? mvStaffel(v) : mvSchluessel(v);
+      const z = reihe[Number(roh[1])]; if (!z) return;
+      z[roh[2]] = t.value; mvAnzeige(o, v); objektSichern(o); return;
     }
     if (t.dataset.dv) {
       const o = S.entwurf; if (!o) return;
@@ -7372,7 +7748,8 @@ const Objekte = (() => {
     const b = e.target.closest("[data-act]"); if (!b || e.composedPath().some(n => n.id === "vv")) return; const act = b.dataset.act; const id = b.dataset.id;
     if (!["loeschen", "hw-loeschen", "p-loeschen", "m-loeschen", "td-loeschen", "v-weg", "mail-weg", "dok-weg", "mail-loeschen", "abl-weg",
       "bh-fest", "za-weg", "kk-weg", "kr-weg", "kr-klasse-weg", "kr-leeren",
-      "nf-weg", "au-weg", "dienst-weg", "lv-weg", "org-weg", "hon-weg", "bs-weg", "ko-weg", "zl-weg"].includes(act)) S.loeschen = false;
+      "nf-weg", "au-weg", "dienst-weg", "lv-weg", "org-weg", "hon-weg", "bs-weg", "ko-weg", "zl-weg",
+      "mv-weg", "mvbs-weg", "mvst-weg", "mvs-weg"].includes(act)) S.loeschen = false;
     switch (act) {
       case "tab": S.tab = b.dataset.tab; S.ansicht = "liste"; S.entwurf = null; S.hwEntwurf = null; S.pEntwurf = null; S.tEntwurf = null; S.tEntwurfTicket = null; S.ticketOffen = null;
         S.vermOffen = null; S.mailOffenId = null; S.mailImport = null; render(); break;
@@ -7982,7 +8359,8 @@ const Objekte = (() => {
         i5.status = "vertrag"; e.vermarktung = v;
         const idx2 = S.liste.findIndex(x => x.id === o.id); if (idx2 >= 0) S.liste[idx2] = o;
         try { await Speicher.speichern("objekte", o, S.liste); } catch (err) {}
-        render(true); toast("Als Mieter angelegt – bitte Mietbeginn ergänzen"); break;
+        toast("Als Mieter angelegt – jetzt den Mietvertrag schreiben");
+        mvStarten(o, e); break;
       }
       case "verm-inseriert": { const { o, e } = vermZiel(); if (!e) return; const v = vermVon(e, o);
         v.status = v.status === "inserat" ? "frei" : "inserat"; if (v.status === "inserat" && !v.inseriertAm) v.inseriertAm = new Date().toISOString().slice(0, 10);
@@ -8444,6 +8822,97 @@ const Objekte = (() => {
         try { await Speicher.loeschen("bausteine", id2, S.bausteine); } catch (e) {}
         S.bsEntwurf = null; S.loeschen = false; render(true); toast("Baustein gelöscht"); break;
       }
+      /* ---------- Mietvertrag ---------- */
+      case "mv-start": { const z = vermZiel(); if (!z.e) return; mvStarten(z.o, z.e); break; }
+      case "mv-neu": {
+        const o = S.entwurf; if (!o) return;
+        const e2 = (o.einheitenListe || []).find(x => x.id === b.dataset.e); if (!e2) return;
+        const v = mvNeu(o, e2); mvListe(o).push(v); S.mvOffen = v.id;
+        await objektSichern(o); render(true); toast("Mietvertrag angelegt – bitte Angaben prüfen"); break;
+      }
+      case "mv-auf": S.mvOffen = S.mvOffen === b.dataset.id ? "" : b.dataset.id; S.loeschen = false; render(true); break;
+      case "mv-drucken": S.mvDruck = b.dataset.id; render(); break;
+      case "mv-zurueck": S.mvDruck = null; S.eTab = "miete"; render(); break;
+      case "mv-weg": {
+        const o = S.entwurf; if (!o) return; const id2 = b.dataset.id;
+        if (S.loeschen !== "mv" + id2) { S.loeschen = "mv" + id2; render(true); return; }
+        o.mietvertraege = mvListe(o).filter(x => x.id !== id2); S.loeschen = false;
+        await objektSichern(o); render(true); toast("Vertrag gelöscht"); break;
+      }
+      case "mv-schalter": {
+        const o = S.entwurf; if (!o) return;
+        const v = mvListe(o).find(x => x.id === b.dataset.id); if (!v) return;
+        v[b.dataset.feld] = !v[b.dataset.feld];
+        await objektSichern(o); render(true); break;
+      }
+      case "mv-baustein": {
+        const o = S.entwurf; if (!o) return;
+        const v = mvListe(o).find(x => x.id === b.dataset.id); if (!v) return;
+        const bs = mvEigene().find(x => x.id === b.dataset.wert); if (!bs || bs.pflicht) return;
+        v.bausteine = v.bausteine && typeof v.bausteine === "object" ? v.bausteine : {};
+        v.bausteine[bs.id] = !mvBsAn(v, bs);
+        await objektSichern(o); render(true); break;
+      }
+      case "mvst-neu": {
+        const o = S.entwurf; if (!o) return;
+        const v = mvListe(o).find(x => x.id === b.dataset.id); if (!v) return;
+        mvStaffel(v).push({ ab: "", betrag: "" }); await objektSichern(o); render(true); break;
+      }
+      case "mvst-weg": {
+        const o = S.entwurf; if (!o) return;
+        const v = mvListe(o).find(x => x.id === b.dataset.id); if (!v) return;
+        const i2 = Number(b.dataset.i);
+        if (S.loeschen !== "mvst" + v.id + i2) { S.loeschen = "mvst" + v.id + i2; render(true); return; }
+        mvStaffel(v).splice(i2, 1); S.loeschen = false; await objektSichern(o); render(true); break;
+      }
+      case "mvs-neu": {
+        const o = S.entwurf; if (!o) return;
+        const v = mvListe(o).find(x => x.id === b.dataset.id); if (!v) return;
+        mvSchluessel(v).push({ art: "", anzahl: "" }); await objektSichern(o); render(true); break;
+      }
+      case "mvs-weg": {
+        const o = S.entwurf; if (!o) return;
+        const v = mvListe(o).find(x => x.id === b.dataset.id); if (!v) return;
+        const i3 = Number(b.dataset.i);
+        if (S.loeschen !== "mvs" + v.id + i3) { S.loeschen = "mvs" + v.id + i3; render(true); return; }
+        mvSchluessel(v).splice(i3, 1); S.loeschen = false; await objektSichern(o); render(true); break;
+      }
+      case "mvbs-neu": S.mvbsEntwurf = { id: Objekte.neueId(), titel: "", text: "", fuer: [], pflicht: false, standard: true, neu: true,
+        sortierung: mvEigene().reduce((n, x) => Math.max(n, Number(x.sortierung) || 0), 0) + 1 };
+        S.loeschen = false; render(true); break;
+      case "mvbs-edit": { const bs = mvEigene().find(x => x.id === b.dataset.id); if (!bs) return;
+        S.mvbsEntwurf = { ...bs, neu: false }; S.loeschen = false; render(true); break; }
+      case "mvbs-abbr": S.mvbsEntwurf = null; S.loeschen = false; render(true); break;
+      case "mvbs-pflicht": { const e3 = S.mvbsEntwurf; if (!e3) return; e3.pflicht = !e3.pflicht; if (e3.pflicht) e3.standard = true; render(true); break; }
+      case "mvbs-standard": { const e4 = S.mvbsEntwurf; if (!e4 || e4.pflicht) return; e4.standard = !e4.standard; render(true); break; }
+      case "mvbs-ok": {
+        const e5 = S.mvbsEntwurf; if (!e5) return;
+        if (!String(e5.titel || "").trim()) { toast("Bitte eine Überschrift eintragen."); return; }
+        if (!String(e5.text || "").trim()) { toast("Bitte den Text des Bausteins eintragen."); return; }
+        await mvBsSichern({ id: e5.id, titel: e5.titel.trim(), text: e5.text, fuer: Array.isArray(e5.fuer) ? e5.fuer : [],
+          pflicht: !!e5.pflicht, standard: !!e5.standard,
+          sortierung: Number(e5.sortierung) || (mvEigene().reduce((n, x) => Math.max(n, Number(x.sortierung) || 0), 0) + 1),
+          geaendert: new Date().toISOString() });
+        S.mvbsEntwurf = null; render(true); toast("Baustein gespeichert"); break;
+      }
+      case "mvbs-weg": {
+        const id4 = b.dataset.id;
+        if (S.loeschen !== "mvbs" + id4) { S.loeschen = "mvbs" + id4; render(true); return; }
+        S.mvBausteine = mvEigene().filter(x => x.id !== id4);
+        try { await Speicher.loeschen("mietbausteine", id4, S.mvBausteine); } catch (e6) {}
+        Speicher.lokalSetzen("mietbausteine", S.mvBausteine);
+        S.mvbsEntwurf = null; S.loeschen = false; render(true); toast("Baustein gelöscht"); break;
+      }
+      case "mvbs-hoch": case "mvbs-runter": {
+        const reihe = mvEigene().slice().sort((x, y) => (Number(x.sortierung) || 0) - (Number(y.sortierung) || 0));
+        const k = reihe.findIndex(x => x.id === b.dataset.id);
+        const z = act === "mvbs-hoch" ? k - 1 : k + 1;
+        if (k < 0 || z < 0 || z >= reihe.length) return;
+        const a2 = reihe[k], b2 = reihe[z];
+        const sa = Number(a2.sortierung) || k + 1, sb = Number(b2.sortierung) || z + 1;
+        a2.sortierung = sb; b2.sortierung = sa;
+        await mvBsSichern(a2); await mvBsSichern(b2); render(true); break;
+      }
       case "dv-baustein": {
         const o = S.entwurf; if (!o) return;
         const d = diensteListe(o)[Number(b.dataset.i)]; if (!d) return;
@@ -8730,6 +9199,7 @@ const Objekte = (() => {
     try { S.einst = { ...S.einst, ...JSON.parse(localStorage.getItem("ov_einstellungen") || "{}") }; } catch (e) {}
     S.org = Speicher.lokal("organigramm");
     S.bausteine = Speicher.lokal("bausteine");
+    S.mvBausteine = Speicher.lokal("mietbausteine");
     S.rahmen = Speicher.lokal("kontenrahmen").filter(r => r && Array.isArray(r.konten));
     if (!S.rahmen.length) { rahmenListe(); rahmenAlleSichern(); }
     try { S.sitzung = localStorage.getItem("ov_sitzung") || sessionStorage.getItem("ov_sitzung") || ""; } catch (e) { S.sitzung = ""; }
@@ -8763,6 +9233,7 @@ const Objekte = (() => {
     Speicher.beobachten("handwerker", l => { S.handwerker = l; Speicher.lokalSetzen("handwerker", l); neuZeichnen(); });
     Speicher.beobachten("organigramm", l => { S.org = l || []; Speicher.lokalSetzen("organigramm", S.org); if (S.tab === "auswertung") render(true); });
     Speicher.beobachten("bausteine", l => { S.bausteine = l || []; Speicher.lokalSetzen("bausteine", S.bausteine); });
+    Speicher.beobachten("mietbausteine", l => { S.mvBausteine = l || []; Speicher.lokalSetzen("mietbausteine", S.mvBausteine); });
     Speicher.beobachten("kontenrahmen", l => { const gut = (l || []).filter(r => r && Array.isArray(r.konten));
       if (gut.length) { S.rahmen = gut; Speicher.lokalSetzen("kontenrahmen", gut); if (S.tab === "einstellungen") render(true); } });
   }
