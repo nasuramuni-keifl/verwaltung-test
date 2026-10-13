@@ -289,7 +289,7 @@ select:focus{outline:none;border-color:var(--accent)}
 .pt-aushang{border-left:3px solid var(--accent);background:var(--field);border-radius:12px;padding:14px 16px;margin-bottom:10px}
 .pt-aushang h3{margin:0 0 2px;font-size:16px}
 .pt-aushang p{margin:0}
-.pt-datei{display:flex;justify-content:space-between;align-items:center;gap:12px;background:var(--field);border-radius:10px;padding:12px 14px;text-decoration:none;color:inherit}
+.pt-datei{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;background:var(--field);border:none;border-radius:10px;padding:12px 14px;text-decoration:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
 .pt-datei:hover{background:var(--accent-soft)}
 .nf-kopf,.nf-zeile{display:grid;grid-template-columns:1fr 180px 1fr 32px;gap:10px;align-items:center}
 .nf-kopf{font-size:12px;color:var(--muted);padding:10px 2px 6px;border-bottom:1px solid var(--line)}
@@ -1256,7 +1256,7 @@ const Objekte = (() => {
   const tel = t => String(t || "").replace(/[^\d+]/g, "");
   const S = { hwTab: "stamm", rgStapel: [], rgEntwurf: null, rgZu: {}, rahmen: [], rahmenOffen: "", kkAuf: {}, kkDetail: false, krProtAuf: false, krVorher: null, bank: null, lsMonat: "", lsDatum: "", sitzung: "", anFehler: "", anMail: "", pwWechsel: false, pwMeldung: "", pwMeldungOk: false, wpJahr: "", wpDatum: "", wpTop: "",
     sollOffen: "", zaNeu: "", zaEntwurf: null, bhFrei: "", bhGrund: "", infoAlle: false, vmtTab: "miete", vkOffen: null, vkWahl: false, vkSuche: "", bonOffen: null, bonHinweis: "", tObjSuche: "", anruferTreffer: null, tdTab: "vorgang", briefAnzeige: null, datFilter: { suche: "", quelle: "" }, eTab: "stamm", pTab: "stamm", pBearbeiten: false, eaHinweis: "", vermTab: "frei", vermOffen: null, vermFeedback: null, kiLaeuft: false, kiHinweis: "", kiStop: null, mails: [], mailTab: "eingang", mailFilter: { suche: "" }, mailImport: null, mailOffenId: null, mailRichtung: "ein",
-    objTab: "stammdaten", bhTab: "konten", rundTab: "rund", ueEinheit: null, mvBausteine: [], mvOffen: "", mvDruck: null, mvbsEntwurf: null, tickets: [], tAnsicht: "liste", kalDatum: "", kalModus: "monat", kalWer: [], tEntwurfTicket: null, ticketOffen: null, ticketBearbeiten: false, ticketVorher: null, mailNeuFuer: null, mailOffen: null, mailVerschieben: null, mailRichtung: "ein", ichBin: "", einst: { ichBin: "", zeitraum: "woche", nurMeine: true, ansicht: "liste", kalModus: "monat" }, tFilter: { status: "", suche: "", nurMeine: true, zeitraum: "woche" }, bearbeiten: false, uOffen: null, anlageOffen: null, team: [], tEntwurf: null, eigNeuFuer: null, mieterNeuFuer: null, pObjekte: {}, pDirty: new Set(), tab: "vertraege", liste: [], handwerker: [], personen: [], pEntwurf: null, pFilter: { rolle: "", suche: "", ehemalige: false }, ansicht: "liste", entwurf: null, istNeu: false, hwEntwurf: null, hwNeuFuer: null,
+    objTab: "stammdaten", bhTab: "konten", rundTab: "rund", ueEinheit: null, mvBausteine: [], mvOffen: "", mvDruck: null, mvbsEntwurf: null, ptAbr: null, tickets: [], tAnsicht: "liste", kalDatum: "", kalModus: "monat", kalWer: [], tEntwurfTicket: null, ticketOffen: null, ticketBearbeiten: false, ticketVorher: null, mailNeuFuer: null, mailOffen: null, mailVerschieben: null, mailRichtung: "ein", ichBin: "", einst: { ichBin: "", zeitraum: "woche", nurMeine: true, ansicht: "liste", kalModus: "monat" }, tFilter: { status: "", suche: "", nurMeine: true, zeitraum: "woche" }, bearbeiten: false, uOffen: null, anlageOffen: null, team: [], tEntwurf: null, eigNeuFuer: null, mieterNeuFuer: null, pObjekte: {}, pDirty: new Set(), tab: "vertraege", liste: [], handwerker: [], personen: [], pEntwurf: null, pFilter: { rolle: "", suche: "", ehemalige: false }, ansicht: "liste", entwurf: null, istNeu: false, hwEntwurf: null, hwNeuFuer: null,
     filter: { art: "", suche: "", beendete: false }, loeschen: false };
   const app = $("#app");
   $("#anlagenarten").innerHTML = Object.keys(Objekte.ANLAGEN).map(a => "<option value='" + esc(a) + "'>").join("");
@@ -2728,6 +2728,74 @@ const Objekte = (() => {
       "<div class='feld' style='margin-top:14px'><label>Wesentliche Gegenstände des Gemeinschaftsvermögens</label>" +
       "<textarea rows='2' data-vmtext='" + esc(String(jahr)) + "' placeholder='z. B. Heizungsanlage, Aufzug, Gartengeräte'>" + esc(v.gegenstaende || "") + "</textarea></div></section>";
   }
+  /* ---------- Freigabe an die Portale ----------
+     Freigegeben wird je Empfänger. Jeder sieht ausschließlich seine eigene Abrechnung. */
+  const abrFreigaben = o => Array.isArray(o.abrFreigaben) ? o.abrFreigaben : (o.abrFreigaben = []);
+  const abrFreiVon = (o, jahr, eid, pid) => abrFreigaben(o).find(x =>
+    String(x.jahr) === String(jahr) && x.einheitId === eid && x.personId === pid);
+  function abrEmpfaenger(o, jahr, erg) {
+    const aus = [];
+    erg.einheiten.forEach(x => {
+      if (erg.weg) {
+        const p = personVon(x.e.eigentuemerId);
+        aus.push({ einheitId: x.e.id, personId: p ? p.id : "", p: p || null,
+          einheit: x.e.nr || x.e.art, rolle: "Eigentümer", betrag: x.ergebnis });
+      } else {
+        x.mieterZeilen.forEach(m => aus.push({ einheitId: x.e.id, personId: m.p.id, p: m.p,
+          einheit: x.e.nr || x.e.art, rolle: "Mieter", betrag: m.ergebnis }));
+      }
+    });
+    return aus;
+  }
+  function abrFreigabeHtml(o, jahr, erg) {
+    const empf = abrEmpfaenger(o, jahr, erg);
+    const st = abrStand(o, jahr);
+    const fertig = abrFertig(st);
+    const offen = empf.filter(x => x.p && !abrFreiVon(o, jahr, x.einheitId, x.personId));
+    const frei = empf.filter(x => x.p && abrFreiVon(o, jahr, x.einheitId, x.personId));
+    let h = "<section class='gruppe voll'><h2>Freigabe für die Portale</h2>" +
+      "<p class='unter'>Mit der Freigabe ordnet das Programm jede Einzelabrechnung ihrem " +
+      (erg.weg ? "Eigentümer" : "Mieter") + " zu und stellt sie in dessen Portal. " +
+      "Jeder sieht dort nur seine eigene Abrechnung – nie die der anderen.</p>";
+    if (!fertig) h += "<ul class='meldungen'><li class='m-hinweis'>Setzen Sie den Bearbeitungsstand unten auf „erstellt“, " +
+      "bevor Sie freigeben. So bleibt nachvollziehbar, dass die Abrechnung geprüft war.</li></ul>";
+    h += "<div class='leiste'><div>" +
+      "<button class='btn klein haupt' data-act='abr-frei-alle'" + (offen.length ? "" : " disabled") + ">" +
+      (offen.length ? "Alle freigeben · " + offen.length : "Alles freigegeben") + "</button>" +
+      (frei.length ? "<button class='btn klein' data-act='abr-frei-alle-zu'>Alle Freigaben zurücknehmen</button>" : "") +
+      "</div><span class='fuer'>" + frei.length + " von " + empf.filter(x => x.p).length + " freigegeben</span></div>";
+    h += "<div class='ue-tab'><div class='abe-kopf'><span>Einheit</span><span>" + (erg.weg ? "Eigentümer" : "Mieter") + "</span>" +
+      "<span>Portalzugang</span><span>Ergebnis</span><span>Stand</span><span></span></div>" +
+      (empf.length ? empf.map(x => {
+        const f = x.p ? abrFreiVon(o, jahr, x.einheitId, x.personId) : null;
+        const zugang = x.p && portalZugang(x.p);
+        return "<div class='abe-row'><span><strong>" + esc(x.einheit) + "</strong></span>" +
+          "<span>" + esc(x.p ? Objekte.personName(x.p) : "– niemand hinterlegt –") + "</span>" +
+          "<span class='fuer'>" + (zugang ? "eingerichtet" : x.p ? "noch keiner" : "–") + "</span>" +
+          "<span class='" + (x.betrag > 0 ? "z-minus" : x.betrag < 0 ? "z-plus" : "") + "'>" +
+          esc(x.betrag > 0 ? (erg.weg ? "Nachschuss " : "Nachzahlung ") + eur2(x.betrag) + " €"
+            : x.betrag < 0 ? "Guthaben " + eur2(-x.betrag) + " €" : "ausgeglichen") + "</span>" +
+          "<span>" + (f ? "<span class='marke s-erledigt'>freigegeben</span><br><span class='fuer'>" +
+            esc(Objekte.datum(String(f.am).slice(0, 10))) + (f.wer ? " · " + esc(f.wer) : "") + "</span>"
+            : "<span class='marke s-neu'>offen</span>") + "</span>" +
+          "<span>" + (!x.p ? "" : f
+            ? "<button class='btn klein' data-act='abr-frei-zu' data-e='" + esc(x.einheitId) + "' data-wer='" + esc(x.personId) + "'>zurücknehmen</button>"
+            : "<button class='btn klein' data-act='abr-frei-eine' data-e='" + esc(x.einheitId) + "' data-wer='" + esc(x.personId) + "'>freigeben</button>") +
+          "</span></div>";
+      }).join("") : "<p class='unter'>Für dieses Jahr gibt es noch keine Empfänger.</p>") + "</div>";
+    const ohne = empf.filter(x => x.p && !portalZugang(x.p));
+    h += "<ul class='meldungen' style='margin-top:14px'>" +
+      (ohne.length ? "<li class='m-hinweis'>" + ohne.length + (ohne.length === 1 ? " Person hat" : " Personen haben") +
+        " noch keinen Portalzugang. Die Freigabe bleibt gespeichert und wird sichtbar, sobald der Zugang eingerichtet ist – " +
+        "den vergeben Sie beim einzelnen Mieter oder Eigentümer unter „Portal“.</li>" : "") +
+      "<li class='m-hinweis'>Das Portal zeigt immer den aktuellen Stand. Wollen Sie nach der Freigabe noch etwas ändern, " +
+      "nehmen Sie die Freigabe zurück, korrigieren Sie und geben Sie erneut frei.</li>" +
+      (erg.weg
+        ? "<li class='m-hinweis'>Jeder Eigentümer sieht zusätzlich die Gesamtabrechnung und den Vermögensbericht – darauf hat er nach § 28 Abs. 4 WEG Anspruch.</li>"
+        : "<li class='m-hinweis'>Die Freigabe im Portal ersetzt den Zugang nach § 556 Abs. 3 BGB nicht automatisch. Versenden Sie die Abrechnung zusätzlich so, dass Sie den Zugang nachweisen können.</li>") +
+      "</ul></section>";
+    return h;
+  }
   function abrechnungSeiteHtml(o) {
     const jahr = abrJahrVon();
     const erg = abrechnungRechnen(o, jahr);
@@ -2776,6 +2844,7 @@ const Objekte = (() => {
               " €</span><span>–</span><span class='fuer'>trägt der Eigentümer</span><span></span></div>" : "")).join("");
       }).join("") + "</div></section>";
     if (erg.weg) h += vermoegenBlockHtml(o, jahr, erg);
+    h += abrFreigabeHtml(o, jahr, erg);
     h += "<section class='gruppe voll'><h2>Stand</h2>" +
       "<div class='felder'><div class='feld'><label>Bearbeitungsstand</label><select data-abr='" + esc(o.id) + "|" + jahr + "|status'>" +
       ABR_STATUS.filter(([w]) => w !== (erg.weg ? "versandt" : "beschlossen")).map(([w, l]) =>
@@ -2791,7 +2860,7 @@ const Objekte = (() => {
     return h;
   }
   /* ---------- Druckfassung ---------- */
-  function abrechnungDruckHtml(o, jahr, einheitId, personId) {
+  function abrechnungDruckHtml(o, jahr, einheitId, personId, portal) {
     const erg = abrechnungRechnen(o, jahr);
     const vw = (() => { try { return window.Firmendaten ? window.Firmendaten.daten() : {}; } catch (x) { return {}; } })();
     const basis = einheitId ? erg.einheiten.find(x => x.e.id === einheitId) : null;
@@ -2801,7 +2870,7 @@ const Objekte = (() => {
       gezahlt: mz.gezahlt, p35: mz.p35, last: mz.umlagefaehig, ergebnis: mz.ergebnis, mieter: [mz] } : basis) : null;
     const titel = erg.weg ? (einzel ? "Einzelabrechnung" : "Jahresabrechnung") : "Betriebskostenabrechnung";
     let h = "<div class='seite'>";
-    h += "<div class='md-werkzeug'><div><button class='btn klein' data-act='abr-zurueck'>‹ Zurück</button>" +
+    h += "<div class='md-werkzeug'><div><button class='btn klein' data-act='" + (portal ? "pt-abr-zu" : "abr-zurueck") + "'>‹ Zurück</button>" +
       "<button class='btn klein haupt' data-act='mandat-drucken'>Drucken / als PDF speichern</button></div>" +
       "<span class='fuer'>" + esc(Objekte.datum(erg.z.von) + " – " + Objekte.datum(erg.z.bis)) + "</span></div>";
     h += "<div class='md-blatt'><header class='md-kopf'>" +
@@ -3615,7 +3684,7 @@ const Objekte = (() => {
   const meineRechte = () => { const m = angemeldet(); return (!m || m.id === ADMIN_ID) ? { gesperrt: [], nurLesen: false } : rechteVon(m); };
   const leseModus = () => meineRechte().nurLesen;
   /* Ansehen, öffnen, drucken, abbrechen bleiben frei – alles andere ändert Daten. */
-  const LESEN_FREI = /^(tab|[a-z0-9]+-tab|oeffnen|[a-z0-9-]+-oeffnen|[a-z0-9-]+-auf|bearbeiten|[a-z0-9-]+-bearbeiten|abbrechen|[a-z0-9-]+-abbrechen|[a-z0-9-]+-abbr|zurueck|[a-z0-9-]+-zurueck|[a-z0-9-]+-zu|drucken|[a-z0-9-]+-drucken|download|[a-z0-9-]+-download|[a-z0-9-]+-pdf|filter|[a-z0-9-]+-filter|kal-[a-z]+|seg|pt-ansehen|pw-sicht|an-login|an-abmelden|an-pw-ok|an-pw-inline|e-meine|e-ansicht|t-meine|t-ansicht|p-ehemalige|beendete|info-alle|info-gelesen|td-verlauf|bs-ansehen|brief-anzeigen|prot-ordnung|kr-prot)$/;
+  const LESEN_FREI = /^(tab|[a-z0-9]+-tab|oeffnen|[a-z0-9-]+-oeffnen|[a-z0-9-]+-auf|bearbeiten|[a-z0-9-]+-bearbeiten|abbrechen|[a-z0-9-]+-abbrechen|[a-z0-9-]+-abbr|zurueck|[a-z0-9-]+-zurueck|[a-z0-9-]+-zu|drucken|[a-z0-9-]+-drucken|download|[a-z0-9-]+-download|[a-z0-9-]+-pdf|filter|[a-z0-9-]+-filter|kal-[a-z]+|seg|pt-ansehen|pt-abr|pw-sicht|an-login|an-abmelden|an-pw-ok|an-pw-inline|e-meine|e-ansicht|t-meine|t-ansicht|p-ehemalige|beendete|info-alle|info-gelesen|td-verlauf|bs-ansehen|brief-anzeigen|prot-ordnung|kr-prot)$/;
   /* Diese Felder bleiben auch im Nur-Lese-Zugang bedienbar. */
   const feldFrei = el => !!el && (["mz-alt", "mz-neu", "mz-neu2", "suche"].includes(el.id) || el.type === "search" ||
     !!el.closest("#ze") || !!el.closest("#anmeldung"));
@@ -4063,7 +4132,42 @@ const Objekte = (() => {
         : "<p class='unter'>Sie haben noch nichts gemeldet.</p>");
     return h + "</section>";
   }
+  /* Welche Abrechnungen für diese Person freigegeben sind. */
+  function portalAbrechnungen(p) {
+    const aus = [];
+    S.liste.forEach(o => (o.abrFreigaben || []).forEach(f => {
+      if (f.personId !== p.id) return;
+      aus.push({ o, f });
+    }));
+    return aus.sort((a, b) => String(b.f.jahr).localeCompare(String(a.f.jahr)));
+  }
+  function portalAbrechnungHtml(p) {
+    const liste = portalAbrechnungen(p);
+    let h = "<section class='gruppe'><h2>Ihre Abrechnungen <span class='fuer'>" + liste.length + "</span></h2>";
+    if (!liste.length) return h + "<p class='unter'>Sobald wir eine Abrechnung für Sie freigeben, finden Sie sie hier.</p></section>";
+    h += "<div class='abl-liste'>" + liste.map(({ o, f }) =>
+      "<button class='pt-datei' data-act='pt-abr' data-o='" + esc(o.id) + "' data-jahr='" + esc(f.jahr) + "'" +
+      " data-e='" + esc(f.einheitId) + "' data-wer='" + esc(f.personId) + "'>" +
+      "<span><strong>" + esc(f.art === "weg" ? "Einzelabrechnung " + f.jahr : "Betriebskostenabrechnung " + f.jahr) + "</strong><br>" +
+      "<span class='fuer'>" + esc(objName(o)) + (f.einheit ? " · " + esc(f.einheit) : "") +
+      " · freigegeben am " + esc(Objekte.datum(String(f.am).slice(0, 10))) + "</span></span><span class='fuer'>ansehen</span></button>" +
+      (f.art === "weg" ? "<button class='pt-datei' data-act='pt-abr' data-o='" + esc(o.id) + "' data-jahr='" + esc(f.jahr) + "' data-e='' data-wer=''>" +
+        "<span><strong>Gesamtabrechnung " + esc(f.jahr) + "</strong><br><span class='fuer'>" + esc(objName(o)) +
+        " · Verteilung auf alle Einheiten und Vermögensbericht</span></span><span class='fuer'>ansehen</span></button>" : "")).join("") + "</div>";
+    return h + "<p class='unter' style='margin-top:10px'>Mit „Drucken“ speichern Sie die Abrechnung als PDF auf Ihrem Gerät.</p></section>";
+  }
   function portalSeiteHtml(p, vorschau) {
+    if (S.ptAbr) {
+      const oA = S.liste.find(x => x.id === S.ptAbr.objektId);
+      const erlaubt = oA && (S.ptAbr.einheitId
+        ? (oA.abrFreigaben || []).some(f => String(f.jahr) === String(S.ptAbr.jahr) && f.einheitId === S.ptAbr.einheitId && f.personId === p.id)
+        : (oA.abrFreigaben || []).some(f => String(f.jahr) === String(S.ptAbr.jahr) && f.personId === p.id && f.art === "weg"));
+      if (erlaubt) return (vorschau ? "<div class='vorschau-band'><div><strong>Ansicht von " + esc(Objekte.personName(p)) + "</strong>" +
+        "<small>So sieht diese Person ihre Abrechnung.</small></div>" +
+        "<button class='btn klein' data-act='pt-vorschau-zurueck'>Zurück zur Verwaltung</button></div>" : "") +
+        abrechnungDruckHtml(oA, Number(S.ptAbr.jahr), S.ptAbr.einheitId, S.ptAbr.personId || p.id, true);
+      S.ptAbr = null;
+    }
     const o = portalObjekt(p);
     const heute = new Date().toISOString().slice(0, 10);
     const nf = o ? notfallListe(o).filter(x => String(x.nummer || "").trim()) : [];
@@ -4095,6 +4199,7 @@ const Objekte = (() => {
         esc([d.art, zeitstempel(d.hochgeladen)].filter(Boolean).join(" · ")) + "</span></span><span class='fuer'>öffnen</span></a>").join("") + "</div>"
         : "<p class='unter'>Hier erscheinen Schreiben, die wir für Sie freigeben.</p>") + "</section>";
 
+    h += portalAbrechnungHtml(p);
     h += portalMeldungHtml(p, vorschau);
 
     const kf = (n, l, typ, hilfe) => "<div class='feld'><label for='ptk-" + n + "'>" + l + "</label>" +
@@ -7749,7 +7854,7 @@ const Objekte = (() => {
     if (!["loeschen", "hw-loeschen", "p-loeschen", "m-loeschen", "td-loeschen", "v-weg", "mail-weg", "dok-weg", "mail-loeschen", "abl-weg",
       "bh-fest", "za-weg", "kk-weg", "kr-weg", "kr-klasse-weg", "kr-leeren",
       "nf-weg", "au-weg", "dienst-weg", "lv-weg", "org-weg", "hon-weg", "bs-weg", "ko-weg", "zl-weg",
-      "mv-weg", "mvbs-weg", "mvst-weg", "mvs-weg"].includes(act)) S.loeschen = false;
+      "mv-weg", "mvbs-weg", "mvst-weg", "mvs-weg", "abr-frei-alle-zu"].includes(act)) S.loeschen = false;
     switch (act) {
       case "tab": S.tab = b.dataset.tab; S.ansicht = "liste"; S.entwurf = null; S.hwEntwurf = null; S.pEntwurf = null; S.tEntwurf = null; S.tEntwurfTicket = null; S.ticketOffen = null;
         S.vermOffen = null; S.mailOffenId = null; S.mailImport = null; render(); break;
@@ -8779,6 +8884,42 @@ const Objekte = (() => {
       case "abr-drucken": { const o = S.entwurf; if (!o) return;
         S.abrDruck = { jahr: abrJahrVon(), einheitId: b.dataset.id || "", personId: b.dataset.wer || "" }; render(); break; }
       case "abr-zurueck": { S.abrDruck = null; S.objTab = "abrechnung"; render(); break; }
+      case "abr-frei-alle": case "abr-frei-eine": {
+        const o = S.entwurf; if (!o) return;
+        const jahr = abrJahrVon(); const erg = abrechnungRechnen(o, jahr);
+        const wer = teamName(S.ichBin) || (angemeldet() && angemeldet().id === ADMIN_ID ? "Admin" : "");
+        const ziel = abrEmpfaenger(o, jahr, erg).filter(x => x.p &&
+          (act === "abr-frei-alle" || (x.einheitId === b.dataset.e && x.personId === b.dataset.wer)));
+        let n = 0;
+        ziel.forEach(x => {
+          if (abrFreiVon(o, jahr, x.einheitId, x.personId)) return;
+          abrFreigaben(o).push({ id: Objekte.neueId(), jahr: String(jahr), einheitId: x.einheitId, personId: x.personId,
+            art: erg.weg ? "weg" : "miete", einheit: x.einheit, am: new Date().toISOString(), wer });
+          n++;
+        });
+        if (!n) { toast("Hier ist schon alles freigegeben."); return; }
+        const st = abrStand(o, jahr);
+        if (!abrFertig(st)) { o.abrechnung = o.abrechnung || {};
+          o.abrechnung[String(jahr)] = { ...st, status: "erstellt", datum: st.datum || isoTag(new Date()) }; }
+        await objektSichern(o); render(true);
+        toast(n === 1 ? "Abrechnung im Portal freigegeben" : n + " Abrechnungen in die Portale gestellt"); break;
+      }
+      case "abr-frei-zu": {
+        const o = S.entwurf; if (!o) return;
+        const jahr = String(abrJahrVon());
+        o.abrFreigaben = abrFreigaben(o).filter(x => !(String(x.jahr) === jahr &&
+          x.einheitId === b.dataset.e && x.personId === b.dataset.wer));
+        await objektSichern(o); render(true); toast("Freigabe zurückgenommen"); break;
+      }
+      case "abr-frei-alle-zu": {
+        const o = S.entwurf; if (!o) return;
+        const jahr = String(abrJahrVon());
+        if (S.loeschen !== "abrfrei") { S.loeschen = "abrfrei"; toast("Noch einmal tippen – dann verschwinden alle Freigaben dieses Jahres."); return; }
+        o.abrFreigaben = abrFreigaben(o).filter(x => String(x.jahr) !== jahr);
+        S.loeschen = false; await objektSichern(o); render(true); toast("Alle Freigaben dieses Jahres zurückgenommen"); break;
+      }
+      case "pt-abr": { S.ptAbr = { objektId: b.dataset.o, jahr: Number(b.dataset.jahr), einheitId: b.dataset.e || "", personId: b.dataset.wer || "" }; render(); break; }
+      case "pt-abr-zu": { S.ptAbr = null; render(); break; }
       /* ---------- Dienstleistungsverträge ---------- */
       case "dienst-neu": { const o = S.entwurf; if (!o) return;
         const d = { id: Objekte.neueId(), art: b.dataset.wert || "hausmeister", firma: "", handwerkerId: "", ansprechpartner: "", telefon: "", email: "",
