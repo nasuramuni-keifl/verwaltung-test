@@ -814,7 +814,7 @@ body.portal-an .seite{max-width:880px;margin:0 auto}
 .aw-kopf,.aw-row{display:grid;grid-template-columns:1.5fr 1.1fr 1.2fr .8fr 1fr 90px;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
 .aw-kopf2,.aw-row2{display:grid;grid-template-columns:1.6fr .9fr .8fr .9fr .8fr 1fr;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
 .aw-kopf,.aw-kopf2,.org-kopf,.um-kopf,.um-kopf2,.abr-kopf{font-size:12px;color:var(--muted)}
-.um-kopf,.um-row{display:grid;grid-template-columns:1.6fr .7fr .9fr 1.2fr 1fr;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
+.um-kopf,.um-row{display:grid;grid-template-columns:1.5fr .6fr .9fr 1fr 1fr 1fr;gap:10px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
 .um-kopf2,.um-row2{display:grid;grid-template-columns:1.6fr 1.1fr .8fr 1fr 1fr 100px;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
 .um-row2 input,.um-row2 select{padding:8px 10px;font-size:13px}
 .um-zusatz{display:grid;grid-template-columns:1fr 110px 44px;gap:10px;align-items:center;padding:7px 0 7px 14px;border-bottom:1px solid var(--line);font-size:13px;color:var(--muted)}
@@ -873,6 +873,14 @@ body.portal-an .seite{max-width:880px;margin:0 auto}
 .org-karte strong{font-size:14.5px}
 .org-zahl{font-size:11.5px;color:var(--accent)}
 @media (max-width:760px){.aw-kopf,.aw-kopf2,.org-kopf{display:none}.aw-row{grid-template-columns:1fr 1fr}.aw-row2{grid-template-columns:1fr 1fr 1fr}.org-row{grid-template-columns:1fr}}
+.rl-kopf,.rl-row{display:grid;grid-template-columns:150px 1fr 130px 52px;gap:10px;align-items:center;padding:8px 2px}
+.rl-kopf{font-size:12px;color:var(--grau);border-bottom:1px solid var(--line)}
+.rl-row+.rl-row{border-top:1px solid var(--line)}
+.rl-row input{width:100%}
+.rl-kopf2,.rl-row2{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;align-items:center;padding:9px 2px}
+.rl-kopf2{font-size:12px;color:var(--grau);border-bottom:1px solid var(--line)}
+.rl-row2+.rl-row2{border-top:1px solid var(--line)}
+@media(max-width:760px){.rl-kopf,.rl-kopf2{display:none}.rl-row,.rl-row2{grid-template-columns:1fr;gap:6px}}
 .bs-liste{display:grid;gap:8px;margin-top:12px}
 .bs-zeile{display:flex;align-items:flex-start;gap:10px;background:var(--field);border:1.5px solid transparent;border-radius:14px;padding:11px 13px}
 .bs-zeile.aus{background:transparent;border-color:var(--line)}
@@ -1256,7 +1264,7 @@ const Objekte = (() => {
   const tel = t => String(t || "").replace(/[^\d+]/g, "");
   const S = { hwTab: "stamm", rgStapel: [], rgEntwurf: null, rgZu: {}, rahmen: [], rahmenOffen: "", kkAuf: {}, kkDetail: false, krProtAuf: false, krVorher: null, bank: null, lsMonat: "", lsDatum: "", sitzung: "", anFehler: "", anMail: "", pwWechsel: false, pwMeldung: "", pwMeldungOk: false, wpJahr: "", wpDatum: "", wpTop: "",
     sollOffen: "", zaNeu: "", zaEntwurf: null, bhFrei: "", bhGrund: "", infoAlle: false, vmtTab: "miete", vkOffen: null, vkWahl: false, vkSuche: "", bonOffen: null, bonHinweis: "", tObjSuche: "", anruferTreffer: null, tdTab: "vorgang", briefAnzeige: null, datFilter: { suche: "", quelle: "" }, eTab: "stamm", pTab: "stamm", pBearbeiten: false, eaHinweis: "", vermTab: "frei", vermOffen: null, vermFeedback: null, kiLaeuft: false, kiHinweis: "", kiStop: null, mails: [], mailTab: "eingang", mailFilter: { suche: "" }, mailImport: null, mailOffenId: null, mailRichtung: "ein",
-    objTab: "stammdaten", bhTab: "konten", rundTab: "rund", ueEinheit: null, mvBausteine: [], mvOffen: "", mvDruck: null, mvbsEntwurf: null, ptAbr: null, tickets: [], tAnsicht: "liste", kalDatum: "", kalModus: "monat", kalWer: [], tEntwurfTicket: null, ticketOffen: null, ticketBearbeiten: false, ticketVorher: null, mailNeuFuer: null, mailOffen: null, mailVerschieben: null, mailRichtung: "ein", ichBin: "", einst: { ichBin: "", zeitraum: "woche", nurMeine: true, ansicht: "liste", kalModus: "monat" }, tFilter: { status: "", suche: "", nurMeine: true, zeitraum: "woche" }, bearbeiten: false, uOffen: null, anlageOffen: null, team: [], tEntwurf: null, eigNeuFuer: null, mieterNeuFuer: null, pObjekte: {}, pDirty: new Set(), tab: "vertraege", liste: [], handwerker: [], personen: [], pEntwurf: null, pFilter: { rolle: "", suche: "", ehemalige: false }, ansicht: "liste", entwurf: null, istNeu: false, hwEntwurf: null, hwNeuFuer: null,
+    objTab: "stammdaten", bhTab: "konten", rundTab: "rund", ueEinheit: null, mvBausteine: [], mvOffen: "", mvDruck: null, mvbsEntwurf: null, ptAbr: null, rlDruck: null, tickets: [], tAnsicht: "liste", kalDatum: "", kalModus: "monat", kalWer: [], tEntwurfTicket: null, ticketOffen: null, ticketBearbeiten: false, ticketVorher: null, mailNeuFuer: null, mailOffen: null, mailVerschieben: null, mailRichtung: "ein", ichBin: "", einst: { ichBin: "", zeitraum: "woche", nurMeine: true, ansicht: "liste", kalModus: "monat" }, tFilter: { status: "", suche: "", nurMeine: true, zeitraum: "woche" }, bearbeiten: false, uOffen: null, anlageOffen: null, team: [], tEntwurf: null, eigNeuFuer: null, mieterNeuFuer: null, pObjekte: {}, pDirty: new Set(), tab: "vertraege", liste: [], handwerker: [], personen: [], pEntwurf: null, pFilter: { rolle: "", suche: "", ehemalige: false }, ansicht: "liste", entwurf: null, istNeu: false, hwEntwurf: null, hwNeuFuer: null,
     filter: { art: "", suche: "", beendete: false }, loeschen: false };
   const app = $("#app");
   $("#anlagenarten").innerHTML = Object.keys(Objekte.ANLAGEN).map(a => "<option value='" + esc(a) + "'>").join("");
@@ -1273,6 +1281,8 @@ const Objekte = (() => {
       if (t.dataset.pf) { const pid = t.dataset.pf.split("|")[0]; const pn = S.personen.find(x => x.id === pid);
         if (pn) { pn[feld] = wert; S.pDirty.add(pid); } const el = app.querySelector("[data-pf='" + pid + "|" + feld + "']"); if (el) el.value = wert; return; }
       if (t.dataset.bz) { bankzugang()[feld] = wert; bankSichern(); const el = app.querySelector("[data-bz='" + feld + "']"); if (el) el.value = wert; return; }
+      if (t.dataset.obbankrl) { const o = S.entwurf; if (!o) return; if (!o.bankRl || typeof o.bankRl !== "object") o.bankRl = {};
+        o.bankRl[feld] = wert; objektSichern(o); const el = app.querySelector("[data-obbankrl='" + feld + "']"); if (el) el.value = wert; return; }
       if (t.dataset.obbank) { const o = S.entwurf; if (!o) return; if (!o.bank || typeof o.bank !== "object") o.bank = {};
         o.bank[feld] = wert; objektSichern(o); const el = app.querySelector("[data-obbank='" + feld + "']"); if (el) el.value = wert; return; }
       if (box) { const el = box.querySelector("[data-hwneu='" + feld + "']"); if (el) el.value = wert; } else if (t.dataset.p && S.pEntwurf) { S.pEntwurf[feld] = wert; const el = $("#p-" + feld); if (el) el.value = wert; } else if (S.hwEntwurf) { S.hwEntwurf[feld] = wert; const el = $("#h-" + feld); if (el) el.value = wert; } };
@@ -2362,43 +2372,51 @@ const Objekte = (() => {
   const HONORARARTEN = [["einheit", "je Einheit und Monat"], ["objekt", "pauschal je Monat"], ["prozent", "% der Sollmiete"]];
   const honorarListe = o => Array.isArray(o.honorare) ? o.honorare : (o.honorare = []);
   function honorarMonat(o) {
-    const n = zahlD(o.honorar); if (!n) return 0;
+    const n = betragZahl(o.honorar); if (!n) return 0;
     const art = o.honorarArt || "einheit";
     if (art === "objekt") return n;
     if (art === "einheit") return n * (o.einheitenListe || []).length;
-    const miete = (o.einheitenListe || []).reduce((sm, e) => sm + zahlD(e.sollmiete), 0);
+    const miete = (o.einheitenListe || []).reduce((sm, e) => sm + betragZahl(e.sollmiete), 0);
     return Math.round(miete * n) / 100;
   }
   const honorarJahr = o => Math.round(honorarMonat(o) * 12 * 100) / 100;
-  const zusatzJahr = (o, jahr) => Math.round(honorarListe(o).filter(h => String(h.datum || "").slice(0, 4) === String(jahr))
-    .reduce((n, h) => n + zahlD(h.betrag), 0) * 100) / 100;
+  const honorarImJahr = (o, jahr) => honorarListe(o).filter(h => String(h.datum || "").slice(0, 4) === String(jahr));
+  const istProvision = h => h.art === "provision";
+  const summeVon = l => Math.round(l.reduce((n, h) => n + betragZahl(h.betrag), 0) * 100) / 100;
+  const zusatzJahr = (o, jahr) => summeVon(honorarImJahr(o, jahr).filter(h => !istProvision(h)));
+  const provisionJahr = (o, jahr) => summeVon(honorarImJahr(o, jahr).filter(istProvision));
   function umsatzZeilen(jahr) {
-    return awObjekte().map(o => ({ o, wer: objBetreuer(o)[0] || "", monat: honorarMonat(o), jahr: honorarJahr(o), zusatz: zusatzJahr(o, jahr) }))
-      .sort((a, b) => (b.jahr + b.zusatz) - (a.jahr + a.zusatz));
+    return awObjekte().map(o => ({ o, wer: objBetreuer(o)[0] || "", monat: honorarMonat(o), jahr: honorarJahr(o),
+      zusatz: zusatzJahr(o, jahr), provision: provisionJahr(o, jahr) }))
+      .sort((a, b) => (b.jahr + b.zusatz + b.provision) - (a.jahr + a.zusatz + a.provision));
   }
   function umsatzHtml() {
     const jahr = S.awJahr || new Date().getFullYear();
     const alle = umsatzZeilen(jahr);
     const liste = alle.filter(awPasst);
     const mon = liste.reduce((n, x) => n + x.monat, 0);
-    const ges = liste.reduce((n, x) => n + x.jahr + x.zusatz, 0);
-    const ohne = liste.filter(x => !x.monat && !x.zusatz).length;
+    const ges = liste.reduce((n, x) => n + x.jahr + x.zusatz + x.provision, 0);
+    const prov = liste.reduce((n, x) => n + x.provision, 0);
+    const ohne = liste.filter(x => !x.monat && !x.zusatz && !x.provision).length;
     let h = "<div class='leiste'><div><label class='fuer' for='aw-jahr'>Jahr</label>" +
       "<input type='number' id='aw-jahr' data-awjahr='1' value='" + jahr + "' min='2000' max='2100' style='width:110px'></div></div>";
     h += "<div class='kacheln'><div class='kachel'><b>" + eurD(mon) + " €</b><span>Honorar im Monat</span></div>" +
+      "<div class='kachel'><b>" + eurD(prov) + " €</b><span>Provisionen " + jahr + "</span></div>" +
       "<div class='kachel'><b>" + eurD(ges) + " €</b><span>Umsatz " + jahr + "</span></div>" +
       "<div class='kachel'><b>" + ohne + "</b><span>Objekte ohne Honorar</span></div></div>";
     /* Je Mitarbeiter zusammengefasst. */
     const proMa = {};
     liste.forEach(x => { const k = x.wer || "ohne";
-      if (!proMa[k]) proMa[k] = { wer: x.wer, objekte: 0, monat: 0, jahr: 0, zusatz: 0 };
-      proMa[k].objekte++; proMa[k].monat += x.monat; proMa[k].jahr += x.jahr; proMa[k].zusatz += x.zusatz; });
-    const reihen = Object.values(proMa).sort((a, b) => (b.jahr + b.zusatz) - (a.jahr + a.zusatz));
-    if (reihen.length) h += "<div class='ue-tab'><div class='um-kopf'><span>Mitarbeiter</span><span>Objekte</span><span>je Monat</span><span>Zusatzhonorare " + jahr + "</span><span>Umsatz " + jahr + "</span></div>" +
+      if (!proMa[k]) proMa[k] = { wer: x.wer, objekte: 0, monat: 0, jahr: 0, zusatz: 0, provision: 0 };
+      proMa[k].objekte++; proMa[k].monat += x.monat; proMa[k].jahr += x.jahr; proMa[k].zusatz += x.zusatz; proMa[k].provision += x.provision; });
+    const reihen = Object.values(proMa).sort((a, b) => (b.jahr + b.zusatz + b.provision) - (a.jahr + a.zusatz + a.provision));
+    if (reihen.length) h += "<div class='ue-tab'><div class='um-kopf'><span>Mitarbeiter</span><span>Objekte</span><span>je Monat</span>" +
+      "<span>Provisionen " + jahr + "</span><span>Zusatzhonorare " + jahr + "</span><span>Umsatz " + jahr + "</span></div>" +
       reihen.map(r => "<div class='um-row'><span><strong>" + esc(teamName(r.wer) || "ohne Betreuung") + "</strong></span>" +
         "<span>" + r.objekte + "</span><span>" + esc(eurD(r.monat)) + " €</span>" +
+        "<span>" + (r.provision ? esc(eurD(r.provision)) + " €" : "–") + "</span>" +
         "<span>" + (r.zusatz ? esc(eurD(r.zusatz)) + " €" : "–") + "</span>" +
-        "<span><strong>" + esc(eurD(r.jahr + r.zusatz)) + " €</strong></span></div>").join("") + "</div>";
+        "<span><strong>" + esc(eurD(r.jahr + r.zusatz + r.provision)) + " €</strong></span></div>").join("") + "</div>";
     h += "<h3 style='margin-top:24px'>Honorar je Objekt</h3>" +
       "<p class='unter'>Tragen Sie hier ein, was Sie für die Verwaltung bekommen. Die Eingaben werden sofort beim Objekt gespeichert.</p>";
     h += "<div class='ue-tab'><div class='um-kopf2'><span>Objekt</span><span>Art</span><span>Betrag</span><span>je Monat</span><span>Betreuung</span><span></span></div>" +
@@ -2409,25 +2427,33 @@ const Objekte = (() => {
           "<span><select data-hon='" + esc(o.id) + "|honorarArt'>" + HONORARARTEN.map(([w, l]) =>
             "<option value='" + w + "'" + ((o.honorarArt || "einheit") === w ? " selected" : "") + ">" + esc(l) + "</option>").join("") + "</select></span>" +
           "<span><input type='number' step='0.01' min='0' inputmode='decimal' data-hon='" + esc(o.id) + "|honorar' value='" + esc(o.honorar || "") + "'></span>" +
-          "<span><strong>" + esc(eurD(x.monat)) + " €</strong>" + (x.zusatz ? "<br><span class='fuer'>+ " + esc(eurD(x.zusatz)) + " € Zusatz</span>" : "") + "</span>" +
+          "<span><strong>" + esc(eurD(x.monat)) + " €</strong>" +
+            (x.provision ? "<br><span class='fuer'>+ " + esc(eurD(x.provision)) + " € Provision</span>" : "") +
+            (x.zusatz ? "<br><span class='fuer'>+ " + esc(eurD(x.zusatz)) + " € Zusatz</span>" : "") + "</span>" +
           "<span>" + esc(teamName(x.wer) || "–") + "</span>" +
           "<span><button class='btn klein' data-act='hon-zusatz' data-id='" + esc(o.id) + "'>+ Zusatz</button></span></div>" +
           (S.honNeu === o.id ? zusatzFormHtml(o) : "") +
-          (honorarListe(o).filter(z => String(z.datum || "").slice(0, 4) === String(jahr)).map((z, zi) =>
-            "<div class='um-zusatz'><span>" + esc(Objekte.datum(z.datum)) + " · " + esc(z.text || "Zusatzhonorar") + "</span>" +
+          (honorarImJahr(o, jahr).map((z, zi) =>
+            "<div class='um-zusatz'><span>" + esc(Objekte.datum(z.datum)) + " · " +
+            (istProvision(z) ? "<span class='marke s-erledigt'>Provision</span> " : "") + esc(z.text || "Zusatzhonorar") + "</span>" +
             "<span>" + esc(eurD(z.betrag)) + " €</span>" +
             "<span><button class='btn klein gefahr' data-act='hon-weg' data-id='" + esc(o.id) + "' data-i='" + zi + "'>" +
             (S.loeschen === "hon" + o.id + zi ? "Wirklich?" : "×") + "</button></span></div>").join(""));
       }).join("") + "</div>";
     return h + "<ul class='meldungen'><li class='m-hinweis'>Gerechnet wird mit dem, was Sie hier eintragen. " +
-      "Zusatzhonorare – etwa für Neuvermietung, Bauleitung oder eine Sonderversammlung – kommen mit Datum dazu und zählen in das Jahr ihres Datums.</li></ul>";
+      "Zusatzhonorare – etwa für Bauleitung oder eine Sonderversammlung – kommen mit Datum dazu und zählen in das Jahr ihres Datums.</li>" +
+      "<li class='m-hinweis'>Provisionen für Neuvermietungen trägt das Programm selbst ein, sobald Sie eine Provisionsrechnung abschließen. " +
+      "Sie zählen in den Umsatz des Mitarbeiters, der das Objekt betreut, und stehen in einer eigenen Spalte.</li></ul>";
   }
   function zusatzFormHtml(o) {
     const e = S.honEntwurf || {};
     return "<div class='um-neu'><div class='felder'>" +
       "<div class='feld'><label>Datum</label><input type='date' data-honneu='datum' value='" + esc(e.datum || new Date().toISOString().slice(0, 10)) + "'></div>" +
       "<div class='feld breit'><label>Wofür</label><input type='text' data-honneu='text' value='" + esc(e.text || "") + "' placeholder='z. B. Neuvermietung WE 3'></div>" +
-      "<div class='feld'><label>Betrag netto</label><input type='number' step='0.01' data-honneu='betrag' value='" + esc(e.betrag || "") + "'></div></div>" +
+      "<div class='feld'><label>Betrag netto</label><input type='number' step='0.01' data-honneu='betrag' value='" + esc(e.betrag || "") + "'></div>" +
+      "<div class='feld'><label>Art</label><select data-honneu='art'>" +
+      [["", "Zusatzhonorar"], ["provision", "Provision Neuvermietung"]].map(([w, l]) =>
+        "<option value='" + w + "'" + ((e.art || "") === w ? " selected" : "") + ">" + l + "</option>").join("") + "</select></div></div>" +
       "<div class='leiste'><div><button class='btn klein haupt' data-act='hon-ok' data-id='" + esc(o.id) + "'>Übernehmen</button>" +
       "<button class='btn klein' data-act='hon-abbr'>Abbrechen</button></div></div></div>";
   }
@@ -2706,11 +2732,146 @@ const Objekte = (() => {
           (Math.abs(diff) < 0.02 ? "stimmt mit den Kosten überein" : "<strong class='z-minus'>" + esc(eur2(Math.abs(diff))) + " € " + (diff > 0 ? "noch offen" : "zu viel") + "</strong>") + "</p>";
       }).join("") + "</section>";
   }
+  /* ---------- Rücklagenabrechnung ----------
+     Entwicklung der Erhaltungsrücklage: Anfangsbestand, Zuführungen laut Plan, Zinsen,
+     beschlossene Entnahmen, Endbestand – und der Abgleich mit dem Rücklagenkonto. */
+  const rlEntnahmen = v => Array.isArray(v.entnahmen) ? v.entnahmen : (v.entnahmen = []);
+  const rlEntnahmeSumme = v => rlEntnahmen(v).length
+    ? cent(rlEntnahmen(v).reduce((n, x) => n + betragZahl(x.betrag), 0))
+    : cent(betragZahl(v.rlEntnahme));
+  function ruecklageRechnen(o, jahr, erg) {
+    const v = vermoegenVon(o, jahr);
+    const anfang = cent(betragZahl(v.rlAnfang));
+    /* Ohne Sollstellungen greift ersatzweise der Wirtschaftsplan des Jahres. */
+    const ausPlan = cent(betragZahl((wplanVon(o, jahr) || {}).ruecklage));
+    const zufuehrung = cent(erg.ruecklageGesamt) || ausPlan;
+    const gezahlt = v.rlGezahlt !== undefined && String(v.rlGezahlt).trim() !== "" ? cent(betragZahl(v.rlGezahlt)) : zufuehrung;
+    const zinsen = cent(betragZahl(v.rlZinsen));
+    const entnahme = rlEntnahmeSumme(v);
+    const ende = cent(anfang + zufuehrung + zinsen - entnahme);
+    const istEnde = cent(anfang + gezahlt + zinsen - entnahme);
+    const konto = cent(betragZahl(v.rlKonto));
+    const diff = cent(konto - istEnde);
+    const liste = (o.einheitenListe || []);
+    const summeMea = Objekte.meaSumme(liste);
+    const je = liste.map(e => {
+      const anteil = summeMea ? betragZahl(e.mea) / summeMea : (liste.length ? 1 / liste.length : 0);
+      return { e, anteil, betrag: cent(ende * anteil), zufuehrung: cent(zufuehrung * anteil) };
+    });
+    return { v, anfang, zufuehrung, gezahlt, zinsen, entnahme, ende, istEnde, konto, diff, je, summeMea,
+      quelle: cent(erg.ruecklageGesamt) ? "soll" : (ausPlan ? "plan" : "") };
+  }
+  function ruecklageBlockHtml(o, jahr, erg) {
+    const r = ruecklageRechnen(o, jahr, erg);
+    const v = r.v;
+    const f = (feld, l, hilfe) => "<div class='feld'><label>" + esc(l) + "</label>" +
+      "<input type='number' step='0.01' inputmode='decimal' data-vm='" + esc(jahr + "|" + feld) + "' value='" + esc(v[feld] || "") + "'>" +
+      (hilfe ? "<small>" + esc(hilfe) + "</small>" : "") + "</div>";
+    const z = (l, w, stark) => "<div class='ue-zeile'><span class='ue-l'>" + (stark ? "<strong>" + l + "</strong>" : l) +
+      "</span><span class='ue-w'>" + (stark ? "<strong>" + w + "</strong>" : w) + "</span></div>";
+    let h = "<section class='gruppe voll'><h2>Rücklagenabrechnung</h2>" +
+      "<p class='unter'>Was im Jahr mit der Erhaltungsrücklage passiert ist: was hineinging, was entnommen wurde und " +
+      "was am Ende übrig bleibt. Die Zahlen gehören in den Vermögensbericht nach § 28 Abs. 4 WEG.</p>" +
+      "<div class='felder'>" + f("rlAnfang", "Bestand am Anfang des Jahres") +
+      f("rlGezahlt", "davon tatsächlich eingegangen", "Leer lassen, wenn alle Vorschüsse gezahlt wurden.") +
+      f("rlZinsen", "Zinsen und Erträge") +
+      f("rlKonto", "Kontostand Rücklagenkonto am Jahresende") + "</div>";
+    h += "<h3 style='margin-top:20px'>Entnahmen</h3>" +
+      "<p class='unter'>Jede Entnahme braucht einen Beschluss der Eigentümer – tragen Sie ihn als Zweck mit ein.</p>" +
+      "<div class='ue-tab'><div class='rl-kopf'><span>Datum</span><span>Wofür · Beschluss</span><span>Betrag €</span><span></span></div>" +
+      (rlEntnahmen(v).length ? rlEntnahmen(v).map((x, i) => "<div class='rl-row'>" +
+        "<span><input type='date' data-rl='" + esc(jahr) + "|" + i + "|datum' value='" + esc(x.datum || "") + "'></span>" +
+        "<span><input type='text' data-rl='" + esc(jahr) + "|" + i + "|zweck' value='" + esc(x.zweck || "") + "' placeholder='z. B. Dachsanierung, Beschluss TOP 4 vom 12.05.'></span>" +
+        "<span><input type='number' step='0.01' inputmode='decimal' data-rl='" + esc(jahr) + "|" + i + "|betrag' value='" + esc(x.betrag || "") + "'></span>" +
+        "<span><button class='btn klein gefahr' data-act='rl-weg' data-jahr='" + esc(jahr) + "' data-i='" + i + "'>" +
+        (S.loeschen === "rl" + jahr + i ? "Wirklich?" : "×") + "</button></span></div>").join("")
+        : "<p class='unter'>Noch keine Entnahme erfasst." +
+          (betragZahl(v.rlEntnahme) ? " Bisher war eine Summe von " + esc(eur2(betragZahl(v.rlEntnahme))) + " € eingetragen – sie wird weiter gerechnet, bis Sie hier Einzelposten anlegen." : "") + "</p>") +
+      "</div><div class='leiste'><div><button class='btn klein' data-act='rl-neu' data-jahr='" + esc(jahr) + "'>+ Entnahme</button>" +
+      "<span class='fuer'>Summe " + esc(eur2(r.entnahme)) + " €</span></div></div>";
+    h += "<div class='ue-tab' style='margin-top:16px'>" +
+      z("Bestand am Anfang", esc(eur2(r.anfang))) +
+      z("Zuführung" + (r.quelle === "plan" ? " laut Wirtschaftsplan" : r.quelle === "soll" ? " laut Sollstellungen" : " im Jahr"), esc(eur2(r.zufuehrung))) +
+      (r.gezahlt !== r.zufuehrung ? z("davon eingegangen", esc(eur2(r.gezahlt))) : "") +
+      (r.zinsen ? z("Zinsen und Erträge", esc(eur2(r.zinsen))) : "") +
+      z("Entnahmen", "− " + esc(eur2(r.entnahme))) +
+      z("Bestand am Ende (Soll)", esc(eur2(r.ende)) + " €", true) +
+      (r.konto ? z("Kontostand Rücklagenkonto", esc(eur2(r.konto))) : "") +
+      (r.konto ? z("Unterschied", (r.diff > 0 ? "+ " : r.diff < 0 ? "− " : "") + esc(eur2(Math.abs(r.diff))) + " €") : "") + "</div>";
+    h += "<h3 style='margin-top:20px'>Anteil je Einheit</h3>" +
+      "<div class='ue-tab'><div class='rl-kopf2'><span>Einheit</span><span>Miteigentumsanteil</span><span>Zuführung " + esc(jahr) + "</span><span>Anteil am Bestand</span></div>" +
+      r.je.map(x => "<div class='rl-row2'><span><strong>" + esc(x.e.nr || x.e.art) + "</strong></span>" +
+        "<span class='fuer'>" + esc(x.e.mea || "–") + (r.summeMea ? " / " + esc(String(r.summeMea)) : "") + "</span>" +
+        "<span>" + esc(eur2(x.zufuehrung)) + " €</span><span>" + esc(eur2(x.betrag)) + " €</span></div>").join("") + "</div>";
+    const warn = [];
+    if (r.konto && Math.abs(r.diff) > 0.02) warn.push(["m-fehler", "Kontostand und rechnerischer Bestand gehen um " + eur2(Math.abs(r.diff)) +
+      " € auseinander. Prüfen Sie, ob alle Zuführungen überwiesen und alle Entnahmen erfasst sind."]);
+    if (rlEntnahmen(v).some(x => !String(x.zweck || "").trim())) warn.push(["m-hinweis", "Zu mindestens einer Entnahme fehlt der Zweck. Ohne Beschluss darf nicht entnommen werden."]);
+    if (!r.summeMea) warn.push(["m-hinweis", "Für die Einheiten sind noch keine Miteigentumsanteile erfasst – der Anteil am Bestand wird deshalb gleichmäßig verteilt."]);
+    if (!r.quelle) warn.push(["m-hinweis", "Für dieses Jahr gibt es weder Sollstellungen noch einen Wirtschaftsplan mit Rücklagenanteil – die Zuführung steht deshalb auf null."]);
+    warn.push(["m-hinweis", "Die Rücklage gehört der Gemeinschaft, nicht den einzelnen Eigentümern. Beim Verkauf einer Wohnung wird sie nicht ausgezahlt; der Anteil geht auf den Erwerber über."]);
+    h += "<ul class='meldungen' style='margin-top:14px'>" + warn.map(([k, t]) => "<li class='" + k + "'>" + esc(t) + "</li>").join("") + "</ul>";
+    h += "<div class='leiste'><div><button class='btn klein haupt' data-act='rl-drucken' data-jahr='" + esc(jahr) + "'>Rücklagenabrechnung drucken</button></div></div>";
+    return h + "</section>";
+  }
+  function ruecklageDruckHtml(o, jahr, portal) {
+    const erg = abrechnungRechnen(o, jahr);
+    const r = ruecklageRechnen(o, jahr, erg);
+    const vw = (() => { try { return window.Firmendaten ? window.Firmendaten.daten() : {}; } catch (x) { return {}; } })();
+    const zeile = (l, w, stark) => "<tr" + (stark ? " class='abr-summe'" : "") + "><td>" + (stark ? "<strong>" + l + "</strong>" : l) +
+      "</td><td>" + (stark ? "<strong>" + w + "</strong>" : w) + "</td></tr>";
+    let h = "<div class='seite'>";
+    h += "<div class='md-werkzeug'><div><button class='btn klein' data-act='" + (portal ? "pt-abr-zu" : "rl-zurueck") + "'>‹ Zurück</button>" +
+      "<button class='btn klein haupt' data-act='mandat-drucken'>Drucken / als PDF speichern</button></div>" +
+      "<span class='fuer'>" + esc(Objekte.datum(erg.z.von) + " – " + Objekte.datum(erg.z.bis)) + "</span></div>";
+    h += "<div class='md-blatt'><header class='md-kopf'>" +
+      (vw.logo ? "<img class='md-logo' src='" + esc(vw.logo) + "' alt='" + esc(vw.name || "Logo") + "'>"
+        : "<div class='md-firma'>" + esc(vw.name || "Hausverwaltung") + "</div>") +
+      "<div class='fuer'>" + esc(Objekte.datum(new Date().toISOString().slice(0, 10))) + "</div></header>" +
+      "<h1>Rücklagenabrechnung " + esc(String(jahr)) + "</h1>" +
+      "<p class='md-art'>" + esc(objName(o)) + " · Entwicklung der Erhaltungsrücklage vom " +
+      esc(Objekte.datum(erg.z.von)) + " bis " + esc(Objekte.datum(erg.z.bis)) + "</p>";
+    h += "<table class='lv-tab abr-tab'><tbody>" +
+      zeile("Bestand am Anfang", esc(eur2(r.anfang)) + " €") +
+      zeile("Zuführung" + (r.quelle === "soll" ? " laut Sollstellungen" : " laut Wirtschaftsplan"), esc(eur2(r.zufuehrung)) + " €") +
+      (r.gezahlt !== r.zufuehrung ? zeile("davon bis zum Jahresende eingegangen", esc(eur2(r.gezahlt)) + " €") : "") +
+      (r.zinsen ? zeile("Zinsen und Erträge", esc(eur2(r.zinsen)) + " €") : "") +
+      zeile("Entnahmen", "− " + esc(eur2(r.entnahme)) + " €") +
+      zeile("Bestand am Ende", esc(eur2(r.ende)) + " €", true) + "</tbody></table>";
+    if (rlEntnahmen(r.v).length)
+      h += "<h2>Entnahmen im Einzelnen</h2><table class='lv-tab'><thead><tr><th>Datum</th><th>Wofür · Beschluss</th><th>Betrag</th></tr></thead><tbody>" +
+        rlEntnahmen(r.v).map(x => "<tr><td>" + (x.datum ? esc(Objekte.datum(x.datum)) : "<span class='md-luecke'></span>") + "</td><td>" +
+          (x.zweck ? esc(x.zweck) : "<span class='md-luecke'></span>") + "</td><td>" + esc(eur2(betragZahl(x.betrag))) + " €</td></tr>").join("") +
+        "</tbody></table>";
+    if (r.konto)
+      h += "<h2>Abgleich mit dem Konto</h2><table class='lv-tab abr-tab'><tbody>" +
+        zeile("Kontostand des Rücklagenkontos am Jahresende", esc(eur2(r.konto)) + " €") +
+        zeile("rechnerischer Bestand", esc(eur2(r.istEnde)) + " €") +
+        zeile("Unterschied", (r.diff > 0 ? "+ " : r.diff < 0 ? "− " : "") + esc(eur2(Math.abs(r.diff))) + " €", true) + "</tbody></table>" +
+        (Math.abs(r.diff) > 0.02 ? "<p class='md-text'>Der Unterschied erklärt sich in der Regel aus Vorschüssen, die am Stichtag noch offen waren, " +
+          "oder aus Beträgen, die erst nach dem Stichtag auf das Rücklagenkonto umgebucht wurden.</p>" : "");
+    h += "<h2>Anteil der Einheiten</h2><table class='lv-tab'><thead><tr><th>Einheit</th><th>Miteigentumsanteil</th>" +
+      "<th>Zuführung " + esc(String(jahr)) + "</th><th>Anteil am Bestand</th></tr></thead><tbody>" +
+      r.je.map(x => "<tr><td>" + esc(x.e.nr || x.e.art) + "</td><td>" + esc(x.e.mea || "–") +
+        (r.summeMea ? " / " + esc(String(r.summeMea)) : "") + "</td><td>" + esc(eur2(x.zufuehrung)) + " €</td><td>" +
+        esc(eur2(x.betrag)) + " €</td></tr>").join("") + "</tbody></table>";
+    const bk = objektBankRl(o);
+    if (Objekte.ibanGueltig(bk.iban))
+      h += "<p class='md-text'>Die Rücklage wird getrennt geführt auf dem Konto " + esc(Objekte.ibanFormat(bk.iban)) +
+        (bk.bank ? " bei der " + esc(bk.bank) : "") + ", lautend auf " + esc(bk.inhaber || objName(o)) + ".</p>";
+    h += "<p class='md-text'>Die Erhaltungsrücklage gehört der Gemeinschaft der Wohnungseigentümer (§ 9a Abs. 3 WEG). " +
+      "Entnahmen setzen einen Beschluss der Eigentümer voraus. Diese Aufstellung ist Teil des Vermögensberichts nach § 28 Abs. 4 WEG.</p>";
+    h += "<p class='md-fuss'>" + esc(vw.name || "Hausverwaltung") + " · erstellt am " +
+      esc(Objekte.datum(new Date().toISOString().slice(0, 10))) +
+      ". Rechnerisch geprüft; maßgeblich sind die Kontoauszüge und Belege, die bei der Verwaltung eingesehen werden können.</p></div>";
+    return h + "</div>";
+  }
   function vermoegenBlockHtml(o, jahr, erg) {
     const v = vermoegenVon(o, jahr);
     const anfang = betragZahl(v.rlAnfang);
-    const entnahme = betragZahl(v.rlEntnahme);
-    const ende = cent(anfang + erg.ruecklageGesamt - entnahme);
+    const entnahme = rlEntnahmeSumme(v);
+    const zinsen = cent(betragZahl(v.rlZinsen));
+    const ende = cent(anfang + erg.ruecklageGesamt + zinsen - entnahme);
     const f = (feld, l, hilfe) => "<div class='feld'><label>" + esc(l) + "</label>" +
       "<input type='number' step='0.01' inputmode='decimal' data-vm='" + esc(jahr + "|" + feld) + "' value='" + esc(v[feld] || "") + "'>" +
       (hilfe ? "<small>" + esc(hilfe) + "</small>" : "") + "</div>";
@@ -2718,11 +2879,12 @@ const Objekte = (() => {
       "<p class='unter'>Stand der Erhaltungsrücklage und der Bankkonten zum Ende des Abrechnungszeitraums. " +
       "Der Bericht ist den Eigentümern jährlich zur Verfügung zu stellen; beschlossen wird er nicht.</p>" +
       "<div class='felder'>" + f("rlAnfang", "Erhaltungsrücklage am Anfang") +
-      f("rlEntnahme", "Entnahmen aus der Rücklage", "Für Erhaltungsmaßnahmen im Zeitraum.") +
+      (rlEntnahmen(v).length ? "" : f("rlEntnahme", "Entnahmen aus der Rücklage", "Einzelposten erfassen Sie unter „Rücklagenabrechnung“.")) +
       f("bankEnde", "Bankguthaben am Ende") + f("forderungen", "Offene Forderungen", "Rückstände der Eigentümer.") + "</div>" +
       "<div class='ue-tab' style='margin-top:14px'>" +
       "<div class='ue-zeile'><span class='ue-l'>Rücklage Anfang</span><span class='ue-w'>" + esc(eur2(anfang)) + " €</span></div>" +
       "<div class='ue-zeile'><span class='ue-l'>Zuführung laut Plan</span><span class='ue-w'>" + esc(eur2(erg.ruecklageGesamt)) + " €</span></div>" +
+      (zinsen ? "<div class='ue-zeile'><span class='ue-l'>Zinsen und Erträge</span><span class='ue-w'>" + esc(eur2(zinsen)) + " €</span></div>" : "") +
       "<div class='ue-zeile'><span class='ue-l'>Entnahmen</span><span class='ue-w'>− " + esc(eur2(entnahme)) + " €</span></div>" +
       "<div class='ue-zeile'><span class='ue-l'><strong>Rücklage Ende</strong></span><span class='ue-w'><strong>" + esc(eur2(ende)) + " €</strong></span></div></div>" +
       "<div class='feld' style='margin-top:14px'><label>Wesentliche Gegenstände des Gemeinschaftsvermögens</label>" +
@@ -2843,7 +3005,7 @@ const Objekte = (() => {
             ? "<div class='abe-row'>" + kopf + "<span class='fuer'>Zeit ohne Mieter</span><span>" + esc(eur2(x.leerstand)) +
               " €</span><span>–</span><span class='fuer'>trägt der Eigentümer</span><span></span></div>" : "")).join("");
       }).join("") + "</div></section>";
-    if (erg.weg) h += vermoegenBlockHtml(o, jahr, erg);
+    if (erg.weg) h += vermoegenBlockHtml(o, jahr, erg) + ruecklageBlockHtml(o, jahr, erg);
     h += abrFreigabeHtml(o, jahr, erg);
     h += "<section class='gruppe voll'><h2>Stand</h2>" +
       "<div class='felder'><div class='feld'><label>Bearbeitungsstand</label><select data-abr='" + esc(o.id) + "|" + jahr + "|status'>" +
@@ -2928,11 +3090,12 @@ const Objekte = (() => {
         }).join("") + "</tbody></table>";
       if (erg.weg) {
         const v = vermoegenVon(o, jahr);
-        const ende = cent(betragZahl(v.rlAnfang) + erg.ruecklageGesamt - betragZahl(v.rlEntnahme));
+        const ende = cent(betragZahl(v.rlAnfang) + erg.ruecklageGesamt + betragZahl(v.rlZinsen) - rlEntnahmeSumme(v));
         h += "<h2>Vermögensbericht (§ 28 Abs. 4 WEG)</h2><table class='lv-tab abr-tab'><tbody>" +
           "<tr><td>Erhaltungsrücklage am Anfang</td><td>" + esc(eur2(betragZahl(v.rlAnfang))) + " €</td></tr>" +
           "<tr><td>Zuführung im Zeitraum</td><td>" + esc(eur2(erg.ruecklageGesamt)) + " €</td></tr>" +
-          "<tr><td>Entnahmen</td><td>− " + esc(eur2(betragZahl(v.rlEntnahme))) + " €</td></tr>" +
+          (betragZahl(v.rlZinsen) ? "<tr><td>Zinsen und Erträge</td><td>" + esc(eur2(betragZahl(v.rlZinsen))) + " €</td></tr>" : "") +
+          "<tr><td>Entnahmen</td><td>− " + esc(eur2(rlEntnahmeSumme(v))) + " €</td></tr>" +
           "<tr class='abr-summe'><td><strong>Erhaltungsrücklage am Ende</strong></td><td><strong>" + esc(eur2(ende)) + " €</strong></td></tr>" +
           "<tr><td>Bankguthaben am Ende</td><td>" + esc(eur2(betragZahl(v.bankEnde))) + " €</td></tr>" +
           "<tr><td>Offene Forderungen</td><td>" + esc(eur2(betragZahl(v.forderungen))) + " €</td></tr></tbody></table>" +
@@ -4153,7 +4316,10 @@ const Objekte = (() => {
       " · freigegeben am " + esc(Objekte.datum(String(f.am).slice(0, 10))) + "</span></span><span class='fuer'>ansehen</span></button>" +
       (f.art === "weg" ? "<button class='pt-datei' data-act='pt-abr' data-o='" + esc(o.id) + "' data-jahr='" + esc(f.jahr) + "' data-e='' data-wer=''>" +
         "<span><strong>Gesamtabrechnung " + esc(f.jahr) + "</strong><br><span class='fuer'>" + esc(objName(o)) +
-        " · Verteilung auf alle Einheiten und Vermögensbericht</span></span><span class='fuer'>ansehen</span></button>" : "")).join("") + "</div>";
+        " · Verteilung auf alle Einheiten und Vermögensbericht</span></span><span class='fuer'>ansehen</span></button>" +
+        "<button class='pt-datei' data-act='pt-abr' data-o='" + esc(o.id) + "' data-jahr='" + esc(f.jahr) + "' data-e='' data-wer='' data-rl='1'>" +
+        "<span><strong>Rücklagenabrechnung " + esc(f.jahr) + "</strong><br><span class='fuer'>" + esc(objName(o)) +
+        " · Entwicklung der Erhaltungsrücklage</span></span><span class='fuer'>ansehen</span></button>" : "")).join("") + "</div>";
     return h + "<p class='unter' style='margin-top:10px'>Mit „Drucken“ speichern Sie die Abrechnung als PDF auf Ihrem Gerät.</p></section>";
   }
   function portalSeiteHtml(p, vorschau) {
@@ -4165,7 +4331,9 @@ const Objekte = (() => {
       if (erlaubt) return (vorschau ? "<div class='vorschau-band'><div><strong>Ansicht von " + esc(Objekte.personName(p)) + "</strong>" +
         "<small>So sieht diese Person ihre Abrechnung.</small></div>" +
         "<button class='btn klein' data-act='pt-vorschau-zurueck'>Zurück zur Verwaltung</button></div>" : "") +
-        abrechnungDruckHtml(oA, Number(S.ptAbr.jahr), S.ptAbr.einheitId, S.ptAbr.personId || p.id, true);
+        (S.ptAbr.rl
+          ? ruecklageDruckHtml(oA, Number(S.ptAbr.jahr), true)
+          : abrechnungDruckHtml(oA, Number(S.ptAbr.jahr), S.ptAbr.einheitId, S.ptAbr.personId || p.id, true));
       S.ptAbr = null;
     }
     const o = portalObjekt(p);
@@ -6024,7 +6192,9 @@ const Objekte = (() => {
         "<button type='button' class='pille" + (j === jahr ? " an" : "") + "' data-act='wp-jahr' data-wert='" + esc(j) + "'>" + esc(j) +
         (wplanFest(wplanVon(o, j)) ? " · beschlossen" : wplanVon(o, j) ? " · Entwurf" : "") + "</button>").join("") +
       "<button type='button' class='pille' data-act='wp-jahr-neu'>+ Folgejahr</button></div>";
-    if (!konten.length) return h + "<p class='unter'>Legen Sie zuerst Ihre Ausgabekonten an – in den Einstellungen unter „Kontenrahmen“ und dann hier unter „Kontenrahmen“ dem Objekt zuordnen.</p></section>";
+    if (!konten.length) return h + "<p class='unter'>Für den Plan brauchen Sie zuerst Ausgabekonten: Legen Sie Ihren Kontenrahmen in den Einstellungen an " +
+      "und ordnen Sie ihn diesem Objekt im Unterreiter „Buchungskonten“ zu.</p>" +
+      "<div class='leiste'><div><button class='btn klein haupt' data-act='bh-tab' data-wert='konten'>Zu den Buchungskonten</button></div></div></section>";
     if (!wp) return h + "<div class='leiste'><div><button class='btn haupt' data-act='wp-neu' data-wert='" + esc(jahr) + "'>Wirtschaftsplan " + esc(jahr) + " anlegen</button>" +
       "<span class='fuer'>Sie tragen je Konto den geplanten Jahresbetrag ein.</span></div></div></section>";
 
@@ -6196,7 +6366,11 @@ const Objekte = (() => {
   }
   const rundReiter = () => S.rundTab === "erhoehung" ? "erhoehung" : "rund";
   /* Welcher Unterreiter der Buchhaltung gerade offen ist. */
-  const bhReiter = () => ["bank", "abrechnung"].includes(S.bhTab) ? S.bhTab : "konten";
+  const bhReiter = () => ["bank", "abrechnung", "wplan"].includes(S.bhTab) ? S.bhTab : "konten";
+  const bhReiterListe = o => [["bank", "Bankkonto"], ["konten", "Buchungskonten"]]
+    .concat(istWeg(o) ? [["wplan", "Wirtschaftsplan"]] : [])
+    .concat([["abrechnung", "Abrechnung"]]);
+  const bhTabOffen = o => { const r = bhReiter(); return (r === "wplan" && !istWeg(o)) ? "konten" : r; };
   const abrechnungTeilHtml = o => ["miet", "weg", "garantie"].includes(o.art)
     ? abrechnungSeiteHtml(o)
     : "<p class='unter' style='margin:14px 0 0'>Eine Abrechnung gibt es in der Miet- und in der WEG-Verwaltung.</p>";
@@ -6209,10 +6383,11 @@ const Objekte = (() => {
     h = kopfTeil0;
     if (!konten.length) {
       const nav = "<nav class='reiter e-reiter' style='margin-top:14px'>" +
-        [["bank", "Bankkonto"], ["konten", "Buchungskonten"], ["abrechnung", "Abrechnung"]].map(([w, l]) =>
-          "<button data-act='bh-tab' data-wert='" + w + "'" + (bhReiter() === w ? " aria-current='page'" : "") + ">" + l + "</button>").join("") + "</nav>";
-      if (bhReiter() === "bank") return nav + objektBankHtml(o) + zahlungslaufHtml(o);
-      if (bhReiter() === "abrechnung") return nav + abrechnungTeilHtml(o);
+        bhReiterListe(o).map(([w, l]) =>
+          "<button data-act='bh-tab' data-wert='" + w + "'" + (bhTabOffen(o) === w ? " aria-current='page'" : "") + ">" + l + "</button>").join("") + "</nav>";
+      if (bhTabOffen(o) === "bank") return nav + objektBankHtml(o) + zahlungslaufHtml(o);
+      if (bhTabOffen(o) === "abrechnung") return nav + abrechnungTeilHtml(o);
+      if (bhTabOffen(o) === "wplan") return nav + wirtschaftsplanHtml(o);
       return nav + kopfTeil0 + "<p class='unter'>Diesem Objekt ist noch kein Kontenrahmen zugeordnet.</p>" +
         "<div class='leiste'><div><button class='btn haupt' data-act='ob-rahmen-neu'>Standard zuordnen" +
         (rahmenStandard(o.art) ? " · " + esc(rahmenStandard(o.art).name) : "") + "</button></div></div></section>";
@@ -6227,13 +6402,14 @@ const Objekte = (() => {
       "<small>Ab diesem Monat erzeugt das Programm Sollstellungen.</small></div></div>";
     h = "";
     /* Bankkonto und Buchungskonten sind zwei Welten – deshalb zwei Unterreiter. */
-    const bhTab = bhReiter();
+    const bhTab = bhTabOffen(o);
     h += "<nav class='reiter e-reiter' style='margin-top:14px'>" +
-      [["bank", "Bankkonto"], ["konten", "Buchungskonten"], ["abrechnung", "Abrechnung"]].map(([w, l]) =>
+      bhReiterListe(o).map(([w, l]) =>
         "<button data-act='bh-tab' data-wert='" + w + "'" + (bhTab === w ? " aria-current='page'" : "") + ">" + l + "</button>").join("") + "</nav>";
     if (bhTab === "bank") return h + objektBankHtml(o) + zahlungslaufHtml(o) + lastschriftHtml(o);
     if (bhTab === "abrechnung") return h + abrechnungTeilHtml(o);
-    h += kopfTeil + "</section>" + wirtschaftsplanHtml(o) + rueckstandHtml(o) + berichtigungHtml(o) + "<section class='gruppe voll'><h2>Konten dieses Objekts</h2>";
+    if (bhTab === "wplan") return h + wirtschaftsplanHtml(o);
+    h += kopfTeil + "</section>" + rueckstandHtml(o) + berichtigungHtml(o) + "<section class='gruppe voll'><h2>Konten dieses Objekts</h2>";
     const gruppen = [["einnahme", "Einnahmen"], ["ausgabe", "Ausgaben"], ["bestand", "Bestandskonten"]];
     h += gruppen.map(([art, titel]) => {
       const teil = konten.filter(k => k.art === art);
@@ -6660,7 +6836,31 @@ const Objekte = (() => {
             "Für Lastschriften brauchen Sie Kontoinhaber, gültige IBAN und die Gläubiger-Identifikationsnummer.</li></ul>"
           : "<ul class='meldungen' style='margin-top:12px'><li class='m-hinweis'>Kein eigenes Konto hinterlegt – es gilt das Konto der Verwaltung aus den Einstellungen" +
             (bankBereit() ? ": " + esc(bankzugang().inhaber) + ", " + esc(Objekte.ibanFormat(bankzugang().iban)) : ", das dort aber noch nicht vollständig ist") + ".</li></ul>") +
-      "</section>";
+      "</section>" + (weg ? ruecklagenKontoHtml(o) : "");
+  }
+  /* Die Erhaltungsrücklage gehört getrennt vom laufenden Geld der Gemeinschaft angelegt. */
+  const objektBankRl = o => (o && o.bankRl && typeof o.bankRl === "object") ? o.bankRl : {};
+  function ruecklagenKontoHtml(o) {
+    const r = objektBankRl(o);
+    const gefuellt = Objekte.ibanGueltig(r.iban) && String(r.inhaber || "").trim();
+    const f = (n, l, hilfe, extra) => "<div class='feld'><label for='ob-rl-" + n + "'>" + esc(l) + "</label>" +
+      "<input type='text' id='ob-rl-" + n + "' data-obbankrl='" + n + "' value='" + esc(r[n] || "") + "'" + (extra || "") + ">" +
+      (hilfe ? "<small>" + hilfe + "</small>" : "") + "</div>";
+    return "<section class='gruppe voll'><h2>Rücklagenkonto</h2>" +
+      "<p class='unter'>Das Konto, auf dem die Erhaltungsrücklage liegt – getrennt vom laufenden WEG-Konto. " +
+      "Auch dieses Konto lautet auf die Gemeinschaft (§ 9a Abs. 1 WEG); von hier wird nicht eingezogen und nicht bezahlt.</p>" +
+      "<div class='felder'>" + f("inhaber", "Kontoinhaber (Gemeinschaft)") +
+      f("iban", "IBAN", "", " autocomplete='off' spellcheck='false' placeholder='DE00 0000 0000 0000 0000 00'") +
+      f("bic", "BIC") + f("bank", "Bank") +
+      "<div class='feld'><label for='ob-rl-art'>Anlageform</label><select id='ob-rl-art' data-obbankrl='anlage'>" +
+      [["tagesgeld", "Tagesgeldkonto"], ["giro", "Girokonto"], ["fest", "Festgeld"], ["sonstiges", "andere Anlage"]].map(([w, l]) =>
+        "<option value='" + w + "'" + ((r.anlage || "tagesgeld") === w ? " selected" : "") + ">" + l + "</option>").join("") +
+      "</select><small>Angelegt wird sicher und verfügbar – das Geld gehört der Gemeinschaft.</small></div>" +
+      "</div><div class='iban-status'></div>" +
+      "<ul class='meldungen' style='margin-top:12px'>" +
+      (gefuellt ? "<li class='m-ok'>Die Rücklage wird getrennt geführt. Entnahmen tragen Sie in der Abrechnung unter „Rücklagenabrechnung“ ein.</li>"
+        : "<li class='m-hinweis'>Noch kein eigenes Rücklagenkonto hinterlegt. Die Erhaltungsrücklage gehört nicht auf das laufende Konto – sonst lässt sich ihr Bestand nicht nachweisen.</li>") +
+      "<li class='m-hinweis'>Entnahmen aus der Rücklage brauchen einen Beschluss der Eigentümer. Das Verwaltungsvermögen gehört der Gemeinschaft, nicht der Verwaltung (§ 9a Abs. 3 WEG).</li></ul></section>";
   }
   function bankzugangHtml() {
     const b = bankzugang();
@@ -7119,6 +7319,22 @@ const Objekte = (() => {
       }
       return true;
     },
+    /* Eine abgeschlossene Provisionsrechnung zählt in den Umsatz des betreuenden Mitarbeiters. */
+    provisionBuchen: d => {
+      const o = S.liste.find(x => x.id === d.objektId); if (!o) return false;
+      const betrag = betragZahl(d.netto); if (!betrag) return false;
+      const nr = String(d.nummer || "");
+      honorarListe(o);
+      if (nr && o.honorare.some(h => h.rechnung === nr)) return true;
+      const e = (o.einheitenListe || []).find(x => x.id === d.einheitId);
+      o.honorare.push({ id: Objekte.neueId(), datum: d.datum || new Date().toISOString().slice(0, 10),
+        text: "Provision Neuvermietung" + (e ? " · " + (e.nr || e.art) : "") + (nr ? " · Rechnung " + nr : ""),
+        betrag: String(betrag), art: "provision", rechnung: nr, einheitId: d.einheitId || "" });
+      const i = S.liste.findIndex(x => x.id === o.id); if (i >= 0) S.liste[i] = o;
+      if (S.entwurf && S.entwurf.id === o.id) S.entwurf.honorare = o.honorare;
+      Speicher.speichern("objekte", o, S.liste).catch(() => {});
+      return true;
+    },
     zurueckZumObjekt: id => { S.tab = "objekte"; if (id) { const o = S.liste.find(x => x.id === id); if (o) { S.ansicht = "formular"; S.bearbeiten = false; S.istNeu = false; S.objTab = "stammdaten";
         S.entwurf = Objekte.betreuungSicherstellen(Objekte.listeSicherstellen(JSON.parse(JSON.stringify(o)))); } } else S.ansicht = "liste";
       render(); return true; },
@@ -7261,7 +7477,15 @@ const Objekte = (() => {
     const dvD = (!mdP && S.dienstDruck && S.entwurf) ? diensteListe(S.entwurf).find(x => x.id === S.dienstDruck) : null;
     const abrD = (!mdP && !dvD && S.abrDruck && S.entwurf) ? S.abrDruck : null;
     const mvD = (!mdP && !dvD && !abrD && S.mvDruck && S.entwurf) ? mvListe(S.entwurf).find(x => x.id === S.mvDruck) : null;
-    document.body.classList.toggle("mandat-an", !!mdP || !!dvD || !!abrD || !!mvD);
+    const rlD = (!mdP && !dvD && !abrD && !mvD && S.rlDruck && S.entwurf) ? S.rlDruck : null;
+    document.body.classList.toggle("mandat-an", !!mdP || !!dvD || !!abrD || !!mvD || !!rlD);
+    if (rlD) {
+      $("#neu-knopf").hidden = true; $("#status").hidden = true; $("#lese-hinweis").hidden = true;
+      $("#ze").hidden = true; $("#vv").hidden = true; app.hidden = false;
+      app.innerHTML = ruecklageDruckHtml(S.entwurf, rlD);
+      window.scrollTo({ top: behalteScroll ? y : 0 });
+      return;
+    }
     if (mvD) {
       const eMv = (S.entwurf.einheitenListe || []).find(x => x.id === mvD.einheitId);
       if (eMv) {
@@ -7514,6 +7738,13 @@ const Objekte = (() => {
       clearTimeout(window.__abrT); window.__abrT = setTimeout(() => render(true), 900);
       return;
     }
+    if (t.dataset.rl) {
+      const o = S.entwurf; if (!o) return;
+      const [jahr, i, feld] = String(t.dataset.rl).split("|");
+      const z = rlEntnahmen(vermoegenVon(o, jahr))[Number(i)]; if (!z) return;
+      z[feld] = t.value; objektSichern(o);
+      clearTimeout(window.__rlT); window.__rlT = setTimeout(() => render(true), 600); return;
+    }
     if (t.dataset.vmtext) {
       const o = S.entwurf; if (!o) return;
       vermoegenVon(o, t.dataset.vmtext).gegenstaende = t.value; objektSichern(o); return;
@@ -7593,6 +7824,13 @@ const Objekte = (() => {
       const [i, feld] = String(nf ? t.dataset.nf : t.dataset.au).split("|");
       const x = (nf ? notfallListe(o) : aushangListe(o))[Number(i)]; if (!x) return;
       x[feld] = t.value; objektSichern(o); return;
+    }
+    if (t.dataset.obbankrl) {
+      const o = S.entwurf; if (!o) return;
+      if (!o.bankRl || typeof o.bankRl !== "object") o.bankRl = {};
+      o.bankRl[t.dataset.obbankrl] = t.dataset.obbankrl === "iban" ? Objekte.ibanFormat(t.value) : t.value;
+      if (t.dataset.obbankrl === "iban") ibanAuswerten(t);
+      objektSichern(o); return;
     }
     if (t.dataset.obbank) {
       const o = S.entwurf; if (!o) return;
@@ -7754,7 +7992,14 @@ const Objekte = (() => {
     /* Betrag im Wirtschaftsplan fertig eingegeben: Verteilung neu rechnen. */
     if (e.target.dataset && (e.target.dataset.wp || e.target.dataset.wprl)) { render(true); return; }
     /* Bankkonto des Objekts fertig eingegeben: Hinweise und Lastschriftteil auffrischen. */
-    if (e.target.dataset && (e.target.dataset.obbank || e.target.dataset.bz)) { render(true); return; }
+    /* Bankfelder: erst auffrischen, wenn der Nutzer den Block verlässt – sonst verschwindet
+       das nächste Feld unter der Maus, bevor er hineinklicken kann. */
+    if (e.target.dataset && (e.target.dataset.obbank || e.target.dataset.obbankrl || e.target.dataset.bz)) {
+      setTimeout(() => { const a2 = document.activeElement;
+        const drin = a2 && a2.dataset && (a2.dataset.obbank || a2.dataset.obbankrl || a2.dataset.bz);
+        if (!drin) render(true); }, 0);
+      return;
+    }
     /* Konto fertig bearbeitet: doppelte Nummer verhindern und die Änderung festhalten. */
     if (e.target.dataset && e.target.dataset.kk) {
       const [iT, feld] = e.target.dataset.kk.split("|");
@@ -7854,7 +8099,7 @@ const Objekte = (() => {
     if (!["loeschen", "hw-loeschen", "p-loeschen", "m-loeschen", "td-loeschen", "v-weg", "mail-weg", "dok-weg", "mail-loeschen", "abl-weg",
       "bh-fest", "za-weg", "kk-weg", "kr-weg", "kr-klasse-weg", "kr-leeren",
       "nf-weg", "au-weg", "dienst-weg", "lv-weg", "org-weg", "hon-weg", "bs-weg", "ko-weg", "zl-weg",
-      "mv-weg", "mvbs-weg", "mvst-weg", "mvs-weg", "abr-frei-alle-zu"].includes(act)) S.loeschen = false;
+      "mv-weg", "mvbs-weg", "mvst-weg", "mvs-weg", "abr-frei-alle-zu", "rl-weg"].includes(act)) S.loeschen = false;
     switch (act) {
       case "tab": S.tab = b.dataset.tab; S.ansicht = "liste"; S.entwurf = null; S.hwEntwurf = null; S.pEntwurf = null; S.tEntwurf = null; S.tEntwurfTicket = null; S.ticketOffen = null;
         S.vermOffen = null; S.mailOffenId = null; S.mailImport = null; render(); break;
@@ -8721,7 +8966,7 @@ const Objekte = (() => {
         const e = S.honEntwurf || {};
         if (!zahlD(e.betrag)) { toast("Bitte einen Betrag eintragen."); return; }
         honorarListe(o).push({ id: Objekte.neueId(), datum: e.datum || new Date().toISOString().slice(0, 10),
-          text: e.text || "Zusatzhonorar", betrag: e.betrag });
+          text: e.text || (e.art === "provision" ? "Provision Neuvermietung" : "Zusatzhonorar"), betrag: e.betrag, art: e.art || "" });
         S.honNeu = ""; S.honEntwurf = null;
         await objektSichern(o); render(true); toast("Zusatzhonorar gespeichert"); break;
       }
@@ -8884,6 +9129,20 @@ const Objekte = (() => {
       case "abr-drucken": { const o = S.entwurf; if (!o) return;
         S.abrDruck = { jahr: abrJahrVon(), einheitId: b.dataset.id || "", personId: b.dataset.wer || "" }; render(); break; }
       case "abr-zurueck": { S.abrDruck = null; S.objTab = "abrechnung"; render(); break; }
+      case "rl-neu": {
+        const o = S.entwurf; if (!o) return;
+        const v = vermoegenVon(o, b.dataset.jahr);
+        rlEntnahmen(v).push({ datum: "", zweck: "", betrag: "" });
+        await objektSichern(o); render(true); break;
+      }
+      case "rl-weg": {
+        const o = S.entwurf; if (!o) return;
+        const v = vermoegenVon(o, b.dataset.jahr); const i2 = Number(b.dataset.i);
+        if (S.loeschen !== "rl" + b.dataset.jahr + i2) { S.loeschen = "rl" + b.dataset.jahr + i2; render(true); return; }
+        rlEntnahmen(v).splice(i2, 1); S.loeschen = false; await objektSichern(o); render(true); break;
+      }
+      case "rl-drucken": S.rlDruck = Number(b.dataset.jahr); render(); break;
+      case "rl-zurueck": { S.rlDruck = null; S.objTab = "buchhaltung"; S.bhTab = "abrechnung"; render(); break; }
       case "abr-frei-alle": case "abr-frei-eine": {
         const o = S.entwurf; if (!o) return;
         const jahr = abrJahrVon(); const erg = abrechnungRechnen(o, jahr);
@@ -8918,7 +9177,8 @@ const Objekte = (() => {
         o.abrFreigaben = abrFreigaben(o).filter(x => String(x.jahr) !== jahr);
         S.loeschen = false; await objektSichern(o); render(true); toast("Alle Freigaben dieses Jahres zurückgenommen"); break;
       }
-      case "pt-abr": { S.ptAbr = { objektId: b.dataset.o, jahr: Number(b.dataset.jahr), einheitId: b.dataset.e || "", personId: b.dataset.wer || "" }; render(); break; }
+      case "pt-abr": { S.ptAbr = { objektId: b.dataset.o, jahr: Number(b.dataset.jahr), einheitId: b.dataset.e || "",
+        personId: b.dataset.wer || "", rl: b.dataset.rl === "1" }; render(); break; }
       case "pt-abr-zu": { S.ptAbr = null; render(); break; }
       /* ---------- Dienstleistungsverträge ---------- */
       case "dienst-neu": { const o = S.entwurf; if (!o) return;
@@ -11556,9 +11816,13 @@ const Pruefung = (() => {
         }
         if (b3.art === "rechnung") {
           rechnungsNummerVerbrauchen(b3.nummer);
+          let gebucht = false;
+          try { gebucht = !!(window.Objektdaten && window.Objektdaten.provisionBuchen &&
+            window.Objektdaten.provisionBuchen({ objektId: b3.objektId, einheitId: b3.einheitId,
+              nummer: b3.nummer, datum: b3.datum, netto: b3.netto })); } catch (x) { gebucht = false; }
           const zurueck = b3.objektId; S.brief = null; S.tab = "vertrag";
           if (window.Objektdaten && window.Objektdaten.zurueckZumObjekt) window.Objektdaten.zurueckZumObjekt(zurueck);
-          toast("Rechnung " + b3.nummer + " abgeschlossen"); break;
+          toast("Rechnung " + b3.nummer + " abgeschlossen" + (gebucht ? " – Provision im Umsatz gebucht" : "")); break;
         }
         if (b3.art === "vermieter") {
           S.brief = null; S.tab = "vertrag";
