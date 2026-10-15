@@ -494,6 +494,26 @@ a.btn{text-decoration:none;display:inline-block}
 .sam-zkopf,.sam-zrow{display:grid;grid-template-columns:minmax(130px,1fr) minmax(140px,1fr) 110px 104px 104px 112px 112px;gap:10px;align-items:center;font-size:13.5px;min-width:800px}
 .sam-zkopf{font-size:12px;color:var(--muted);padding:8px 2px 6px;border-bottom:1px solid var(--line)}
 .sam-zrow{padding:7px 2px;border-bottom:1px solid var(--line)}
+.org-zahl .org-karte{padding-right:12px}
+.org-wert{margin-left:auto;padding-left:14px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap;font-size:14.5px}
+.org-wert.org-leer{font-weight:400;color:var(--muted)}
+.org-karte.org-klick{cursor:pointer}
+.org-karte.org-klick:hover{border-color:var(--akzent)}
+.org-karte.org-an{border-color:var(--akzent);box-shadow:inset 0 0 0 1px var(--akzent)}
+.vkd-tab{margin-top:8px}
+.vkd-row{display:grid;grid-template-columns:minmax(240px,1.8fr) 160px minmax(170px,1fr);gap:12px;align-items:center;padding:10px 2px;border-bottom:1px solid var(--line);font-size:14px}
+.vkd-row select,.vkd-row input{padding:8px 10px;font-size:13.5px;width:100%}
+@media(max-width:820px){.vkd-row{grid-template-columns:1fr;gap:7px}}
+.nf-dienste{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px;margin-top:10px}
+.nf-dienst{display:flex;gap:10px;align-items:flex-start;background:var(--field);border:1px solid var(--line);border-radius:12px;padding:11px 13px;cursor:pointer;font-size:14px}
+.nf-dienst.aus{opacity:.55}
+.nf-dienst input{margin-top:3px;width:auto}
+.nf-plan{margin-top:10px}
+.nf-pzeile{display:grid;grid-template-columns:minmax(200px,1fr) 180px 150px;gap:12px;align-items:center;padding:10px 2px;border-bottom:1px solid var(--line);font-size:14.5px}
+.nf-pzeile .pt-nr{font-weight:600;font-variant-numeric:tabular-nums}
+@media(max-width:760px){.nf-pzeile{grid-template-columns:1fr auto}}
+.nf-druck td{padding:9px 6px}
+.nf-gross{font-size:19px;font-weight:700;white-space:nowrap;text-align:right}
 .liq-tab{margin-top:12px;overflow-x:auto}
 .liq-kopf,.liq-row{display:grid;grid-template-columns:minmax(130px,1fr) 118px 118px 118px 126px 136px;gap:10px;align-items:center;font-size:14px;min-width:700px}
 .liq-kopf{font-size:12px;color:var(--muted);padding:9px 2px 6px;border-bottom:1px solid var(--line)}
@@ -1339,7 +1359,7 @@ const Objekte = (() => {
     return bloecke.map(b => ({ ...mailLesen(b), roh: b }));
   }
   /* ---------- Vermarktung einer Einheit ---------- */
-  const VERM_STATUS = [["vermietet", "Vermietet"], ["frei", "Frei / wird frei"], ["inserat", "Inseriert"], ["reserviert", "Reserviert"]];
+  const VERM_STATUS = [["vermietet", "Vermietet"], ["frei", "Frei / wird frei"], ["inserat", "Inseriert"]];
   const AUSWEISARTEN = [["", "– bitte wählen –"], ["bedarf", "Bedarfsausweis"], ["verbrauch", "Verbrauchsausweis"]];
   const ENERGIETRAEGER = ["Gas", "Öl", "Fernwärme", "Wärmepumpe", "Pellets", "Strom", "Holz", "Solar"];
   const leereVermarktung = () => ({ status: "vermietet", freiAb: "", flaeche: "", kaltmiete: "", nebenkosten: "", heizkosten: "", kaution: "", zimmer: "", etage: "",
@@ -1605,23 +1625,10 @@ const Objekte = (() => {
   const aushangListe = o => Array.isArray(o.aushaenge) ? o.aushaenge : (o.aushaenge = []);
   const NOTFALL_ARTEN = ["Hausmeister", "Heizung und Sanitär", "Wasserschaden", "Strom", "Aufzug", "Schlüsseldienst", "Schornsteinfeger", "Verwaltung", "Polizei", "Feuerwehr"];
   function objektPortalHtml(o) {
-    const nf = notfallListe(o); const au = aushangListe(o);
+    const au = aushangListe(o);
     const heute = new Date().toISOString().slice(0, 10);
     const zugaenge = S.personen.filter(x => x.objektId === o.id && portalZugang(x)).length;
-    let h = "<section class='gruppe voll' style='margin-top:14px'><h2>Notfallnummern</h2>" +
-      "<p class='unter'>Diese Liste sehen alle Mieter und Eigentümer dieses Objekts in ihrem Portal. " +
-      "Tragen Sie ein, wen man außerhalb Ihrer Bürozeiten erreicht.</p>" +
-      "<div class='nf-kopf'><span>Wofür</span><span>Telefon</span><span>Hinweis</span><span></span></div>" +
-      nf.map((x, i) => "<div class='nf-zeile'>" +
-        "<input type='text' list='notfallarten' aria-label='Wofür' data-nf='" + i + "|was' value='" + esc(x.was || "") + "' placeholder='z. B. Heizung'>" +
-        "<input type='tel' aria-label='Telefon' data-nf='" + i + "|nummer' value='" + esc(x.nummer || "") + "' placeholder='0731 …'>" +
-        "<input type='text' aria-label='Hinweis' data-nf='" + i + "|hinweis' value='" + esc(x.hinweis || "") + "' placeholder='z. B. nur bei akutem Schaden'>" +
-        "<button type='button' class='e-weg' data-act='nf-weg' data-i='" + i + "' aria-label='Zeile entfernen'>" +
-        (S.loeschen === "nf" + i ? "↺?" : "×") + "</button></div>").join("") +
-      (nf.length ? "" : "<p class='unter' style='margin:8px 0 0'>Noch keine Nummer eingetragen.</p>") +
-      "<div class='leiste'><div><button class='btn klein haupt' data-act='nf-neu'>+ Nummer hinzufügen</button>" +
-      "<span class='fuer'>Die Reihenfolge ist die Reihenfolge im Portal.</span></div></div></section>";
-
+    let h = "";
     h += "<section class='gruppe voll'><h2>Aushänge</h2>" +
       "<p class='unter'>Mitteilungen an alle im Haus – wie der Zettel im Treppenhaus, nur dass ihn niemand abreißt. " +
       "Mit Datum „sichtbar bis“ verschwindet der Aushang von selbst.</p>" +
@@ -1640,7 +1647,8 @@ const Objekte = (() => {
       "<p class='unter'>Den Zugang vergeben Sie beim einzelnen Mieter oder Eigentümer unter „Portal“.</p>" +
       "<p class='unter'><strong>" + zugaenge + "</strong> von " + S.personen.filter(x => x.objektId === o.id).length +
       " Personen dieses Objekts haben einen Portalzugang.</p>" +
-      "<ul class='meldungen'><li class='m-hinweis'>Das Portal zeigt ausschließlich Notfallnummern, Aushänge und die Schreiben, die Sie der jeweiligen Person freigegeben haben. " +
+      "<ul class='meldungen'><li class='m-hinweis'>Die Notfallnummern tragen Sie in den Stammdaten dieses Objekts ein – Dienstleister mit laufendem Vertrag kommen von selbst dazu.</li>" +
+      "<li class='m-hinweis'>Das Portal zeigt ausschließlich Notfallnummern, Aushänge und die Schreiben, die Sie der jeweiligen Person freigegeben haben. " +
       "Buchhaltung, andere Mieter und Objektdaten sind dort nicht zu sehen.</li></ul></section>";
     h += beiratPortalHtml(o);
     return h;
@@ -2445,7 +2453,52 @@ const Objekte = (() => {
       erstellt: new Date().toISOString() };
   }
   const orgInitialen = t => String(t || "").trim().split(/\s+/).slice(0, 2).map(w => w[0] || "").join("").toUpperCase();
-  function orgKarteHtml(k, admin) {
+  /* ---------- Organigramm mit Zahlen ----------
+     Der Baum zeigt, wer wo sitzt. Zusammen mit der Zahl des gerade gewählten Reiters zeigt er
+     auch, wie viel bei wem liegt – Leerstand, Rückstand, Umsatz, offene Abrechnungen. */
+  function awZahlJeMa(tab) {
+    const je = {}, setz = (id, n) => { if (!id) return; je[id] = cent((je[id] || 0) + n); };
+    const jahr = S.awJahr || new Date().getFullYear();
+    if (tab === "leerstand") { leerstandListe().forEach(x => setz(x.wer, 1));
+      return { je, art: "zahl", label: "leere Einheiten" }; }
+    if (tab === "rueckstand") { rueckstandListe().forEach(x => setz(x.wer, x.rest));
+      return { je, art: "euro", label: "Rückstand" }; }
+    if (tab === "op") { opDebitoren().forEach(x => setz(objBetreuer(x.o)[0] || "", x.offen));
+      return { je, art: "euro", label: "offene Forderungen" }; }
+    if (tab === "zahllauf") {
+      (S.liste || []).filter(o => !o.beendet).forEach(o => ueberweisungen(o)
+        .filter(x => x.status !== "bezahlt" && betragZahl(x.betrag) > 0)
+        .forEach(x => setz(objBetreuer(o)[0] || "", betragZahl(x.betrag))));
+      return { je, art: "euro", label: "offene Zahlungen" }; }
+    if (tab === "umsatz") { umsatzZeilen(jahr).forEach(x => setz(x.wer, x.jahr + x.zusatz + x.provision));
+      return { je, art: "euro", label: "Umsatz " + jahr }; }
+    if (tab === "abrechnung") {
+      const j2 = S.awJahr || (new Date().getFullYear() - 1);
+      awObjekte().filter(o => ["miet", "weg", "garantie"].includes(o.art)).forEach(o => {
+        if (!abrFertig(abrStand(o, j2))) setz(objBetreuer(o)[0] || "", 1); });
+      return { je, art: "zahl", label: "offene Abrechnungen " + j2 }; }
+    auslastung().forEach(x => setz(x.m.id, x.einheiten));
+    return { je, art: "zahl", label: "betreute Einheiten" };
+  }
+  const awZahlText = (z, id) => {
+    const w = z.je[id];
+    if (w === undefined) return "";
+    if (z.art === "euro") return Math.abs(w) < 0.005 ? "0 €" : eur2(w) + " €";
+    return String(w);
+  };
+  /* Das Organigramm unter jedem Auswertungsreiter – mit der Zahl des Reiters je Person. */
+  function awOrgHtml(tab) {
+    if (!orgListe().length) return "";
+    const z = awZahlJeMa(tab);
+    const wurzeln = orgKinder("");
+    const summe = Object.values(z.je).reduce((n, x) => n + x, 0);
+    return "<section class='gruppe voll'><h2>Organigramm <span class='fuer'>" + esc(z.label) + "</span></h2>" +
+      "<p class='unter'>Bei jeder Person steht, was in diesem Reiter auf sie entfällt. " +
+      "Ein Klick auf eine Person filtert die Liste oben." + (summe ? " Zusammen: " +
+        esc(z.art === "euro" ? eur2(summe) + " €" : String(summe)) + "." : "") + "</p>" +
+      "<div class='org org-zahl'><ul>" + wurzeln.map(k => orgKnotenHtml(k, 0, false, z)).join("") + "</ul></div></section>";
+  }
+  function orgKarteHtml(k, admin, zahlen) {
     const m = k.mitarbeiterId ? S.team.find(x => x.id === k.mitarbeiterId) : null;
     const name = m ? Objekte.mitarbeiterName(m) : "";
     const titel = k.titel || name || "Neuer Kasten";
@@ -2458,12 +2511,16 @@ const Objekte = (() => {
         "<div class='org-werkzeug'><button class='btn klein haupt' data-act='org-fertig'>Fertig</button>" +
         "<button class='btn klein gefahr' data-act='org-weg' data-id='" + esc(k.id) + "'>" + (S.loeschen === "org" + k.id ? "Wirklich?" : "Löschen") + "</button></div></div>";
     }
-    let h = "<div class='org-karte" + (m ? " person" : "") + "'>" +
+    const wert = (zahlen && m) ? awZahlText(zahlen, m.id) : "";
+    const anKlick = (zahlen && m) ? " data-act='aw-wer' data-wert='" + esc(m.id) + "' role='button' tabindex='0'" : "";
+    let h = "<div class='org-karte" + (m ? " person" : "") + (zahlen && m ? " org-klick" : "") +
+      (zahlen && m && S.awWer === m.id ? " org-an" : "") + "'" + anKlick + ">" +
       "<span class='org-kreis'>" + esc(orgInitialen(name || titel) || "·") + "</span>" +
       "<span class='org-text'><strong>" + esc(titel) + "</strong>" +
       (m && k.titel ? "<span class='org-person'>" + esc(name) + "</span>" : "") +
       (m && m.funktion && !k.titel ? "<span class='org-person'>" + esc(m.funktion) + "</span>" : "") +
-      (k.untertitel ? "<span class='fuer'>" + esc(k.untertitel) + "</span>" : "") + "</span>";
+      (k.untertitel ? "<span class='fuer'>" + esc(k.untertitel) + "</span>" : "") + "</span>" +
+      (zahlen && m ? "<span class='org-wert" + (wert === "" ? " org-leer" : "") + "'>" + esc(wert === "" ? "–" : wert) + "</span>" : "");
     if (admin) h += "<span class='org-werkzeug'>" +
       "<button class='btn klein' data-act='org-neu' data-id='" + esc(k.id) + "' title='Kasten darunter anhängen'>+</button>" +
       "<button class='btn klein' data-act='org-hoch' data-id='" + esc(k.id) + "' title='nach links'>‹</button>" +
@@ -2472,10 +2529,10 @@ const Objekte = (() => {
       "<button class='btn klein' data-act='org-edit' data-id='" + esc(k.id) + "' title='ändern'>✎</button></span>";
     return h + "</div>";
   }
-  function orgKnotenHtml(k, tief, admin) {
+  function orgKnotenHtml(k, tief, admin, zahlen) {
     const kinder = orgKinder(k.id);
-    return "<li>" + orgKarteHtml(k, admin) +
-      (kinder.length && tief < 8 ? "<ul>" + kinder.map(x => orgKnotenHtml(x, tief + 1, admin)).join("") + "</ul>" : "") + "</li>";
+    return "<li>" + orgKarteHtml(k, admin, zahlen) +
+      (kinder.length && tief < 8 ? "<ul>" + kinder.map(x => orgKnotenHtml(x, tief + 1, admin, zahlen)).join("") + "</ul>" : "") + "</li>";
   }
   function organigrammHtml() {
     const admin = istAdmin();
@@ -2656,6 +2713,7 @@ const Objekte = (() => {
     h += awWerHtml();
     h += "<section class='gruppe'>" + (tab === "leerstand" ? leerstandHtml() : tab === "rueckstand" ? awRueckstandHtml()
       : tab === "op" ? opHtml() : tab === "zahllauf" ? sammelHtml() : tab === "umsatz" ? umsatzHtml() : tab === "abrechnung" ? abrechnungenHtml() : teamLastHtml()) + "</section>";
+    h += awOrgHtml(tab);
     return h + "</div>";
   }
   /* ================= Abrechnung: WEG-Jahresabrechnung (§ 28 WEG) und
@@ -3358,6 +3416,7 @@ const Objekte = (() => {
     return h + "</div>";
   }
   function objektAnsichtHtml(o) {
+    if (S.nfDruck === o.id) return "<div class='seite'>" + notfallDruckHtml(o) + "</div>";
     const weg = o.art === "weg"; const liste = o.einheitenListe || []; const summe = Objekte.meaSumme(liste);
     const zeile = (l, w) => w ? "<div class='ue-zeile'><span class='ue-l'>" + l + "</span><span class='ue-w'>" + w + "</span></div>" : "";
     const betreuung = betreuerNamen(o); const h2 = t => "<h2>" + t + "</h2>";
@@ -3416,6 +3475,17 @@ const Objekte = (() => {
         "<div class='we-chips'>" + liste.map(e => "<button type='button' class='we-chip" + (offenE && e.id === offenE.id ? " an" : "") + "' data-act='ue-einheit' data-id='" + esc(e.id) + "'>" + esc(e.nr || e.art) + "</button>").join("") + "</div>" +
         (offenE ? einheitAnsichtHtml(o, offenE) : "<p class='unter' style='margin:10px 0 0'>Einheit antippen, um alle Angaben zu sehen.</p>") + "</section>";
     }
+    h += notfallAnsichtHtml(o);
+    (() => { const a = schlAnlage(o), liste = schlListe(o);
+      const ges = liste.reduce((n, x) => n + (Number(x.anzahl) || 1), 0);
+      const drau = liste.filter(x => x.ausgabe && !x.rueckgabe).reduce((n, x) => n + (Number(x.anzahl) || 1), 0);
+      if (!a.hersteller && !a.nummer && !a.karte && !a.nachbestellung && !ges) return;
+      h += "<section class='gruppe'>" + h2("Schließanlage") +
+        zeile("Hersteller", esc(a.hersteller || "–")) + zeile("Anlagennummer", esc(a.nummer || "–")) +
+        zeile("Sicherungskarte bei", esc(a.karte || "–")) + zeile("Nachbestellung über", esc(a.nachbestellung || "–")) +
+        zeile("Schlüssel", ges + " erfasst · " + drau + " ausgegeben") +
+        "<div class='leiste'><div><button class='btn klein' data-act='obj-tab' data-wert='gebaeude'>Schlüsselausgabe</button></div></div></section>";
+    })();
     if (anlagen.length) h += "<section class='gruppe'>" + h2("Technische Anlagen <span class='fuer'>" + anlagen.length + "</span>") + "<ul class='ue-liste'>" +
       anlagen.map(a => { const hw = S.handwerker.find(x => x.id === a.handwerkerId);
         return "<li><strong>" + esc(a.art || "Anlage") + "</strong>" + (a.standort ? " · " + esc(a.standort) : "") +
@@ -3606,6 +3676,131 @@ const Objekte = (() => {
       "damit es beim nächsten Schaden nicht wieder nachgeschlagen werden muss. Im Zweifel gilt die Urkunde.</li></ul>";
     return h + "</section>";
   }
+  /* ---------- Notfallnummernplan ----------
+     Die selbst eingetragenen Nummern und die Dienstleister mit laufendem Vertrag ergeben
+     zusammen einen Plan. Hausmeister und Winterdienst sind nachts die Nummern, die wirklich
+     gebraucht werden – deshalb kommen sie von selbst mit, ohne doppelte Pflege. */
+  const nfAusListe = o => Array.isArray(o.notfallAus) ? o.notfallAus : (o.notfallAus = []);
+  function notfallAusDiensten(o) {
+    return diensteListe(o).filter(dienstAktiv).map(d => {
+      const hw = d.handwerkerId ? S.handwerker.find(x => x.id === d.handwerkerId) : null;
+      const nummer = String((hw && hw.notfall) || d.telefon || (hw && hw.telefon) || "").trim();
+      return { quelle: "dienst", id: d.id, was: dienstArtName(d.art), nummer,
+        firma: String(d.firma || (hw && hw.firma) || "").trim(),
+        hinweis: [String(d.firma || (hw && hw.firma) || "").trim(),
+          d.ansprechpartner ? String(d.ansprechpartner).trim() : "",
+          (hw && hw.notfall) ? "Notfallnummer" : ""].filter(Boolean).join(" · "),
+        aus: nfAusListe(o).includes(d.id) };
+    }).filter(x => x.nummer);
+  }
+  /* Der fertige Plan, so wie ihn Mieter und Eigentümer sehen. */
+  function notfallPlan(o) {
+    const eigen = notfallListe(o).filter(x => String(x.nummer || "").trim())
+      .map(x => ({ quelle: "eigen", was: x.was || "Notruf", nummer: String(x.nummer).trim(), hinweis: x.hinweis || "" }));
+    const nur = n => String(n).replace(/[^0-9+]/g, "");
+    const schon = new Set(eigen.map(x => nur(x.nummer)));
+    const dienste = notfallAusDiensten(o).filter(x => !x.aus && !schon.has(nur(x.nummer)));
+    return eigen.concat(dienste);
+  }
+  function notfallHtml(o) {
+    const nf = notfallListe(o);
+    const dienste = notfallAusDiensten(o);
+    const plan = notfallPlan(o);
+    let h = "<section class='gruppe voll'><h2>Notfallnummern</h2>" +
+      "<p class='unter'>Wen erreicht man außerhalb Ihrer Bürozeiten? Diese Liste sehen alle Mieter und Eigentümer " +
+      "dieses Objekts in ihrem Portal, und sie lässt sich als Aushang fürs Treppenhaus drucken.</p>" +
+      "<div class='nf-kopf'><span>Wofür</span><span>Telefon</span><span>Hinweis</span><span></span></div>" +
+      nf.map((x, i) => "<div class='nf-zeile'>" +
+        "<input type='text' list='notfallarten' aria-label='Wofür' data-nf='" + i + "|was' value='" + esc(x.was || "") + "' placeholder='z. B. Heizung'>" +
+        "<input type='tel' aria-label='Telefon' data-nf='" + i + "|nummer' value='" + esc(x.nummer || "") + "' placeholder='0731 …'>" +
+        "<input type='text' aria-label='Hinweis' data-nf='" + i + "|hinweis' value='" + esc(x.hinweis || "") + "' placeholder='z. B. nur bei akutem Schaden'>" +
+        "<button type='button' class='e-weg' data-act='nf-weg' data-i='" + i + "' aria-label='Zeile entfernen'>" +
+        (S.loeschen === "nf" + i ? "↺?" : "×") + "</button></div>").join("") +
+      (nf.length ? "" : "<p class='unter' style='margin:8px 0 0'>Noch keine eigene Nummer eingetragen.</p>") +
+      "<div class='leiste'><div><button class='btn klein haupt' data-act='nf-neu'>+ Nummer hinzufügen</button>" +
+      (plan.length ? "<button class='btn klein' data-act='nf-drucken'>Aushang drucken</button>" : "") +
+      "</div><span class='fuer'>Die Reihenfolge ist die Reihenfolge im Portal.</span></div>";
+    h += "<h3 style='margin-top:20px'>Aus den Dienstleistungsverträgen <span class='fuer'>" + dienste.length + "</span></h3>" +
+      "<p class='unter'>Jeder laufende Vertrag mit einer Rufnummer kommt automatisch auf den Plan. " +
+      "Hinterlegen Sie beim Handwerker eine Notfallnummer, wird diese bevorzugt. Einzelne lassen sich hier abschalten.</p>";
+    h += dienste.length ? "<div class='nf-dienste'>" + dienste.map(x =>
+      "<label class='nf-dienst" + (x.aus ? " aus" : "") + "'>" +
+      "<input type='checkbox' data-nfd='" + esc(x.id) + "'" + (x.aus ? "" : " checked") + ">" +
+      "<span><strong>" + esc(x.was) + "</strong> · " + esc(x.nummer) +
+      (x.hinweis ? "<br><span class='fuer'>" + esc(x.hinweis) + "</span>" : "") + "</span></label>").join("") + "</div>"
+      : "<p class='unter'>Keiner Ihrer laufenden Verträge hat eine Rufnummer. Tragen Sie sie unter „Dienstleister“ beim jeweiligen Vertrag ein.</p>";
+    h += "<h3 style='margin-top:20px'>So sieht der Plan aus <span class='fuer'>" + plan.length + "</span></h3>";
+    h += plan.length ? "<div class='nf-plan'>" + plan.map(x => "<div class='nf-pzeile'>" +
+      "<span><strong>" + esc(x.was) + "</strong>" + (x.hinweis ? "<br><span class='fuer'>" + esc(x.hinweis) + "</span>" : "") + "</span>" +
+      "<span class='pt-nr'>" + esc(x.nummer) + "</span>" +
+      "<span class='fuer'>" + (x.quelle === "dienst" ? "aus dem Vertrag" : "selbst eingetragen") + "</span></div>").join("") + "</div>"
+      : "<p class='unter'>Der Plan ist noch leer – im Portal steht dann der Hinweis, sich an die Verwaltung zu wenden.</p>";
+    h += "<ul class='meldungen'><li class='m-hinweis'>Bei Gefahr für Leib und Leben gelten 112 und 110. " +
+      "Der Plan ersetzt keine Rufbereitschaft – vereinbaren Sie mit Hausmeister und Notdiensten ausdrücklich, " +
+      "wann sie erreichbar sind, und halten Sie das im Vertrag fest.</li></ul>";
+    return h + "</section>";
+  }
+  /* Kurzfassung für die Objektansicht. */
+  function notfallAnsichtHtml(o) {
+    const plan = notfallPlan(o);
+    let h = "<section class='gruppe voll'><h2>Notfallnummern <span class='fuer'>" + plan.length + "</span></h2>";
+    if (!plan.length) return h + "<p class='unter'>Noch keine Nummer hinterlegt. Tragen Sie unter „Bearbeiten“ ein, " +
+      "wen die Bewohner außerhalb Ihrer Bürozeiten erreichen.</p>" +
+      "<div class='leiste'><div><button class='btn klein' data-act='bearbeiten'>Eintragen</button></div></div></section>";
+    h += "<div class='nf-plan'>" + plan.map(x => "<div class='nf-pzeile'>" +
+      "<span><strong>" + esc(x.was) + "</strong>" + (x.hinweis ? "<br><span class='fuer'>" + esc(x.hinweis) + "</span>" : "") + "</span>" +
+      "<span class='pt-nr'><a href='tel:" + esc(tel(x.nummer)) + "'>" + esc(x.nummer) + "</a></span>" +
+      "<span class='fuer'>" + (x.quelle === "dienst" ? "aus dem Vertrag" : "selbst eingetragen") + "</span></div>").join("") + "</div>";
+    return h + "<div class='leiste'><div><button class='btn klein' data-act='nf-drucken'>Aushang drucken</button>" +
+      "<button class='btn klein' data-act='bearbeiten'>Ändern</button></div></div></section>";
+  }
+  /* Ein Blatt zum Aufhängen im Treppenhaus. */
+  function notfallDruckHtml(o) {
+    const plan = notfallPlan(o);
+    const vw = (() => { try { return window.Firmendaten ? window.Firmendaten.daten() : {}; } catch (e) { return {}; } })();
+    let h = "<div class='md-werkzeug'><div><button class='btn klein' data-act='nf-druck-zu'>‹ Zurück</button>" +
+      "<button class='btn klein haupt' data-act='mandat-drucken'>Drucken / als PDF speichern</button></div></div>";
+    h += "<div class='md-blatt'><header class='md-kopf'>" +
+      (vw.logo ? "<img class='md-logo' src='" + esc(vw.logo) + "' alt='" + esc(vw.name || "Logo") + "'>"
+        : "<div class='md-firma'>" + esc(vw.name || "Hausverwaltung") + "</div>") +
+      "<div class='fuer'>" + esc(Objekte.datum(isoTag(new Date()))) + "</div></header>";
+    h += "<h1>Wichtige Rufnummern</h1><p class='md-art'>" + esc(objName(o)) +
+      (o.strasse ? " · " + esc([o.strasse, [o.plz, o.ort].filter(Boolean).join(" ")].filter(Boolean).join(", ")) : "") + "</p>";
+    h += "<table class='lv-tab abr-tab nf-druck'><tbody>" +
+      "<tr><td><strong>Feuerwehr und Rettungsdienst</strong></td><td class='nf-gross'>112</td></tr>" +
+      "<tr><td><strong>Polizei</strong></td><td class='nf-gross'>110</td></tr>" +
+      plan.map(x => "<tr><td><strong>" + esc(x.was) + "</strong>" +
+        (x.hinweis ? "<br><span class='fuer'>" + esc(x.hinweis) + "</span>" : "") + "</td>" +
+        "<td class='nf-gross'>" + esc(x.nummer) + "</td></tr>").join("") +
+      (vw.telefon ? "<tr><td><strong>Hausverwaltung</strong><br><span class='fuer'>" + esc(vw.name || "") +
+        "</span></td><td class='nf-gross'>" + esc(vw.telefon) + "</td></tr>" : "") +
+      "</tbody></table>";
+    h += "<p class='md-fuss'>Bei Gefahr für Menschen zuerst 112 oder 110 wählen. " +
+      "Bitte diesen Aushang nicht entfernen. Stand " + esc(Objekte.datum(isoTag(new Date()))) + ".</p>";
+    return h + "</div>";
+  }
+  /* Die Schließanlage selbst gehört zu den Stammdaten des Hauses – die Ausgabe einzelner
+     Schlüssel bleibt im Reiter „Gebäude“, weil sie laufend bearbeitet wird. */
+  function schliessanlageHtml(o) {
+    const a = schlAnlage(o), liste = schlListe(o);
+    const ges = liste.reduce((n, x) => n + (Number(x.anzahl) || 1), 0);
+    const draussen = liste.filter(x => x.ausgabe && !x.rueckgabe).reduce((n, x) => n + (Number(x.anzahl) || 1), 0);
+    const f = (feld, label, hilfe) => "<div class='feld'><label for='sa-" + feld + "'>" + esc(label) + "</label>" +
+      "<input type='text' id='sa-" + feld + "' data-sa='" + feld + "' value='" + esc(a[feld] || "") + "'>" +
+      (hilfe ? "<small>" + esc(hilfe) + "</small>" : "") + "</div>";
+    return "<section class='gruppe voll'><h2>Schließanlage</h2>" +
+      "<p class='unter'>Bei einer geschlossenen Anlage öffnet ein Schlüssel mehrere Türen. Geht einer verloren, " +
+      "kann der Austausch der ganzen Anlage nötig werden – deshalb gehören Hersteller, Anlagennummer und der Ort " +
+      "der Sicherungskarte hierher, wo sie nicht verloren gehen.</p>" +
+      "<div class='felder'>" + f("hersteller", "Hersteller") + f("nummer", "Anlagennummer") +
+      f("karte", "Sicherungskarte bei", "Ohne Sicherungskarte gibt der Hersteller keine Nachschlüssel heraus.") +
+      f("nachbestellung", "Nachbestellung über") + "</div>" +
+      "<p class='unter' style='margin-top:14px'><strong>" + ges + "</strong> Schlüssel erfasst, davon <strong>" + draussen +
+      "</strong> ausgegeben. Wer welchen Schlüssel hat, steht unter „Gebäude → Schlüssel“ – dort wird auch ausgegeben und zurückgenommen.</p>" +
+      (a.karte ? "" : "<ul class='meldungen'><li class='m-hinweis'>Die Sicherungskarte ist noch nicht hinterlegt. " +
+        "Ohne sie bekommen Sie beim Hersteller keinen Nachschlüssel – halten Sie fest, wo sie liegt.</li></ul>") +
+      "</section>";
+  }
   function formularHtml() {
     const o = S.entwurf; const weg = o.art === "weg"; const p = Objekte.pruefen(o);
     let h = "<div class='seite'><div class='hero'><h1>" + (S.istNeu ? "Neues Objekt" : esc(objName(o))) + "</h1><p>" +
@@ -3642,6 +3837,7 @@ const Objekte = (() => {
       "<datalist id='energietraeger'>" + Objekte.ENERGIETRAEGER.map(x => "<option value='" + esc(x) + "'>").join("") + "</datalist></section>";
     h += "<section class='gruppe voll'><h2>Notizen</h2><p class='unter'>Platz für alles Allgemeine zum Objekt: Absprachen, Besonderheiten, Zugänge, Schlüssel.</p>" +
       "<div class='feld'><label for='f-notizen' class='nur-lesbar-label'>Allgemeine Notizen</label><textarea id='f-notizen' data-f='notizen' style='min-height:150px' placeholder='z. B. Müllabfuhr dienstags, Schlüsseltresor Code beim Beirat, Zufahrt über Hinterhof'>" + esc(o.notizen) + "</textarea></div></section>";
+    h += notfallHtml(o) + schliessanlageHtml(o);
     h += einheitenHtml(o) + umlageHtml(o) + eigentumHtml(o) + dokumenteHtml(o);
     h += "<section class='gruppe voll'><h2>Technische Anlagen</h2><p class='unter'>Aufzug, Heizung, Rauchwarnmelder & Co. – mit zuständigem Handwerker und Prüftermin. Fällige Termine erscheinen automatisch in der Übersicht.</p>" +
       (o.anlagen || []).map(anlageHtml).join("") + "<button class='btn klein' data-act='anlage-neu'>+ Technische Anlage hinzufügen</button></section>";
@@ -3813,15 +4009,22 @@ const Objekte = (() => {
 
   /* ---------- Handwerker ---------- */
   function zustaendig(id) { const aus = []; S.liste.forEach(o => (o.anlagen || []).forEach(a => { if (a.handwerkerId === id) aus.push((a.art || "Anlage") + " · " + objName(o)); })); return aus; }
-  function bankverzeichnisHtml() {
+  /* Das Bankleitzahlen-Verzeichnis der Bundesbank gehört in die Einstellungen – es wird einmal
+     im Quartal gepflegt und geht alle Bereiche an, nicht nur die Handwerker. */
+  function bankverzeichnisHtml(immer) {
     const i = Bank.info();
-    /* Nur zeigen, wenn noch nichts geladen ist oder das Verzeichnis älter als 100 Tage ist (Bundesbank aktualisiert vierteljährlich). */
-    if (i && (Date.now() - new Date(i.hochgeladen).getTime()) < 100 * 864e5) return "";
-    return "<section class='gruppe bankverz'><h2>Bankverzeichnis</h2><p class='unter'>Damit aus der IBAN automatisch BIC und Bank ermittelt werden, nutzt das Tool das offizielle Bankleitzahlen-Verzeichnis der Deutschen Bundesbank. Es wird viermal im Jahr aktualisiert (März, Juni, September, Dezember).</p>" +
-      "<p class='bank-stand'>" + (i ? "<strong>Bitte aktualisieren – geladen:</strong> " + Number(i.anzahl).toLocaleString("de-DE") + " Banken · Stand " + new Date(i.hochgeladen).toLocaleDateString("de-DE") : "<strong>Noch nicht geladen.</strong>") + "</p>" +
+    const alt = !i || (Date.now() - new Date(i.hochgeladen).getTime()) >= 100 * 864e5;
+    if (!immer && !alt) return "";
+    return "<section class='gruppe bankverz'><h2>Bankverzeichnis</h2><p class='unter'>Damit aus der IBAN automatisch BIC und Bank ermittelt werden, nutzt das Programm das offizielle Bankleitzahlen-Verzeichnis der Deutschen Bundesbank. Es wird viermal im Jahr aktualisiert (März, Juni, September, Dezember).</p>" +
+      "<p class='bank-stand'>" + (i
+        ? (alt ? "<strong>Bitte aktualisieren – geladen:</strong> " : "<strong>Geladen:</strong> ") +
+          Number(i.anzahl).toLocaleString("de-DE") + " Banken · Stand " + new Date(i.hochgeladen).toLocaleDateString("de-DE")
+        : "<strong>Noch nicht geladen.</strong>") + "</p>" +
       "<ol><li>Seite <a href='" + BUBA_LINK + "' target='_blank' rel='noopener'>Bankleitzahlen-Download der Bundesbank</a> öffnen.</li>" +
       "<li>Die aktuelle Bankleitzahlendatei im Format <strong>TXT</strong> oder <strong>CSV</strong> (ungepackt) herunterladen.</li><li>Die Datei hier auswählen – fertig.</li></ol>" +
-      "<input type='file' id='bank-datei' accept='.txt,.csv,text/plain,text/csv'></section>";
+      "<input type='file' id='bank-datei' accept='.txt,.csv,text/plain,text/csv'>" +
+      (alt ? "" : "<p class='unter' style='margin-top:10px'>Eine neue Datei ersetzt die alte vollständig. Bis zur nächsten Aktualisierung der Bundesbank ist nichts zu tun.</p>") +
+      "</section>";
   }
   /* ---------- Eigentümer und Mieter ---------- */
   const objTitel = id => { const o = S.liste.find(x => x.id === id); return o ? objName(o) : ""; };
@@ -4385,8 +4588,21 @@ const Objekte = (() => {
         zugangBlockHtml(m) + arbeitszeitBlockHtml(m) +
         "<div id='m-meldung'></div><div class='leiste'><div><button class='btn haupt' data-act='m-speichern'>Speichern</button><button class='btn' data-act='m-abbrechen'>Abbrechen</button></div></div></section>";
     }
-    if (!S.team.length && !S.tEntwurf) return h + "<div class='leer'><h2>Noch keine Mitarbeiter</h2><p>Legen Sie Ihr Team an, damit Sie Objekte zuordnen können.</p><button class='btn haupt' data-act='neu'>+ Mitarbeiter</button></div></div>";
-    return h + "<div class='hw-raster'>" + S.team.slice().sort((a, b) => Objekte.mitarbeiterName(a).localeCompare(Objekte.mitarbeiterName(b), "de")).map(m => {
+    if (!S.team.length && !S.tEntwurf) return h + "<div class='leer'><h2>Noch keine Mitarbeiter</h2><p>Legen Sie Ihr Team an, damit Sie Objekte zuordnen können.</p><button class='btn haupt' data-act='neu'>+ Mitarbeiter</button></div>" + organigrammHtml() + "</div>";
+    /* Nach Jobbezeichnung filtern – praktisch, sobald mehrere Leute dasselbe machen. */
+    const jobs = [...new Set(S.team.map(m => String(m.funktion || "").trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b, "de"));
+    const ohneJob = S.team.filter(m => !String(m.funktion || "").trim()).length;
+    const jobAktiv = S.mJob && (jobs.includes(S.mJob) || S.mJob === "ohne") ? S.mJob : "";
+    const passt = m => !jobAktiv || (jobAktiv === "ohne" ? !String(m.funktion || "").trim() : String(m.funktion || "").trim() === jobAktiv);
+    const sicht = S.team.filter(passt);
+    if (jobs.length || ohneJob) h += "<div class='kal-wer'>" +
+      "<button type='button' class='pille" + (jobAktiv ? "" : " an") + "' data-act='m-job' data-wert=''>Alle <span class='fuer'>" + S.team.length + "</span></button>" +
+      jobs.map(j => "<button type='button' class='pille" + (jobAktiv === j ? " an" : "") + "' data-act='m-job' data-wert='" + esc(j) + "'>" +
+        esc(j) + " <span class='fuer'>" + S.team.filter(m => String(m.funktion || "").trim() === j).length + "</span></button>").join("") +
+      (ohneJob ? "<button type='button' class='pille" + (jobAktiv === "ohne" ? " an" : "") + "' data-act='m-job' data-wert='ohne'>ohne Bezeichnung <span class='fuer'>" + ohneJob + "</span></button>" : "") +
+      "</div>";
+    if (!sicht.length) return h + "<p class='unter'>Für diese Jobbezeichnung gibt es niemanden.</p>" + organigrammHtml() + "</div>";
+    return h + "<div class='hw-raster'>" + sicht.slice().sort((a, b) => Objekte.mitarbeiterName(a).localeCompare(Objekte.mitarbeiterName(b), "de")).map(m => {
       const objekte = S.liste.filter(o => !o.beendet && ((o.betreuerIds || [o.betreuerId]).includes(m.id) || o.buchhaltungId === m.id || o.technikId === m.id));
       return "<div class='hw-karte" + (m.ausgeschieden ? " beendet" : "") + "'>" + (m.funktion ? "<span class='gewerk'>" + esc(m.funktion) + (m.ausgeschieden ? " · ausgeschieden" : "") + "</span>" : "") +
         "<h3>" + esc(Objekte.mitarbeiterName(m)) + "</h3>" +
@@ -4395,7 +4611,7 @@ const Objekte = (() => {
         "<div class='zust'>" + (objekte.length ? "Zuständig für " + objekte.length + (objekte.length === 1 ? " Objekt: " : " Objekte: ") + objekte.map(o => esc(objName(o))).join(", ") : "Noch keinem Objekt zugeordnet") + "</div>" +
         "<div class='aktionen'><button class='btn klein' data-act='m-bearbeiten' data-id='" + esc(m.id) + "'>Bearbeiten</button><button class='btn klein gefahr' data-act='m-loeschen' data-id='" + esc(m.id) + "'>" +
         (S.loeschen === m.id ? "Wirklich löschen?" : "Löschen") + "</button></div></div>";
-    }).join("") + "</div></div>";
+    }).join("") + "</div>" + organigrammHtml() + "</div>";
   }
   async function teamSichern(m) {
     const i = S.team.findIndex(x => x.id === m.id); if (i >= 0) S.team[i] = m; else S.team.push(m);
@@ -4802,7 +5018,7 @@ const Objekte = (() => {
     }
     const o = portalObjekt(p);
     const heute = new Date().toISOString().slice(0, 10);
-    const nf = o ? notfallListe(o).filter(x => String(x.nummer || "").trim()) : [];
+    const nf = o ? notfallPlan(o) : [];
     const au = o ? aushangListe(o).filter(x => (!x.bis || x.bis >= heute) && (x.titel || x.text)) : [];
     const dateien = portalDateien(p);
     let h = vorschau
@@ -6091,18 +6307,127 @@ const Objekte = (() => {
       : "<div class='leer'><h2>Keine Einheit im Verkauf</h2><p>Nehmen Sie oben eine Einheit auf, um Kaufpreis, Unterlagen und Interessenten zu führen.</p></div>";
     return h;
   }
+  /* ---------- Unterlagen für den Verkauf ----------
+     Was dem Käufer und dem Notar vorliegen muss. Ein Teil davon ist Pflicht: ohne
+     Energieausweis droht ein Bußgeld, ohne Verwalterzustimmung nach § 12 WEG geht das
+     Eigentum nicht über, und was an Beschlüssen und Sonderumlagen offen ist, muss offengelegt
+     werden – verschwiegene Mängel und Lasten holen den Verkäufer später ein. */
+  const VK_STAND = [["offen", "offen"], ["angefordert", "angefordert"], ["da", "liegt vor"], ["entfaellt", "entfällt"]];
+  const vkStandText = w => (VK_STAND.find(x => x[0] === w) || VK_STAND[0])[1];
+  const VK_GRUPPEN = [["basis", "Objekt und Grundbuch"], ["weg", "Wohnungseigentum"],
+    ["vermietet", "Bei vermieteter Einheit"], ["lasten", "Lasten, Steuern, Versicherung"],
+    ["technik", "Technik und Prüfungen"]];
+  /* [Schlüssel, Bezeichnung, Gruppe, Pflicht, Erläuterung, alter Name] */
+  const VK_DOKS = [
+    ["grundbuch", "Grundbuchauszug", "basis", true, "Aktuell, nicht älter als drei Monate. Zeigt Eigentümer und die Lasten in Abteilung II und III.", "Grundbuchauszug"],
+    ["grundriss", "Grundriss", "basis", false, "", "Grundriss"],
+    ["wohnflaeche", "Wohnflächenberechnung", "basis", false, "Weicht die tatsächliche Fläche erheblich ab, kann der Käufer den Kaufpreis mindern.", "Wohnflächenberechnung"],
+    ["energie", "Energieausweis", "basis", true, "Spätestens bei der Besichtigung unaufgefordert vorzulegen und bei Abschluss zu übergeben (§ 80 GEG). Fehlt er, droht ein Bußgeld.", "Energieausweis"],
+    ["flurkarte", "Flurkarte oder Lageplan", "basis", false, "", ""],
+    ["baulasten", "Auszug aus dem Baulastenverzeichnis", "basis", false, "Baulasten stehen nicht im Grundbuch – ohne Auszug erfährt der Käufer nichts davon.", ""],
+    ["baugenehmigung", "Baubeschreibung und Baugenehmigung", "basis", false, "", ""],
+    ["modernisierung", "Nachweise über Sanierungen und Modernisierungen", "basis", false, "Belege der letzten Jahre – sie begründen den Preis.", ""],
+    ["teilung", "Teilungserklärung mit Aufteilungsplan", "weg", true, "Dazu die Abgeschlossenheitsbescheinigung. Sie entscheidet, was Sonder- und was Gemeinschaftseigentum ist.", "Teilungserklärung"],
+    ["gemeinschaftsordnung", "Gemeinschaftsordnung", "weg", false, "Meist Teil der Teilungserklärung.", ""],
+    ["protokolle", "Protokolle der letzten drei Eigentümerversammlungen", "weg", true, "", "Protokolle der letzten 3 Jahre"],
+    ["beschluesse", "Beschluss-Sammlung", "weg", true, "Fortlaufend nach § 24 Abs. 7 WEG.", "Beschluss-Sammlung"],
+    ["wirtschaftsplan", "Aktueller Wirtschaftsplan", "weg", false, "", "Wirtschaftsplan"],
+    ["abrechnungen", "Jahresabrechnungen der letzten drei Jahre", "weg", false, "", "Hausgeldabrechnung"],
+    ["ruecklage", "Nachweis der Erhaltungsrücklage", "weg", false, "Anteil der Einheit und Kontostand.", ""],
+    ["sonderumlagen", "Beschlossene Maßnahmen und Sonderumlagen", "weg", true, "Was beschlossen, aber noch nicht bezahlt ist, trifft den Käufer – und ist offenzulegen.", ""],
+    ["hausgeld", "Nachweis über gezahltes Hausgeld", "weg", false, "Zeigt, dass keine Rückstände bestehen.", ""],
+    ["verwaltervertrag", "Verwaltervertrag", "weg", false, "", ""],
+    ["zustimmung", "Zustimmung des Verwalters zur Veräußerung", "weg", false, "Nur wenn die Teilungserklärung sie verlangt (§ 12 WEG) – dann geht ohne sie das Eigentum nicht über.", "Verwalterzustimmung"],
+    ["mietvertrag", "Mietvertrag und Mietaufstellung", "vermietet", false, "Kauf bricht nicht Miete (§ 566 BGB) – der Käufer tritt in den Vertrag ein.", ""],
+    ["kaution", "Nachweis über die Mietkaution", "vermietet", false, "Die Sicherheit geht auf den Käufer über.", ""],
+    ["bkabrechnung", "Letzte Betriebskostenabrechnung", "vermietet", false, "", ""],
+    ["versicherung", "Nachweis der Gebäudeversicherung", "lasten", false, "", ""],
+    ["grundsteuer", "Grundsteuerbescheid", "lasten", false, "", ""],
+    ["erbbau", "Erbbaurechtsvertrag", "lasten", false, "Nur bei Erbbaurecht – dann aber zwingend.", ""],
+    ["rechte", "Wege-, Wohn- und Nießbrauchrechte", "lasten", false, "Alles aus Abteilung II des Grundbuchs erklären.", ""],
+    ["schornstein", "Feuerstättenbescheid des Schornsteinfegers", "technik", false, "", ""],
+    ["legionellen", "Letzte Legionellenprüfung", "technik", false, "Bei vermietetem Gebäude mit Großanlage nach TrinkwV.", ""],
+    ["wartung", "Wartungsnachweise Heizung und Aufzug", "technik", false, "", ""]
+  ];
+  const vkDokKat = k => VK_DOKS.find(x => x[0] === k) || null;
+  /* Ältere Einträge standen als {"Grundbuchauszug": true} in den Daten – die gelten weiter. */
+  function vkDokWert(vk, k) {
+    const u = (vk && vk.unterlagen) || {}; const kat = vkDokKat(k);
+    let v = u[k];
+    if (v === undefined && kat && kat[5]) v = u[kat[5]];
+    if (v === true) return { stand: "da", notiz: "" };
+    if (typeof v === "string") return { stand: v || "offen", notiz: "" };
+    if (v && typeof v === "object") return { stand: v.stand || "offen", notiz: v.notiz || "" };
+    return { stand: "offen", notiz: "" };
+  }
+  function vkUnterlagenHtml(o, e, vk) {
+    const weg = istWeg(o) || VK_DOKS.some(d => d[2] === "weg" && vkDokWert(vk, d[0]).stand !== "offen");
+    const vermietet = !!mieterVon(e.id, o) || VK_DOKS.some(d => d[2] === "vermietet" && vkDokWert(vk, d[0]).stand !== "offen");
+    const zeigen = d => d[2] === "weg" ? weg : d[2] === "vermietet" ? vermietet : true;
+    const liste = VK_DOKS.filter(zeigen);
+    const zahl = w => liste.filter(d => vkDokWert(vk, d[0]).stand === w).length;
+    const pflichtOffen = liste.filter(d => d[3] && ["offen", "angefordert"].includes(vkDokWert(vk, d[0]).stand));
+    let h = "<section class='gruppe'><h2>Unterlagen für den Verkauf</h2>" +
+      "<p class='unter'>Was dem Käufer und dem Notar vorliegen muss. Pflichtangaben sind gekennzeichnet – " +
+      "was der Verkäufer verschweigt, holt ihn später ein.</p>";
+    h += "<div class='op-kacheln'>" +
+      "<div class='op-kachel'><span class='op-klabel'>liegt vor</span><strong class='z-plus'>" + zahl("da") + "</strong></div>" +
+      "<div class='op-kachel'><span class='op-klabel'>angefordert</span><strong>" + zahl("angefordert") + "</strong></div>" +
+      "<div class='op-kachel" + (zahl("offen") ? " op-rot" : "") + "'><span class='op-klabel'>offen</span><strong>" + zahl("offen") + "</strong></div>" +
+      "<div class='op-kachel'><span class='op-klabel'>entfällt</span><strong>" + zahl("entfaellt") + "</strong></div></div>";
+    h += VK_GRUPPEN.filter(([g]) => liste.some(d => d[2] === g)).map(([g, titel]) =>
+      "<h3 style='margin-top:18px'>" + esc(titel) + "</h3><div class='vkd-tab'>" +
+      liste.filter(d => d[2] === g).map(d => { const w = vkDokWert(vk, d[0]);
+        return "<div class='vkd-row" + (w.stand === "da" ? " vkd-da" : "") + "'>" +
+          "<span><strong>" + esc(d[1]) + "</strong>" + (d[3] ? " <span class='marke s-warten'>Pflicht</span>" : "") +
+          (d[4] ? "<br><span class='fuer'>" + esc(d[4]) + "</span>" : "") + "</span>" +
+          "<span><select data-vkd='" + esc(d[0]) + "|stand'>" + VK_STAND.map(([wv, l]) =>
+            "<option value='" + wv + "'" + (w.stand === wv ? " selected" : "") + ">" + esc(l) + "</option>").join("") + "</select></span>" +
+          "<span><input type='text' data-vkd='" + esc(d[0]) + "|notiz' value='" + esc(w.notiz) + "' placeholder='Wo, wann angefordert'></span>" +
+          "</div>"; }).join("") + "</div>").join("");
+    if (pflichtOffen.length) h += "<ul class='meldungen'><li class='m-fehler'>Pflichtunterlagen fehlen noch: " +
+      esc(pflichtOffen.map(d => d[1]).join(", ")) + ".</li></ul>";
+    else h += "<ul class='meldungen'><li class='m-ok'>Alle Pflichtunterlagen liegen vor oder entfallen.</li></ul>";
+    h += "<div class='leiste'><div><button class='btn klein' data-act='vk-liste-drucken'>Checkliste drucken</button></div></div>";
+    return h + "</section>";
+  }
+  /* Die Checkliste zum Mitgeben – für den Eigentümer oder den Makler. */
+  function vkListeDruckHtml(o, e, vk) {
+    const vw = (() => { try { return window.Firmendaten ? window.Firmendaten.daten() : {}; } catch (x) { return {}; } })();
+    const weg = istWeg(o) || VK_DOKS.some(d => d[2] === "weg" && vkDokWert(vk, d[0]).stand !== "offen");
+    const vermietet = !!mieterVon(e.id, o) || VK_DOKS.some(d => d[2] === "vermietet" && vkDokWert(vk, d[0]).stand !== "offen");
+    const zeigen = d => d[2] === "weg" ? weg : d[2] === "vermietet" ? vermietet : true;
+    let h = "<div class='md-werkzeug'><div><button class='btn klein' data-act='vk-liste-zu'>‹ Zurück</button>" +
+      "<button class='btn klein haupt' data-act='mandat-drucken'>Drucken / als PDF speichern</button></div></div>";
+    h += "<div class='md-blatt'><header class='md-kopf'>" +
+      (vw.logo ? "<img class='md-logo' src='" + esc(vw.logo) + "' alt='" + esc(vw.name || "Logo") + "'>"
+        : "<div class='md-firma'>" + esc(vw.name || "Hausverwaltung") + "</div>") +
+      "<div class='fuer'>" + esc(Objekte.datum(isoTag(new Date()))) + "</div></header>";
+    h += "<h1>Unterlagen für den Verkauf</h1><p class='md-art'>" +
+      esc((e.nr || e.art) + " · " + objName(o)) + (vk.preis ? " · Kaufpreis " + esc(vk.preis) + " €" : "") + "</p>";
+    h += VK_GRUPPEN.filter(([g]) => VK_DOKS.some(d => d[2] === g && zeigen(d))).map(([g, titel]) =>
+      "<h2>" + esc(titel) + "</h2><table class='lv-tab abr-tab'><tbody>" +
+      VK_DOKS.filter(d => d[2] === g && zeigen(d)).map(d => { const w = vkDokWert(vk, d[0]);
+        return "<tr><td>" + (w.stand === "da" ? "☑" : "☐") + " " + esc(d[1]) + (d[3] ? " <strong>(Pflicht)</strong>" : "") +
+          (w.notiz ? "<br><span class='fuer'>" + esc(w.notiz) + "</span>" : "") + "</td>" +
+          "<td style='white-space:nowrap'>" + esc(vkStandText(w.stand)) + "</td></tr>"; }).join("") +
+      "</tbody></table>").join("");
+    h += "<p class='md-fuss'>Diese Liste ist eine Arbeitshilfe und nicht abschließend. " +
+      "Welche Unterlagen der Notar im Einzelfall braucht, teilt er Ihnen mit. " +
+      "Der Energieausweis ist spätestens bei der Besichtigung unaufgefordert vorzulegen (§ 80 GEG). " +
+      "Stand " + esc(Objekte.datum(isoTag(new Date()))) + ".</p>";
+    return h + "</div>";
+  }
   function verkaufMaskeHtml(o, e, vk) {
+    if (S.vkListe === e.id) return vkListeDruckHtml(o, e, vk);
     const f = (feld, label, typ, hilfe) => "<div class='feld'><label>" + label + "</label><input type='" + (typ || "text") + "' data-vk='" + feld + "' value='" + esc(vk[feld]) + "'>" + (hilfe ? "<small>" + hilfe + "</small>" : "") + "</div>";
-    const fehlt = VK_UNTERLAGEN.filter(u => !vk.unterlagen[u]);
     let h = "<div class='hero'><h1>" + esc((e.nr || e.art) + " · " + (o.strasse || "")) + "</h1><p>Verkauf · " + esc(objMitNr(o)) + (e.flaeche ? " · " + esc(e.flaeche) + " m²" : "") + "</p></div>";
     h += "<section class='gruppe'><h2>Eckdaten</h2><div class='felder'>" +
       "<div class='feld'><label>Stand</label><select data-vk='status'>" + VK_STATUS.map(([w, l]) => "<option value='" + w + "'" + (vk.status === w ? " selected" : "") + ">" + l + "</option>").join("") + "</select></div>" +
       f("preis", "Kaufpreis €") + f("courtage", "Courtage", "text", "z. B. 3,57 % inkl. USt – je Seite zu tragen (§ 656c BGB).") +
       f("hausgeld", "Hausgeld monatlich €") + f("ruecklage", "Anteil Rücklage €") + f("mea", "Miteigentumsanteil") +
-      f("notar", "Notar") + f("notartermin", "Notartermin", "date") + f("is24Url", "Adresse des Inserats", "url") + "</div></section>";
-    h += "<section class='gruppe'><h2>Unterlagen</h2><p class='unter'>Was dem Käufer vorliegen sollte.</p><div class='vk-liste'>" +
-      VK_UNTERLAGEN.map(u => "<label class='top'><input type='checkbox' " + (vk.unterlagen[u] ? "checked " : "") + "data-vkdok='" + esc(u) + "'><span>" + esc(u) + "</span></label>").join("") + "</div>" +
-      (fehlt.length ? "<p class='unter' style='margin-top:10px'>Noch offen: " + esc(fehlt.join(", ")) + "</p>" : "<p class='unter' style='margin-top:10px'>Alle Unterlagen beisammen.</p>") + "</section>";
+      f("notartermin", "Notartermin", "date") + f("is24Url", "Adresse des Inserats", "url") + "</div></section>";
+    h += vkUnterlagenHtml(o, e, vk);
     h += "<section class='gruppe'><h2>Interessenten</h2>" +
       "<div class='leiste' style='padding:0 0 10px'><div><button class='btn klein haupt' data-act='vk-int-neu'>+ Interessent</button></div></div>" +
       (vk.interessenten.length ? vk.interessenten.map((i, idx) => "<div class='abl-zeile'>" +
@@ -6164,12 +6489,15 @@ const Objekte = (() => {
         "<div class='leiste'><div><button class='btn haupt' data-act='verm-speichern'>Speichern</button><button class='btn' data-act='verm-zu'>Zurück</button></div></div></div>";
     }
     const alle = [];
-    S.liste.filter(o => !o.beendet).forEach(o => (o.einheitenListe || []).forEach(e => { const v = vermVon(e, o); if (v.status !== "vermietet") alle.push({ o, e, v }); }));
-    const nachStatus = w => alle.filter(x => x.v.status === w);
-    const sicht = nachStatus(S.vermTab);
-    const kachel = (w, l) => "<button class='kachel' data-act='verm-tab' data-wert='" + w + "' aria-pressed='" + (S.vermTab === w) + "'><b>" + nachStatus(w).length + "</b><span>" + l + "</span></button>";
+    S.liste.filter(o => !o.beendet).forEach(o => (o.einheitenListe || []).forEach(e => alle.push({ o, e, v: vermVon(e, o) })));
+    /* Früher gab es auch „Reserviert“ – solche Einheiten stehen weiter bei den inserierten. */
+    const stufe = v => v.status === "reserviert" ? "inserat" : (v.status === "frei" || v.status === "inserat") ? v.status : "vermietet";
+    const nachStatus = w => alle.filter(x => stufe(x.v) === w);
+    const tab = ["frei", "inserat", "vermietet"].includes(S.vermTab) ? S.vermTab : "frei";
+    const sicht = nachStatus(tab);
+    const kachel = (w, l) => "<button class='kachel' data-act='verm-tab' data-wert='" + w + "' aria-pressed='" + (tab === w) + "'><b>" + nachStatus(w).length + "</b><span>" + l + "</span></button>";
     let h = "<div class='seite'>" + (reiter || "") +
-      "<div class='kacheln'>" + kachel("frei", "Frei / wird frei") + kachel("inserat", "Inseriert") + kachel("reserviert", "Reserviert") + "</div>" +
+      "<div class='kacheln'>" + kachel("frei", "Frei / wird frei") + kachel("inserat", "Inseriert") + kachel("vermietet", "Vermietet") + "</div>" +
       "<div class='werkzeug'><button class='btn' data-act='verm-feedback'>Rückmeldung von ImmoScout24 einlesen</button></div>";
     if (S.vermFeedback !== null && S.vermFeedback !== undefined) h += "<section class='gruppe'><h2>Rückmeldung einlesen</h2>" +
       "<p class='unter'>Nach dem Import legt ImmoScout24 eine Rückmeldung mit der Scout-ID je Objektnummer ab. Diese Datei hier einfügen oder auswählen – die Einheiten werden dann automatisch auf „Inseriert“ gesetzt und bekommen ihre Scout-ID.</p>" +
@@ -6185,7 +6513,8 @@ const Objekte = (() => {
       "<span class='fuer'>" + (x.v.freiAb ? "frei ab " + Objekte.datum(x.v.freiAb) : "") + "</span></div>" +
       "<h3>" + esc(x.e.nr || x.e.art) + " · " + esc(objName(x.o)) + "</h3>" +
       "<div class='fuer'>" + esc([x.e.lage, (x.v.flaeche || x.e.flaeche) ? (x.v.flaeche || x.e.flaeche) + " m²" : "", x.v.kaltmiete ? x.v.kaltmiete + " € kalt" : ""].filter(Boolean).join(" · ")) + "</div></button>").join("") + "</div>"
-      : "<div class='leer'><h2>Nichts zu vermarkten</h2><p>Sobald Sie eine Einheit auf „Frei“ setzen, erscheint sie hier.</p></div>";
+      : "<div class='leer'><h2>" + (tab === "vermietet" ? "Keine vermietete Einheit" : "Nichts zu vermarkten") + "</h2><p>" +
+        (tab === "vermietet" ? "Hier stehen alle vermieteten Einheiten." : "Sobald Sie eine Einheit auf „Frei“ setzen, erscheint sie hier.") + "</p></div>";
     return h + "</div>";
   }
 
@@ -6594,6 +6923,19 @@ const Objekte = (() => {
   /* Positionen, für die noch kein Konto bestimmt ist – ohne sie entsteht keine Sollstellung. */
   const verwendungFehlt = (konten, art) => sollPosten(art).filter(([feld]) => !kontoFuer(konten, feld)).map(x => x[1]);
   const eur = n => (Math.round(n * 100) / 100).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
+  /* Beim Tippen darf das Bild nicht neu gezeichnet werden, solange das Feld noch den Fokus hat –
+     sonst verschwindet das Feld unter den Fingern und die Eingabe bricht ab. Also wird gewartet,
+     bis der Cursor das Feld verlassen hat. */
+  function spaeterZeichnen(name, ms) {
+    const schl = "__sp_" + name;
+    clearTimeout(window[schl]);
+    const pruefen = () => {
+      const a = document.activeElement;
+      if (a && a.dataset && a.dataset[name] != null) { window[schl] = setTimeout(pruefen, 500); return; }
+      render(true);
+    };
+    window[schl] = setTimeout(pruefen, ms || 700);
+  }
   /* Jede Änderung an der Buchhaltung wird mitgeschrieben. */
   function bhProtokoll(o, was, grund, vorher, nachher) {
     o.bhProtokoll = (o.bhProtokoll || []).concat({ id: Objekte.neueId(), zeit: new Date().toISOString(),
@@ -8545,12 +8887,12 @@ const Objekte = (() => {
       "<div class='kachel'><b>" + liste.reduce((n, x) => n + (Number(x.anzahl) || 1), 0) + "</b><span>Schlüssel erfasst</span></div>" +
       "<div class='kachel'><b>" + draussen + "</b><span>ausgegeben</span></div>" +
       "<div class='kachel'><b>" + (liste.reduce((n, x) => n + (Number(x.anzahl) || 1), 0) - draussen) + "</b><span>bei der Verwaltung</span></div></div>";
-    h += "<section class='gruppe voll'><h2>Schließanlage</h2>" +
-      "<p class='unter'>Bei einer geschlossenen Anlage öffnet jeder Schlüssel mehrere Türen – ein verlorener Schlüssel kann dann den Austausch der ganzen Anlage nötig machen. Halten Sie deshalb fest, wer welchen Schlüssel hat.</p>" +
-      "<div class='felder'>" + f("hersteller", "Hersteller") + f("nummer", "Anlagennummer") +
-      f("karte", "Sicherungskarte bei", "Ohne Sicherungskarte gibt der Hersteller keine Nachschlüssel heraus.") +
-      f("nachbestellung", "Nachbestellung über") + "</div></section>";
-    h += "<section class='gruppe voll'><h2>Schlüssel</h2>" +
+    if (a.hersteller || a.nummer || a.karte || a.nachbestellung)
+      h += "<p class='unter' style='margin-top:12px'>Schließanlage: <strong>" +
+        esc([a.hersteller, a.nummer].filter(Boolean).join(" · ") || "ohne Angabe") + "</strong>" +
+        (a.karte ? " · Sicherungskarte bei " + esc(a.karte) : "") +
+        " <button class='link' data-act='obj-tab' data-wert='stammdaten'>in den Stammdaten ändern</button></p>";
+    h += "<section class='gruppe voll'><h2>Schlüsselausgabe</h2>" +
       "<div class='leiste'><div><button class='btn klein haupt' data-act='schl-neu'>+ Schlüssel</button></div></div>";
     if (!liste.length) return h + "<p class='unter'>Noch kein Schlüssel erfasst.</p></section>";
     const einheiten = o.einheitenListe || [];
@@ -9428,7 +9770,7 @@ const Objekte = (() => {
       "<li><strong>Dateien:</strong> In Outlook ausgewählte Mails als .eml oder .txt speichern und im selben Fenster auswählen.</li>" +
       "<li><strong>Automatische Zuordnung:</strong> Steht die Ticketnummer im Betreff, zum Beispiel [#2026-001], landet die Mail sofort beim richtigen Ticket.</li></ol>" +
       "<p class='unter'>Eine dauerhafte Verbindung, die Ihr Postfach von selbst abruft, ist aus dem Browser heraus nicht möglich. Dafür braucht es einen Server, der sich per Microsoft 365 anmeldet – das gehört zum selben Schritt wie die Zugangsdaten für Mitarbeiter.</p></section>" +
-      (istVerwalter() ? bankzugangHtml() + gobdBlockHtml() + kontenrahmenHtml() : "") +
+      (istVerwalter() ? bankzugangHtml() + bankverzeichnisHtml(true) + gobdBlockHtml() + kontenrahmenHtml() : "") +
       "<div class='hero' style='padding-bottom:4px'><h1 style='font-size:28px'>Dokumente</h1><p>Briefkopf und Fußzeile für Verträge und Schreiben. Diese Angaben gelten für das ganze Unternehmen, nicht nur für Sie.</p></div></div>";
   }
   /* Alle Vorgänge, in denen dieser Handwerker beauftragt oder angefragt wurde. */
@@ -9496,7 +9838,7 @@ const Objekte = (() => {
         hwFuss + "</section>";
       return h + "</div>";
     }
-    if (!S.handwerker.length && !S.hwEntwurf) return h + "<div class='leer'><h2>Noch keine Handwerker</h2><p>Legen Sie Ihre Handwerker an oder direkt beim Hinzufügen einer technischen Anlage.</p><button class='btn haupt' data-act='neu'>+ Neuer Handwerker</button></div>" + bankverzeichnisHtml() + "</div>";
+    if (!S.handwerker.length && !S.hwEntwurf) return h + "<div class='leer'><h2>Noch keine Handwerker</h2><p>Legen Sie Ihre Handwerker an oder direkt beim Hinzufügen einer technischen Anlage.</p><button class='btn haupt' data-act='neu'>+ Neuer Handwerker</button></div></div>";
     return h + "<div class='hw-raster'>" + S.handwerker.slice().sort((x, y) => (x.firma || "").localeCompare(y.firma || "", "de")).map(w => {
       const z = zustaendig(w.id);
       return "<div class='hw-karte klickbar' data-act='hw-bearbeiten' data-id='" + esc(w.id) + "' role='button' tabindex='0'>" +
@@ -9510,7 +9852,7 @@ const Objekte = (() => {
           .filter(Boolean).map(x => "<span class='marke s-neu'>" + esc(x) + "</span>").join("") + "</div>" +
         "<div class='zust'>" + (z.length ? "Zuständig für: " + z.map(esc).join(", ") : "Noch keiner Anlage zugeordnet") + "</div>" +
         "</div>";
-    }).join("") + "</div>" + bankverzeichnisHtml() + "</div>";
+    }).join("") + "</div></div>";
   }
 
   /* ---------- Unterlagen zum Objekt ---------- */
@@ -10151,14 +10493,22 @@ const Objekte = (() => {
     }
     if (t.id === "vk-suche") { S.vkSuche = t.value; const pos = t.selectionStart; render(true);
       const el = $("#vk-suche"); if (el) { el.focus(); el.setSelectionRange(pos, pos); } return; }
-    if (t.dataset.vk || t.dataset.vki || t.dataset.vkdok) {
+    if (t.dataset.vk || t.dataset.vki || t.dataset.vkd) {
       const ziel = vkZiel(); if (!ziel) return; const { o, e } = ziel; const vk = vkVon(e);
       if (t.dataset.vk) vk[t.dataset.vk] = t.value;
-      else if (t.dataset.vkdok) vk.unterlagen = { ...vk.unterlagen, [t.dataset.vkdok]: t.checked };
+      else if (t.dataset.vkd) {
+        const [k, feld] = String(t.dataset.vkd).split("|");
+        const alt2 = vkDokWert(vk, k);
+        vk.unterlagen = { ...vk.unterlagen, [k]: { stand: alt2.stand, notiz: alt2.notiz, [feld]: t.value } };
+        const kat = vkDokKat(k); if (kat && kat[5] && vk.unterlagen[kat[5]] !== undefined) delete vk.unterlagen[kat[5]];
+      }
       else { const [i, feld] = t.dataset.vki.split("|"); vk.interessenten[Number(i)][feld] = t.value; }
       e.verkauf = vk;
-      clearTimeout(window.__vkT); window.__vkT = setTimeout(() => { const ix = S.liste.findIndex(x => x.id === o.id); if (ix >= 0) S.liste[ix] = o;
-        Speicher.speichern("objekte", o, S.liste).catch(() => {}); if (t.dataset.vkdok || t.dataset.vk === "status") render(true); }, 700);
+      const sofort = t.dataset.vk === "status" || (t.dataset.vkd && String(t.dataset.vkd).endsWith("|stand"));
+      const sichern = () => { const ix = S.liste.findIndex(x => x.id === o.id); if (ix >= 0) S.liste[ix] = o;
+        Speicher.speichern("objekte", o, S.liste).catch(() => {}); };
+      if (sofort) { clearTimeout(window.__vkT); sichern(); render(true); return; }
+      clearTimeout(window.__vkT); window.__vkT = setTimeout(() => { sichern(); spaeterZeichnen("vkd", 10); }, 700);
       return;
     }
     if (t.dataset.rgsw) { const [xid, k] = t.dataset.rgsw.split("|"); const x = (S.rgStapel || []).find(y => y.id === xid);
@@ -10216,7 +10566,7 @@ const Objekte = (() => {
       x[feld] = feld === "iban" ? Objekte.ibanFormat(t.value) : t.value;
       if (feld === "iban") { const el = app.querySelector("[data-ue='" + i + "|iban']"); if (el) el.value = x.iban; }
       objektSichern(o);
-      clearTimeout(window.__ueT); window.__ueT = setTimeout(() => render(true), 900);
+      spaeterZeichnen("ue", 900);
       return;
     }
     if (t.dataset.ko) {
@@ -10227,7 +10577,7 @@ const Objekte = (() => {
       if (jahrK && periodeFest(o, jahrK)) { toast("Das Jahr " + jahrK + " ist festgeschrieben."); render(true); return; }
       k[feld] = t.value; objektSichern(o);
       if (feld === "kontoNr") render(true);
-      else { clearTimeout(window.__abrT); window.__abrT = setTimeout(() => render(true), 900); }
+      else spaeterZeichnen("ko", 900);
       return;
     }
     if (t.dataset.ebics) {
@@ -10237,10 +10587,16 @@ const Objekte = (() => {
       bz.ebicsArten = t.checked ? [...new Set(liste.concat(k))] : liste.filter(x => x !== k);
       bankSichern(); render(true); return;
     }
+    if (t.dataset.nfd) {
+      const o = S.entwurf; if (!o) return;
+      const liste = nfAusListe(o).filter(x => x !== t.dataset.nfd);
+      o.notfallAus = t.checked ? liste : liste.concat(t.dataset.nfd);
+      objektSichern(o); render(true); return;
+    }
     if (t.dataset.liq) {
       const o = S.entwurf; if (!o) return;
       o.liq = { ...(o.liq || {}), [t.dataset.liq]: t.value }; objektSichern(o);
-      clearTimeout(window.__liqT); window.__liqT = setTimeout(() => render(true), 800);
+      spaeterZeichnen("liq", 800);
       return;
     }
     if (t.dataset.ptu) { S.ptuEntwurf = { ...(S.ptuEntwurf || {}), [t.dataset.ptu]: t.value }; return; }
@@ -10254,7 +10610,7 @@ const Objekte = (() => {
         if (ziel[j]) ziel[j][teil[2]] = t.value; }
       objektSichern(o);
       if (teil[1] === "art") { render(true); return; }
-      clearTimeout(window.__kauT); window.__kauT = setTimeout(() => render(true), 900);
+      spaeterZeichnen("kau", 900);
       return;
     }
     if (t.dataset.uste) {
@@ -10270,7 +10626,7 @@ const Objekte = (() => {
       const o = S.entwurf; if (!o) return;
       co2Von(o, abrJahrVon())[t.dataset.co2] = t.value; objektSichern(o);
       if (t.dataset.co2 === "gebaeude" || t.dataset.co2 === "ausnahme") { render(true); return; }
-      clearTimeout(window.__co2T); window.__co2T = setTimeout(() => render(true), 900);
+      spaeterZeichnen("co2", 900);
       return;
     }
     if (t.dataset.co2k) {
@@ -10289,20 +10645,20 @@ const Objekte = (() => {
       else if (teil[0] === "eigen") { const x = e.eigene[Number(teil[1])]; if (x) x[teil[2]] = t.value; }
       if (teil[2] === "zu" || teil[0] === "teil" && teil[2] === "zu") { objektSichern(o); render(true); return; }
       objektSichern(o);
-      clearTimeout(window.__seT); window.__seT = setTimeout(() => render(true), 1200);
+      spaeterZeichnen("se", 1200);
       return;
     }
     if (t.dataset.gk) {
       const o = S.entwurf; if (!o) return;
       o.gegenkonten = { ...gegenKonten(o), [t.dataset.gk]: String(t.value || "").replace(/[^0-9]/g, "") };
       objektSichern(o);
-      clearTimeout(window.__gkT); window.__gkT = setTimeout(() => render(true), 900);
+      spaeterZeichnen("gk", 900);
       return;
     }
     if (t.dataset.dv) {
       S.einst[t.dataset.dv] = t.value; einstellungenSpeichern();
       if (t.dataset.dv === "datevSkr" || t.dataset.dv === "datevLaenge") render(true);
-      else { clearTimeout(window.__dvT); window.__dvT = setTimeout(() => render(true), 900); }
+      else spaeterZeichnen("dv", 900);
       return;
     }
     if (t.dataset.kobeleg) { S.koKonto = { ...(S.koKonto || {}) }; S.koKonto[t.dataset.kobeleg] = t.value; return; }
@@ -10311,14 +10667,14 @@ const Objekte = (() => {
       const jahrV = String(t.dataset.vb).split("|")[0];
       if (periodeFest(o, jahrV)) { toast("Das Jahr " + jahrV + " ist festgeschrieben."); render(true); return; }
       verbrauchMap(o)[t.dataset.vb] = t.value; objektSichern(o);
-      clearTimeout(window.__abrT); window.__abrT = setTimeout(() => render(true), 900);
+      spaeterZeichnen("vb", 900);
       return;
     }
     if (t.dataset.vm) {
       const o = S.entwurf; if (!o) return;
       const [jahr, feld] = String(t.dataset.vm).split("|");
       vermoegenVon(o, jahr)[feld] = t.value; objektSichern(o);
-      clearTimeout(window.__abrT); window.__abrT = setTimeout(() => render(true), 900);
+      spaeterZeichnen("vm", 900);
       return;
     }
     if (t.dataset.brjahr) { S.brJahr = t.value; clearTimeout(window.__brT); window.__brT = setTimeout(() => render(true), 600); return; }
@@ -10347,7 +10703,7 @@ const Objekte = (() => {
       const [id, feld] = String(t.dataset.ih).split("|");
       const x = ihListe(o).find(y => y.id === id); if (!x) return;
       x[feld] = t.value; objektSichern(o);
-      clearTimeout(window.__ihT); window.__ihT = setTimeout(() => render(true), 700); return;
+      spaeterZeichnen("ih"); return;
     }
     if (t.dataset.ihjahre) { S.ihJahre = Number(t.value) || 15; render(true); return; }
     if (t.dataset.sa) {
@@ -10360,18 +10716,18 @@ const Objekte = (() => {
       const x = schlListe(o).find(y => y.id === id); if (!x) return;
       x[feld] = t.value; objektSichern(o);
       if (["einheitId", "rueckgabe", "ausgabe", "anzahl"].includes(feld)) {
-        clearTimeout(window.__schlT); window.__schlT = setTimeout(() => render(true), 700);
+        spaeterZeichnen("schl");
       }
       return;
     }
     if (t.dataset.rz) {
       if (!S.rzEntwurf) return;
       S.rzEntwurf[t.dataset.rz] = t.value;
-      clearTimeout(window.__rzT); window.__rzT = setTimeout(() => render(true), 600); return;
+      spaeterZeichnen("rz", 700); return;
     }
     if (t.dataset.mhe) {
       const e2 = mahnEinst(); e2[t.dataset.mhe] = t.value; S.mahnEinst = e2;
-      clearTimeout(window.__mheT); window.__mheT = setTimeout(() => { mahnEinstSichern(); render(true); }, 700); return;
+      clearTimeout(window.__mheT); window.__mheT = setTimeout(() => { mahnEinstSichern(); spaeterZeichnen("mhe", 10); }, 700); return;
     }
     if (t.dataset.mhs) {
       const [k, feld] = String(t.dataset.mhs).split("|");
@@ -10384,7 +10740,7 @@ const Objekte = (() => {
       const [jahr, i, feld] = String(t.dataset.rl).split("|");
       const z = rlEntnahmen(vermoegenVon(o, jahr))[Number(i)]; if (!z) return;
       z[feld] = t.value; objektSichern(o);
-      clearTimeout(window.__rlT); window.__rlT = setTimeout(() => render(true), 600); return;
+      spaeterZeichnen("rl", 700); return;
     }
     if (t.dataset.vmtext) {
       const o = S.entwurf; if (!o) return;
@@ -11333,8 +11689,8 @@ const Objekte = (() => {
         try { await Speicher.speichern("objekte", o, S.liste); } catch (err) {}
         S.vkWahl = false; S.vkOffen = e.id; render(); toast("Einheit in den Verkauf aufgenommen"); break;
       }
-      case "vk-oeffnen": S.vkOffen = b.dataset.e; render(); oben(); break;
-      case "vk-zu": S.vkOffen = null; render(); break;
+      case "vk-oeffnen": S.vkOffen = b.dataset.e; S.vkListe = ""; render(); window.scrollTo({ top: 0 }); break;
+      case "vk-zu": S.vkOffen = null; S.vkListe = ""; render(); break;
       case "vk-int-neu": case "vk-int-weg": case "vk-speichern": case "vk-raus": {
         const ziel = vkZiel(); if (!ziel) return; const { o, e } = ziel; const vk = vkVon(e);
         if (act === "vk-int-neu") vk.interessenten = vk.interessenten.concat({ name: "", kontakt: "", gebot: "", finanzierung: "" });
@@ -11721,6 +12077,10 @@ const Objekte = (() => {
         for (const o of g.objekte) await objektSichern(o);
         render(true);
         toast(posten.length + " Zahlungen zum " + Objekte.datum(tag) + " eingereicht"); break; }
+      case "vk-liste-drucken": S.vkListe = S.vkOffen; render(); break;
+      case "vk-liste-zu": S.vkListe = ""; render(); break;
+      case "nf-drucken": { const o = S.entwurf; if (!o) return; S.nfDruck = o.id; S.bearbeiten = false; render(); break; }
+      case "nf-druck-zu": S.nfDruck = ""; render(); break;
       case "liq-csv": { const o = S.entwurf; if (!o) return;
         const erg = liqRechnen(o);
         const reihen = [["Monat", "Einnahmen", "Zahlungen", "Vertraege", "Veraenderung", "Kontostand"]]
@@ -11839,7 +12199,8 @@ const Objekte = (() => {
           x.faellig ? Objekte.datum(x.faellig) : "", String(x.tage)]));
         dateiGeben("Offene_Posten_" + isoTag(new Date()) + ".csv", csvZeilen(reihen));
         toast("Offene Posten gespeichert"); break; }
-      case "aw-wer": S.awWer = b.dataset.wert || ""; render(true); break;
+      case "aw-wer": S.awWer = (S.awWer === (b.dataset.wert || "")) ? "" : (b.dataset.wert || ""); render(true); break;
+      case "m-job": S.mJob = b.dataset.wert; render(true); break;
       case "abr-oeffnen": {
         const o = S.liste.find(x => x.id === b.dataset.id); if (!o) return;
         S.entwurf = Objekte.betreuungSicherstellen(Objekte.listeSicherstellen(JSON.parse(JSON.stringify(o))));
