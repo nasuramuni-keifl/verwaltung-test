@@ -1145,8 +1145,18 @@ const Objekte = (() => {
     nummer: "", provision: "", baujahr: "", ausweisArt: "", energiewert: "", energietraeger: "", effizienz: "", dokumente: [], einheiten: [], einheitenListe: [], beirat: [], anlagen: [], betreuerIds: [], buchhaltungId: "", technikId: "", beginn: "", ende: "", garantiemiete: "", notizen: "", beendet: false, erstellt: new Date().toISOString() });
   const datum = iso => { if (!iso) return ""; const [y, m, d] = iso.split("-"); return d + "." + m + "." + y; };
   const tageBis = iso => iso ? Math.ceil((new Date(iso + "T12:00:00") - new Date(new Date().toDateString() + " 12:00")) / 864e5) : null;
-  const summeEinheiten = o => (o.einheiten || []).reduce((n, e) => n + (Number(e.anzahl) || 0), 0);
-  const einheitenText = o => (o.einheiten || []).filter(e => Number(e.anzahl) > 0).map(e => e.anzahl + " × " + (e.art || "Einheit")).join(" · ");
+  /* Maßgeblich ist die tatsächliche Einheitenliste. Das ältere Feld „einheiten" zählt nur
+     dort, wo noch keine Liste besteht – sonst liefen Kachel und Objekt auseinander. */
+  const summeEinheiten = o => Array.isArray(o.einheitenListe) && o.einheitenListe.length
+    ? o.einheitenListe.length
+    : (o.einheiten || []).reduce((n, e) => n + (Number(e.anzahl) || 0), 0);
+  const einheitenText = o => {
+    if (Array.isArray(o.einheitenListe) && o.einheitenListe.length) {
+      const z = {}; o.einheitenListe.forEach(e => { const a = e.art || "Einheit"; z[a] = (z[a] || 0) + 1; });
+      return Object.entries(z).map(([a, n]) => n + " × " + a).join(" · ");
+    }
+    return (o.einheiten || []).filter(e => Number(e.anzahl) > 0).map(e => e.anzahl + " × " + (e.art || "Einheit")).join(" · ");
+  };
   /* Hinweis zum Vertragsende: WEG-Wiederbestellung frühestens 1 Jahr vor Ablauf (§ 26 Abs. 2 WEG). */
   const heuteIso = () => { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
   /* Objekte, deren Bestellung bzw. Vertrag ausgelaufen ist, werden automatisch beendet (Stichtag: Tag nach dem Vertragsende). */
@@ -1192,10 +1202,13 @@ const Objekte = (() => {
     (o.anlagen || []).forEach(a => { if ((a.art || a.standort) && !a.handwerkerId) warn.push("Für „" + (a.art || a.standort) + "“ ist noch kein Handwerker hinterlegt."); });
     return { fehler, warn };
   }
-  function filtern(liste, { art, suche, beendete }) {
+  /* Die Namen der Betreuung kennt nur die Anwendung, nicht dieses Modul – sie wird
+     deshalb von außen hereingereicht. Fehlt sie, wird ohne sie gesucht. */
+  function filtern(liste, { art, suche, beendete }, betreuung) {
     const q = (suche || "").trim().toLowerCase();
+    const wer = typeof betreuung === "function" ? betreuung : () => "";
     return liste.filter(o => (beendete || !o.beendet) && (!art || o.art === art) &&
-      (!q || [o.nummer, o.bezeichnung, o.strasse, o.plz, o.ort, o.auftraggeber, o.ansprechpartner, betreuerNamen(o)].join(" ").toLowerCase().includes(q)))
+      (!q || [o.nummer, o.bezeichnung, o.strasse, o.plz, o.ort, o.auftraggeber, o.ansprechpartner, wer(o)].join(" ").toLowerCase().includes(q)))
       .sort((a, b) => (a.ort || "").localeCompare(b.ort || "", "de") || (a.strasse || "").localeCompare(b.strasse || "", "de", { numeric: true }));
   }
   function zahlen(liste) {
@@ -1509,7 +1522,7 @@ const Objekte = (() => {
         (w.tage < 0 ? " – Prüfung überfällig seit " : " – Prüfung fällig am ") + Objekte.datum(w.anlage.naechste) +
         (hw ? " · " + esc(hw.firma) + " · " + kontaktZeile(hw, w.anlage.kontaktId) : " · kein Handwerker hinterlegt") + "</li>";
     });
-    const sicht = Objekte.filtern(S.liste, f);
+    const sicht = Objekte.filtern(S.liste, f, betreuerNamen);
     let h = "<div class='seite'><div class='hero'><h1>Ihre Objekte</h1><p>Alle verwalteten Objekte auf einen Blick. Tippen Sie auf ein Objekt, um es anzusehen oder zu ändern.</p></div>" +
       "<div class='kacheln'>" + kachel("", z.gesamt, "Objekte gesamt · " + z.einheiten + " Einheiten") + kachel("miet", z.miet, "Mietverwaltung", "var(--miet)") +
       kachel("weg", z.weg, "WEG-Verwaltung", "var(--weg)") + kachel("garantie", z.garantie, "Garantiemiete", "var(--gar)") + "</div>";
@@ -1758,7 +1771,7 @@ const Objekte = (() => {
       "<div class='felder' style='margin-top:14px'>" +
       fe("beginn", "Beginn", "date") + fe("ende", "Ende (falls befristet)", "date") +
       "<div class='feld'><label>Kündigungsfrist</label><input type='text' data-dv='" + i + "|kuendigung' value='" + esc(d.kuendigung || "") + "' placeholder='z. B. 3 Monate zum Quartalsende'></div>" +
-      fe("verguetung", "Vergütung netto", "number", "step='0.01' min='0' inputmode='decimal'") +
+      fe("verguetung", "Vergütung netto", "text", "inputmode='decimal' placeholder='z. B. 400,00'") +
       "<div class='feld'><label>Zahlweise</label><select data-dv='" + i + "|zahlweise'>" +
       dienstZahlweise.map(([w, l]) => "<option value='" + w + "'" + ((d.zahlweise || "monatlich") === w ? " selected" : "") + ">" + esc(l) + "</option>").join("") + "</select></div>" +
       "<div class='feld'><label>Umsatzsteuer</label><select data-dv='" + i + "|ust'>" +
@@ -1952,8 +1965,9 @@ const Objekte = (() => {
   }
 
   function mvFormHtml(o, e, v) {
-    const f = (feld, label, typ, hilfe) => "<div class='feld'><label>" + label + "</label><input type='" + (typ || "text") + "'" +
-      (typ === "number" ? " step='0.01' inputmode='decimal'" : "") + " data-mv='" + esc(v.id) + "|" + feld + "' value='" + esc(v[feld] || "") + "'>" +
+    /* Geldfelder bleiben Textfelder – ein Zahlenfeld verschluckt im Browser das Komma. */
+    const f = (feld, label, typ, hilfe) => "<div class='feld'><label>" + label + "</label><input type='" + (typ === "number" ? "text" : (typ || "text")) + "'" +
+      (typ === "number" ? " inputmode='decimal'" : "") + " data-mv='" + esc(v.id) + "|" + feld + "' value='" + esc(v[feld] || "") + "'>" +
       (hilfe ? "<small>" + hilfe + "</small>" : "") + "</div>";
     const mieter = S.personen.filter(x => x.rolle === "mieter").sort((a, b) => Objekte.personName(a).localeCompare(Objekte.personName(b), "de"));
     const kalt = eurZahl(v.kaltmiete);
@@ -2612,7 +2626,7 @@ const Objekte = (() => {
           esc(Objekte.ARTEN[o.art] ? Objekte.ARTEN[o.art].name : "") + " · " + (o.einheitenListe || []).length + " Einheiten</span></span>" +
           "<span><select data-hon='" + esc(o.id) + "|honorarArt'>" + HONORARARTEN.map(([w, l]) =>
             "<option value='" + w + "'" + ((o.honorarArt || "einheit") === w ? " selected" : "") + ">" + esc(l) + "</option>").join("") + "</select></span>" +
-          "<span><input type='number' step='0.01' min='0' inputmode='decimal' data-hon='" + esc(o.id) + "|honorar' value='" + esc(o.honorar || "") + "'></span>" +
+          "<span><input type='text' inputmode='decimal' data-hon='" + esc(o.id) + "|honorar' value='" + esc(o.honorar || "") + "'></span>" +
           "<span><strong>" + esc(eurD(x.monat)) + " €</strong>" +
             (x.provision ? "<br><span class='fuer'>+ " + esc(eurD(x.provision)) + " € Provision</span>" : "") +
             (x.zusatz ? "<br><span class='fuer'>+ " + esc(eurD(x.zusatz)) + " € Zusatz</span>" : "") + "</span>" +
@@ -2636,7 +2650,7 @@ const Objekte = (() => {
     return "<div class='um-neu'><div class='felder'>" +
       "<div class='feld'><label>Datum</label><input type='date' data-honneu='datum' value='" + esc(e.datum || new Date().toISOString().slice(0, 10)) + "'></div>" +
       "<div class='feld breit'><label>Wofür</label><input type='text' data-honneu='text' value='" + esc(e.text || "") + "' placeholder='z. B. Neuvermietung WE 3'></div>" +
-      "<div class='feld'><label>Betrag netto</label><input type='number' step='0.01' data-honneu='betrag' value='" + esc(e.betrag || "") + "'></div>" +
+      "<div class='feld'><label>Betrag netto</label><input type='text' inputmode='decimal' data-honneu='betrag' value='" + esc(e.betrag || "") + "'></div>" +
       "<div class='feld'><label>Art</label><select data-honneu='art'>" +
       [["", "Zusatzhonorar"], ["provision", "Provision Neuvermietung"]].map(([w, l]) =>
         "<option value='" + w + "'" + ((e.art || "") === w ? " selected" : "") + ">" + l + "</option>").join("") + "</select></div></div>" +
@@ -2645,6 +2659,43 @@ const Objekte = (() => {
   }
   /* ---------- Abrechnungen: was ist fertig, was fehlt ---------- */
   const ABR_STATUS = [["offen", "offen"], ["arbeit", "in Arbeit"], ["erstellt", "erstellt"], ["versandt", "versandt"], ["beschlossen", "beschlossen"]];
+  /* Ein Beschluss ist anfechtbar, bis ein Monat nach der Versammlung vergangen ist
+     (§ 45 Satz 1 WEG). Danach ist er bestandskräftig – auch wenn er fehlerhaft war. */
+  /* Was ein Beschluss im Programm auslöst: die Jahresabrechnung gilt als beschlossen,
+     der Wirtschaftsplan als festgestellt. Beides mit Datum und Anfechtungsfrist. */
+  function beschluesseAuswerten(o, daten) {
+    const datum = String(daten.datum || "").slice(0, 10);
+    if (!datum || !istWeg(o)) return;
+    (daten.beschluesse || []).forEach(b => {
+      if (String(b.ergebnis || "").toLowerCase().indexOf("angenommen") < 0) return;
+      const txt = [b.titel, b.text].join(" ");
+      const jahr = (txt.match(/\b(20\d{2})\b/) || [])[1];
+      if (!jahr) return;
+      if (/jahresabrechnung|nachsch(ü|ue)sse|abrechnungsspitze/i.test(txt)) {
+        o.abrechnung = o.abrechnung || {};
+        o.abrechnung[jahr] = { ...(o.abrechnung[jahr] || {}), status: "beschlossen",
+          datum: (o.abrechnung[jahr] || {}).datum || datum, beschlussAm: datum,
+          beschlussNr: b.nr || "", beschlussTitel: b.titel || "" };
+      }
+      if (/wirtschaftsplan|vorsch(ü|ue)sse/i.test(txt) && !/jahresabrechnung/i.test(txt)) {
+        const wp = wplanAlle(o)[jahr];
+        if (wp && !wplanFest(wp)) { wp.beschlossenAm = datum; wp.beschlussTop = String(b.nr || ""); }
+      }
+    });
+  }
+  function anfechtungBis(datum) {
+    const d = String(datum || "").slice(0, 10); if (d.length !== 10) return "";
+    const x = new Date(d + "T12:00:00"); if (isNaN(x)) return "";
+    const tag = x.getDate();
+    x.setMonth(x.getMonth() + 1);
+    if (x.getDate() !== tag) x.setDate(0);
+    return isoTag(x);
+  }
+  const anfechtungStand = datum => {
+    const bis = anfechtungBis(datum); if (!bis) return null;
+    const heute = isoTag(new Date());
+    return { bis, offen: heute <= bis, tage: tageBis(heute, bis) };
+  };
   const abrArt = o => istWeg(o) ? "WEG-Jahresabrechnung" : "Betriebskostenabrechnung";
   const abrStand = (o, jahr) => ((o.abrechnung || {})[String(jahr)] || {});
   const abrFertig = st => ["erstellt", "versandt", "beschlossen"].includes(st.status || "");
@@ -2664,21 +2715,26 @@ const Objekte = (() => {
   function abrechnungenHtml() {
     const jahr = S.awJahr || (new Date().getFullYear() - 1);
     const heute = new Date().toISOString().slice(0, 10);
+    /* Die Zwölfmonatsfrist gilt nur gegenüber Mietern (§ 556 Abs. 3 BGB). Für die WEG
+       gibt es keine Ausschlussfrist – dort zählt der Beschluss, nicht der Kalender. */
     const alle = awObjekte().filter(o => ["miet", "weg", "garantie"].includes(o.art))
-      .map(o => { const z = abrZeitraum(o, jahr); return { o, wer: objBetreuer(o)[0] || "", st: abrStand(o, jahr), z, frist: z.frist }; });
+      .map(o => { const z = abrZeitraum(o, jahr); const weg = istWeg(o);
+        return { o, weg, wer: objBetreuer(o)[0] || "", st: abrStand(o, jahr), z, frist: weg ? "" : z.frist }; });
     const liste = alle.filter(awPasst);
     const fertig = liste.filter(x => abrFertig(x.st)).length;
     const offen = liste.length - fertig;
-    const spaet = liste.filter(x => !abrFertig(x.st) && x.frist < heute).length;
+    const spaet = liste.filter(x => !abrFertig(x.st) && x.frist && x.frist < heute).length;
     let h = "<div class='leiste'><div><label class='fuer' for='aw-jahr'>Abrechnungsjahr</label>" +
       "<input type='number' id='aw-jahr' data-awjahr='1' value='" + jahr + "' min='2000' max='2100' style='width:110px'></div></div>";
     h += "<div class='kacheln'><div class='kachel'><b>" + fertig + " von " + liste.length + "</b><span>erstellt</span></div>" +
       "<div class='kachel'><b class='" + (offen ? "z-minus" : "z-plus") + "'>" + offen + "</b><span>fehlen noch</span></div>" +
-      "<div class='kachel'><b class='" + (spaet ? "z-minus" : "") + "'>" + spaet + "</b><span>Frist abgelaufen</span></div></div>";
+      "<div class='kachel'><b class='" + (spaet ? "z-minus" : "") + "'>" + spaet + "</b><span>Frist abgelaufen</span>" +
+      "<small class='fuer'>nur Mietverwaltung</small></div></div>";
     if (!liste.length) return h + "<p class='unter'>Keine Objekte, für die eine Abrechnung zu erstellen wäre.</p>";
     h += "<div class='ue-tab'><div class='abr-kopf'><span>Objekt</span><span>Zeitraum</span><span>Stand</span><span>Datum</span><span>Frist</span><span>Betreuung</span></div>" +
       liste.map(x => {
-        const spaetDran = !abrFertig(x.st) && x.frist < heute;
+        const spaetDran = !abrFertig(x.st) && !!x.frist && x.frist < heute;
+        const anf = x.weg && x.st.beschlussAm ? anfechtungStand(x.st.beschlussAm) : null;
         return "<div class='abr-row" + (abrFertig(x.st) ? " abr-ok" : spaetDran ? " aw-warn" : "") + "'>" +
           "<span><strong>" + esc(objName(x.o)) + "</strong><br><span class='fuer'>" + esc(abrArt(x.o)) + " · " + (x.o.einheitenListe || []).length + " Einheiten</span></span>" +
           "<span>" + esc(Objekte.datum(x.z.von)) + " – " + esc(Objekte.datum(x.z.bis)) +
@@ -2688,7 +2744,11 @@ const Objekte = (() => {
             w !== (istWeg(x.o) ? "versandt" : "beschlossen")).map(([w, l]) =>
             "<option value='" + w + "'" + ((x.st.status || "offen") === w ? " selected" : "") + ">" + esc(l) + "</option>").join("") + "</select></span>" +
           "<span><input type='date' data-abr='" + esc(x.o.id) + "|" + jahr + "|datum' value='" + esc(x.st.datum || "") + "'></span>" +
-          "<span>" + esc(Objekte.datum(x.frist)) + (spaetDran ? "<br><span class='fuer'>überschritten</span>" : "") + "</span>" +
+          "<span>" + (x.weg
+            ? (anf ? "<span class='marke " + (anf.offen ? "s-warten" : "s-erledigt") + "'>" +
+                (anf.offen ? "anfechtbar bis " + Objekte.datum(anf.bis) : "bestandskräftig") + "</span>"
+              : "<span class='fuer'>keine Frist</span>")
+            : esc(Objekte.datum(x.frist)) + (spaetDran ? "<br><span class='fuer'>überschritten</span>" : "")) + "</span>" +
           "<span>" + esc(teamName(x.wer) || "–") +
           "<br><button class='btn klein' data-act='abr-oeffnen' data-id='" + esc(x.o.id) + "'>Abrechnung</button></span></div>";
       }).join("") + "</div>";
@@ -2699,8 +2759,9 @@ const Objekte = (() => {
     if (reihen.length) h += "<p class='unter'>Noch offen: " + reihen.map(r => esc(teamName(r.wer) || "ohne Betreuung") + " " + r.offen).join(" · ") + "</p>";
     return h + "<ul class='meldungen'><li class='m-hinweis'>Der Abrechnungszeitraum ist das Kalenderjahr; hat ein Objekt ein abweichendes Wirtschaftsjahr, " +
       "stellen Sie den Startmonat in der Zeile um – Zeitraum und Frist rechnen sich dann mit. " +
-      "Die Frist läuft zwölf Monate nach Ende des Zeitraums ab (§ 556 Abs. 3 BGB); danach sind Nachforderungen gegenüber Mietern grundsätzlich ausgeschlossen. " +
-      "Bei der WEG beschließen die Eigentümer über Nachschüsse und Anpassungen (§ 28 Abs. 2 WEG).</li></ul>";
+      "Gegenüber Mietern läuft die Frist zwölf Monate nach Ende des Zeitraums ab (§ 556 Abs. 3 BGB); danach sind Nachforderungen grundsätzlich ausgeschlossen. " +
+      "Für die WEG gibt es keine solche Frist – dort beschließen die Eigentümer über Nachschüsse und Anpassungen (§ 28 Abs. 2 WEG), " +
+      "und einen Monat nach dem Beschluss ist er bestandskräftig (§ 45 WEG).</li></ul>";
   }
   function auswertungHtml() {
     const tabs = [["leerstand", "Leerstand"], ["rueckstand", "Rückstände"], ["op", "Offene Posten"], ["zahllauf", "Zahlungslauf"], ["umsatz", "Umsatz"], ["abrechnung", "Abrechnungen"], ["team", "Auslastung"], ["org", "Organigramm"]];
@@ -2924,13 +2985,13 @@ const Objekte = (() => {
         "<option value='" + w + "'" + ((c.gebaeude || "wgb") === w ? " selected" : "") + ">" + l + "</option>").join("") +
       "</select><small>Bei Wohngebäuden gilt das Zehn-Stufen-Modell, bei Nichtwohngebäuden die hälftige Teilung.</small></div>" +
       "<div class='feld'><label for='co2-kosten'>CO₂-Kosten im Zeitraum €</label>" +
-      "<input type='number' step='0.01' inputmode='decimal' id='co2-kosten' data-co2='kosten' value='" + esc(c.kosten || "") + "'>" +
+      "<input type='text' inputmode='decimal' id='co2-kosten' data-co2='kosten' value='" + esc(c.kosten || "") + "'>" +
       "<small>Steht als eigener Posten auf der Brennstoff- oder Fernwärmerechnung.</small></div>" +
       "<div class='feld'><label for='co2-menge'>CO₂-Ausstoß kg</label>" +
-      "<input type='number' step='1' inputmode='decimal' id='co2-menge' data-co2='menge' value='" + esc(c.menge || "") + "'>" +
+      "<input type='text' inputmode='decimal' id='co2-menge' data-co2='menge' value='" + esc(c.menge || "") + "'>" +
       "<small>Ebenfalls von der Rechnung – nicht die Kilowattstunden.</small></div>" +
       "<div class='feld'><label for='co2-flaeche'>Beheizte Wohnfläche m²</label>" +
-      "<input type='number' step='0.01' inputmode='decimal' id='co2-flaeche' data-co2='flaeche' value='" + esc(c.flaeche || "") + "' placeholder='" + esc(String(beheizteFlaeche(o) || "")) + "'>" +
+      "<input type='text' inputmode='decimal' id='co2-flaeche' data-co2='flaeche' value='" + esc(c.flaeche || "") + "' placeholder='" + esc(String(beheizteFlaeche(o) || "")) + "'>" +
       "<small>Leer gelassen wird die Summe der Einheiten genommen" + (beheizteFlaeche(o) ? ": " + esc(eur2(beheizteFlaeche(o))) + " m²" : " – dort fehlen noch die Flächen") + ".</small></div>" +
       "<div class='feld breit'><label for='co2-ausn'>Öffentlich-rechtliche Ausnahme</label><select id='co2-ausn' data-co2='ausnahme'>" +
       CO2_AUSNAHME.map(([w, l]) => "<option value='" + w + "'" + ((c.ausnahme || "") === w ? " selected" : "") + ">" + esc(l) + "</option>").join("") +
@@ -2994,7 +3055,7 @@ const Objekte = (() => {
           "<span><select data-ko='" + gi + "|kontoNr'><option value=''>– Konto wählen –</option>" +
           konten.map(x => "<option value='" + esc(x.nr) + "'" + (String(k.kontoNr) === String(x.nr) ? " selected" : "") + ">" +
             esc(x.nr + " " + x.name) + "</option>").join("") + "</select></span>" +
-          "<span><input type='number' step='0.01' inputmode='decimal' data-ko='" + gi + "|betrag' value='" + esc(k.betrag || "") + "'></span>" +
+          "<span><input type='text' inputmode='decimal' data-ko='" + gi + "|betrag' value='" + esc(k.betrag || "") + "'></span>" +
           (ustAktiv(o) ? "<span><select data-ko='" + gi + "|ustSatz'>" +
             [["", "ohne"], ["19", "19 %"], ["7", "7 %"]].map(([w, l]) => "<option value='" + w + "'" +
               (String(k.ustSatz || "") === w ? " selected" : "") + ">" + l + "</option>").join("") + "</select></span>" : "") +
@@ -3027,7 +3088,7 @@ const Objekte = (() => {
         const diff = cent(k.summe - summe);
         return "<h4 class='az-ueber'>" + esc(k.nr + " " + k.name) + " <span class='fuer'>Kosten " + esc(eur2(k.summe)) + " €</span></h4>" +
           "<div class='felder'>" + liste.map(e => "<div class='feld'><label>" + esc(e.nr || e.art) + "</label>" +
-            "<input type='number' step='0.01' inputmode='decimal' data-vb='" + esc(jahr + "|" + k.nr + "|" + e.id) + "' value='" +
+            "<input type='text' inputmode='decimal' data-vb='" + esc(jahr + "|" + k.nr + "|" + e.id) + "' value='" +
             esc(verbrauchMap(o)[vbSchluessel(jahr, k.nr, e.id)] || "") + "'></div>").join("") + "</div>" +
           "<p class='unter'>Verteilt: " + esc(eur2(summe)) + " € · " +
           (Math.abs(diff) < 0.02 ? "stimmt mit den Kosten überein" : "<strong class='z-minus'>" + esc(eur2(Math.abs(diff))) + " € " + (diff > 0 ? "noch offen" : "zu viel") + "</strong>") + "</p>";
@@ -3066,7 +3127,7 @@ const Objekte = (() => {
     const r = ruecklageRechnen(o, jahr, erg);
     const v = r.v;
     const f = (feld, l, hilfe) => "<div class='feld'><label>" + esc(l) + "</label>" +
-      "<input type='number' step='0.01' inputmode='decimal' data-vm='" + esc(jahr + "|" + feld) + "' value='" + esc(v[feld] || "") + "'>" +
+      "<input type='text' inputmode='decimal' data-vm='" + esc(jahr + "|" + feld) + "' value='" + esc(v[feld] || "") + "'>" +
       (hilfe ? "<small>" + esc(hilfe) + "</small>" : "") + "</div>";
     const z = (l, w, stark) => "<div class='ue-zeile'><span class='ue-l'>" + (stark ? "<strong>" + l + "</strong>" : l) +
       "</span><span class='ue-w'>" + (stark ? "<strong>" + w + "</strong>" : w) + "</span></div>";
@@ -3083,7 +3144,7 @@ const Objekte = (() => {
       (rlEntnahmen(v).length ? rlEntnahmen(v).map((x, i) => "<div class='rl-row'>" +
         "<span><input type='date' data-rl='" + esc(jahr) + "|" + i + "|datum' value='" + esc(x.datum || "") + "'></span>" +
         "<span><input type='text' data-rl='" + esc(jahr) + "|" + i + "|zweck' value='" + esc(x.zweck || "") + "' placeholder='z. B. Dachsanierung, Beschluss TOP 4 vom 12.05.'></span>" +
-        "<span><input type='number' step='0.01' inputmode='decimal' data-rl='" + esc(jahr) + "|" + i + "|betrag' value='" + esc(x.betrag || "") + "'></span>" +
+        "<span><input type='text' inputmode='decimal' data-rl='" + esc(jahr) + "|" + i + "|betrag' value='" + esc(x.betrag || "") + "'></span>" +
         "<span><button class='btn klein gefahr' data-act='rl-weg' data-jahr='" + esc(jahr) + "' data-i='" + i + "'>" +
         (S.loeschen === "rl" + jahr + i ? "Wirklich?" : "×") + "</button></span></div>").join("")
         : "<p class='unter'>Noch keine Entnahme erfasst." +
@@ -3174,7 +3235,7 @@ const Objekte = (() => {
     const zinsen = cent(betragZahl(v.rlZinsen));
     const ende = cent(anfang + erg.ruecklageGesamt + zinsen - entnahme);
     const f = (feld, l, hilfe) => "<div class='feld'><label>" + esc(l) + "</label>" +
-      "<input type='number' step='0.01' inputmode='decimal' data-vm='" + esc(jahr + "|" + feld) + "' value='" + esc(v[feld] || "") + "'>" +
+      "<input type='text' inputmode='decimal' data-vm='" + esc(jahr + "|" + feld) + "' value='" + esc(v[feld] || "") + "'>" +
       (hilfe ? "<small>" + esc(hilfe) + "</small>" : "") + "</div>";
     return "<section class='gruppe voll'><h2>Vermögensbericht (§ 28 Abs. 4 WEG)</h2>" +
       "<p class='unter'>Stand der Erhaltungsrücklage und der Bankkonten zum Ende des Abrechnungszeitraums. " +
@@ -3265,7 +3326,8 @@ const Objekte = (() => {
     const st = abrStand(o, jahr);
     let h = "<div class='leiste'><div><label class='fuer' for='abr-jahr'>Abrechnungsjahr</label>" +
       "<input type='number' id='abr-jahr' data-abrjahr='1' value='" + jahr + "' min='2000' max='2100' style='width:110px'>" +
-      "<span class='fuer'>" + esc(Objekte.datum(erg.z.von) + " – " + Objekte.datum(erg.z.bis)) + " · Frist " + esc(Objekte.datum(erg.z.frist)) + "</span></div>" +
+      "<span class='fuer'>" + esc(Objekte.datum(erg.z.von) + " – " + Objekte.datum(erg.z.bis)) +
+        (erg.weg ? "" : " · Frist " + Objekte.datum(erg.z.frist)) + "</span></div>" +
       "<div><button class='btn klein haupt' data-act='abr-drucken' data-id=''>Gesamtabrechnung</button></div></div>";
     h += "<div class='kacheln'><div class='kachel'><b>" + esc(eur2(erg.kostenGesamt)) + " €</b><span>Kosten gesamt</span></div>" +
       (erg.weg
@@ -3309,6 +3371,15 @@ const Objekte = (() => {
       }).join("") + "</div></section>";
     if (erg.weg) h += vermoegenBlockHtml(o, jahr, erg) + ruecklageBlockHtml(o, jahr, erg);
     h += abrFreigabeHtml(o, jahr, erg);
+    (() => { const st2 = abrStand(o, jahr); if (!erg.weg || !st2.beschlussAm) return;
+      const an = anfechtungStand(st2.beschlussAm);
+      h += "<ul class='meldungen'><li class='" + (an && an.offen ? "m-hinweis" : "m-ok") + "'>" +
+        "<strong>Beschlossen am " + esc(Objekte.datum(st2.beschlussAm)) + "</strong>" +
+        (st2.beschlussNr ? " als Beschluss Nr. " + esc(String(st2.beschlussNr)) : "") + ". " +
+        (an && an.offen
+          ? "Die Anfechtungsfrist läuft noch bis zum " + esc(Objekte.datum(an.bis)) + " (§ 45 WEG) – erst danach steht die Abrechnung endgültig fest."
+          : "Die Anfechtungsfrist ist abgelaufen; die Abrechnung ist bestandskräftig. Nachschüsse sind fällig und können eingefordert werden.") +
+        "</li></ul>"; })();
     h += "<section class='gruppe voll'><h2>Stand</h2>" +
       "<div class='felder'><div class='feld'><label>Bearbeitungsstand</label><select data-abr='" + esc(o.id) + "|" + jahr + "|status'>" +
       ABR_STATUS.filter(([w]) => w !== (erg.weg ? "versandt" : "beschlossen")).map(([w, l]) =>
@@ -3516,9 +3587,15 @@ const Objekte = (() => {
     if (bs.length) h += "<section class='gruppe voll'>" + h2("Beschluss-Sammlung <span class='fuer'>" + bs.length + "</span>") +
       "<p class='unter'>Fortlaufend nach § 24 Abs. 7 WEG. Neue Beschlüsse kommen automatisch aus dem Protokoll dazu.</p><div class='ue-tab'>" +
       "<div class='bs-kopf'><span>Nr.</span><span>Datum</span><span>Beschluss</span><span>Ergebnis</span></div>" +
-      bs.map(b => "<div class='bs-row'><span><strong>" + esc(b.nr) + "</strong></span><span>" + esc(b.datum ? Objekte.datum(b.datum) : "") + "</span>" +
+      bs.map(b => { const an = anfechtungStand(b.datum);
+        return "<div class='bs-row'><span><strong>" + esc(b.nr) + "</strong></span><span>" + esc(b.datum ? Objekte.datum(b.datum) : "") +
+        (an ? "<br><span class='marke " + (an.offen ? "s-warten" : "s-erledigt") + "'>" +
+          (an.offen ? "anfechtbar noch " + an.tage + (an.tage === 1 ? " Tag" : " Tage") : "bestandskräftig") + "</span>" : "") + "</span>" +
         "<span><strong>" + esc(b.titel) + "</strong><br><span class='fuer'>" + esc(b.text) + "</span></span>" +
-        "<span class='" + (String(b.ergebnis).startsWith("angenommen") ? "bs-ja" : "bs-nein") + "'>" + esc(b.ergebnis || "") + "</span></div>").join("") + "</div></section>";
+        "<span class='" + (String(b.ergebnis).startsWith("angenommen") ? "bs-ja" : "bs-nein") + "'>" + esc(b.ergebnis || "") + "</span></div>"; }).join("") + "</div>" +
+      (bs.some(b => { const an = anfechtungStand(b.datum); return an && an.offen; })
+        ? "<ul class='meldungen'><li class='m-hinweis'>Solange die Monatsfrist des § 45 WEG läuft, kann ein Beschluss noch angefochten werden. " +
+          "Setzen Sie ihn in dieser Zeit nur um, wenn ein Aufschub der Gemeinschaft schadet.</li></ul>" : "") + "</section>";
     if (String(o.notizen || "").trim()) h += "<section class='gruppe'>" + h2("Notizen") + "<p class='t-text'>" + esc(o.notizen).replace(/\n/g, "<br>") + "</p></section>";
     h += "</div><div class='leiste'><div><button class='btn haupt' data-act='bearbeiten'>Bearbeiten</button><button class='btn' data-act='abbrechen'>Zurück zur Übersicht</button>" +
       (o.art === "miet" || o.art === "weg" ? "<button class='btn' data-act='vertrag-erstellen'>Verwaltervertrag erstellen</button>" : "") + "</div></div></div>";
@@ -3821,7 +3898,7 @@ const Objekte = (() => {
     h += "<section class='gruppe voll'><h2>Vertrag</h2><p class='unter'>" + (weg ? "Zeitraum der Verwalterbestellung." : "Laufzeit des Verwaltervertrags.") + "</p><div class='felder'>" +
       feld("provision", "Provision bei Neuvermietung", "text", { ph: "z. B. eine Nettokaltmiete zzgl. USt", hilfe: "Kommt aus dem Verwaltervertrag und steht in der Anfrage an den Eigentümer." }) +
       feld("beginn", weg ? "Bestellt ab" : "Vertragsbeginn", "date") + feld("ende", weg ? "Bestellt bis" : "Vertragsende (falls vereinbart)", "date", { hilfe: weg ? "Höchstens 5 Jahre (§ 26 Abs. 2 WEG)." : "" }) +
-      (o.art === "garantie" ? feld("garantiemiete", "Garantierte Miete", "number", { einheit: "€/Mon.", attr: "min='0' step='0.01' inputmode='decimal'", hilfe: "Betrag, den Sie dem Eigentümer monatlich zusichern." }) : "") +
+      (o.art === "garantie" ? feld("garantiemiete", "Garantierte Miete", "text", { einheit: "€/Mon.", attr: "inputmode='decimal' placeholder='z. B. 1.250,00'", hilfe: "Betrag, den Sie dem Eigentümer monatlich zusichern." }) : "") +
       "</div>" +
       (S.istNeu ? "" : "<div class='schalter-zeile' style='margin-top:18px'><div>Verwaltung beendet<small>" + (o.beendet && o.beendetAutomatisch ? "Automatisch beendet, weil " + (weg ? "die Bestellung" : "der Vertrag") + " am " + Objekte.datum(o.beendetAm) + " ausgelaufen ist. Bei Wiederbestellung: Schalter aus und neues Ende eintragen." : "Das Objekt verschwindet aus der Übersicht, bleibt aber gespeichert. Läuft das Vertragsende ab, geschieht das automatisch.") + "</small></div>" +
         "<button type='button' class='schalter' role='switch' aria-checked='" + !!o.beendet + "' aria-label='Verwaltung beendet' data-act='beendet'></button></div>") + "</section>";
@@ -4114,6 +4191,8 @@ const Objekte = (() => {
     const vertrag = mieter
       ? z("Mietbeginn", p.mietbeginn ? Objekte.datum(p.mietbeginn) : "") + z("Mietende", p.mietende ? Objekte.datum(p.mietende) : "") +
         z("Kaltmiete", eur(p.kaltmiete)) + z("Betriebskosten", eur(p.bkVoraus)) + z("Heizkosten", eur(p.hkVoraus)) + z("Kaution", eur(p.kaution)) +
+        (mietStufenOffen(p).length ? z("Vereinbarte Erhöhung", mietStufenOffen(p).map(x =>
+          eur(x.kaltmiete) + " ab " + Objekte.datum(x.ab)).join("<br>")) : "") +
         z("Abnahmetermin", p.abnahme ? Objekte.datum(p.abnahme) : "")
       : z("Eigentümer seit", p.eigentumSeit ? Objekte.datum(p.eigentumSeit) : "") + z("Eigentum bis", p.eigentumBis ? Objekte.datum(p.eigentumBis) : "") + z("Miteigentumsanteil", esc(p.mea));
     const bank = z("Kontoinhaber", esc(p.kontoinhaber)) + z("IBAN", p.iban ? esc(Objekte.ibanFormat(p.iban)) : "") +
@@ -4458,8 +4537,18 @@ const Objekte = (() => {
   const BEREICHE = [["objekte", "Objekte"], ["vertraege", "Verträge"], ["etv", "ETV"], ["vermietung", "Vermittlung"],
     ["zeit", "Zeiterfassung"], ["tickets", "Tickets"], ["kalender", "Kalender"], ["auswertung", "Auswertung"], ["mails", "E-Mail"],
     ["handwerker", "Handwerker"], ["personen", "Eigentümer/Mieter"], ["einstellungen", "Einstellungen"]];
-  const rechteVon = m => { const r = (m && m.rechte) || {}; return { gesperrt: Array.isArray(r.gesperrt) ? r.gesperrt : [], nurLesen: !!r.nurLesen }; };
-  const meineRechte = () => { const m = angemeldet(); return (!m || m.id === ADMIN_ID) ? { gesperrt: [], nurLesen: false } : rechteVon(m); };
+  const rechteVon = m => { const r = (m && m.rechte) || {};
+    return { gesperrt: Array.isArray(r.gesperrt) ? r.gesperrt : [], nurLesen: !!r.nurLesen, umlage: !!r.umlage }; };
+  const meineRechte = () => { const m = angemeldet(); return (!m || m.id === ADMIN_ID) ? { gesperrt: [], nurLesen: false, umlage: true } : rechteVon(m); };
+  /* Ob eine Kostenart auf die Mieter umgelegt werden darf, entscheidet über bares Geld und
+     über die Angreifbarkeit jeder Abrechnung. Diese Entscheidung braucht deshalb eine
+     ausdrückliche Berechtigung – der Admin und der Verwalter haben sie immer. */
+  function darfUmlage() {
+    const m = angemeldet();
+    if (!m || m.id === ADMIN_ID) return true;
+    if (rechteVon(m).nurLesen) return false;
+    return m.rolle !== "team" || rechteVon(m).umlage;
+  }
   const leseModus = () => meineRechte().nurLesen;
   /* Ansehen, öffnen, drucken, abbrechen bleiben frei – alles andere ändert Daten. */
   const LESEN_FREI = /^(tab|[a-z0-9]+-tab|oeffnen|[a-z0-9-]+-oeffnen|[a-z0-9-]+-auf|bearbeiten|[a-z0-9-]+-bearbeiten|abbrechen|[a-z0-9-]+-abbrechen|[a-z0-9-]+-abbr|zurueck|[a-z0-9-]+-zurueck|[a-z0-9-]+-zu|drucken|[a-z0-9-]+-drucken|download|[a-z0-9-]+-download|[a-z0-9-]+-pdf|filter|[a-z0-9-]+-filter|kal-[a-z]+|seg|pt-ansehen|pt-abr|pw-sicht|an-login|an-abmelden|an-pw-ok|an-pw-inline|e-meine|e-ansicht|t-meine|t-ansicht|p-ehemalige|beendete|info-alle|info-gelesen|td-verlauf|bs-ansehen|brief-anzeigen|prot-ordnung|kr-prot)$/;
@@ -4536,6 +4625,11 @@ const Objekte = (() => {
       "<div class='schalter-zeile' style='margin-top:16px'><div>Nur lesen, nichts ändern" +
         "<small>Er darf alles ansehen, öffnen und drucken, aber nichts speichern oder löschen. Die eigene Zeiterfassung bleibt möglich.</small></div>" +
       "<button type='button' class='schalter' role='switch' aria-checked='" + r.nurLesen + "' aria-label='Nur lesen' data-act='m-nurlesen'></button></div>" +
+      (m.rolle === "team"
+        ? "<div class='schalter-zeile' style='margin-top:12px'><div>Darf festlegen, was umlagefähig ist" +
+          "<small>Das Häkchen „umlagefähig“ am Konto entscheidet, was der Mieter zahlt. Eine falsch gesetzte Kostenart macht die Abrechnung angreifbar – deshalb ist das Recht getrennt.</small></div>" +
+          "<button type='button' class='schalter' role='switch' aria-checked='" + r.umlage + "' aria-label='Umlagefähigkeit ändern' data-act='m-umlage'></button></div>"
+        : "<p class='unter' style='margin-top:10px'>Als Verwalter darf er auch festlegen, was umlagefähig ist.</p>") +
       (r.gesperrt.length || r.nurLesen
         ? "<ul class='meldungen' style='margin-top:12px'><li class='m-hinweis'>" +
           (r.nurLesen ? "Nur-Lese-Zugang. " : "") +
@@ -6831,6 +6925,16 @@ const Objekte = (() => {
   }
   /* Die Positionen einer Sollstellung: bei Miete aus dem Mietvertrag,
      bei WEG aus dem Wirtschaftsplan bzw. dem hinterlegten Hausgeld der Einheit. */
+  /* Eine Mieterhöhung wirkt erst ab ihrem Datum. Deshalb merkt sich das Programm die
+     Stufen und nimmt für jeden Monat den Betrag, der in diesem Monat geschuldet war. */
+  const mietStufen = p => Array.isArray(p && p.mietStufen) ? p.mietStufen : [];
+  function kaltmieteAm(p, ym) {
+    const bis = mietStufen(p).filter(x => x.ab && String(x.ab).slice(0, 7) <= ym)
+      .sort((a, b) => String(a.ab).localeCompare(String(b.ab)));
+    return bis.length ? betragZahl(bis[bis.length - 1].kaltmiete) : betragZahl(p && p.kaltmiete);
+  }
+  const mietStufenOffen = p => mietStufen(p).filter(x => x.ab && String(x.ab) > isoTag(new Date()))
+    .sort((a, b) => String(a.ab).localeCompare(String(b.ab)));
   function sollPositionen(o, e, partei, ym) {
     const weg = istWeg(o);
     const tage = tageImMonat(ym);
@@ -6846,7 +6950,7 @@ const Objekte = (() => {
     if (anteil <= 0) return null;
     const konten = objektKonten(o);
     const betraege = weg ? hausgeldBetraege(o, e, ym) : {
-      kaltmiete: betragZahl(partei.kaltmiete), bkVoraus: betragZahl(partei.bkVoraus), hkVoraus: betragZahl(partei.hkVoraus) };
+      kaltmiete: kaltmieteAm(partei, ym), bkVoraus: betragZahl(partei.bkVoraus), hkVoraus: betragZahl(partei.hkVoraus) };
     const aus = [];
     const mitUst = !weg && ustPflichtig(e);
     const satz = mitUst ? ustSatzVon(e) : 0;
@@ -6898,6 +7002,20 @@ const Objekte = (() => {
     return neu;
   }
   const periodeFest = (o, jahr) => !!((o.perioden || {})[jahr] || {}).fest;
+  /* Sollstellungen für alle Objekte nachtragen. Früher geschah das nur beim Öffnen eines
+     Objekts – dadurch fehlten in Rückständen, offenen Posten, Mahnwesen und Abrechnung die
+     Monate jedes Objekts, das gerade niemand aufgeschlagen hatte. */
+  async function sollstellungenAlle() {
+    let n = 0;
+    for (const o of (S.liste || []).filter(x => !x.beendet)) {
+      const k = sollstellungenErzeugen(o);
+      if (!k) continue;
+      n += k;
+      try { await Speicher.speichern("objekte", o, S.liste); } catch (e) {}
+      if (S.entwurf && S.entwurf.id === o.id) S.entwurf.soll = o.soll;
+    }
+    return n;
+  }
   const zahlungenZu = (o, sollId) => zahlungsListe(o).filter(z => z.sollId === sollId && !z.storniert);
   const gezahltAuf = (o, sollId) => Math.round(zahlungenZu(o, sollId).reduce((s, z) => s + betragZahl(z.betrag), 0) * 100) / 100;
   function sollStand(o, s) {
@@ -6930,8 +7048,11 @@ const Objekte = (() => {
     const schl = "__sp_" + name;
     clearTimeout(window[schl]);
     const pruefen = () => {
+      /* Solange der Cursor irgendwo in einem Eingabefeld steht, wird nicht neu gezeichnet –
+         sonst verliert auch das nächste Feld den Fokus, in das der Nutzer gerade gewechselt ist. */
       const a = document.activeElement;
-      if (a && a.dataset && a.dataset[name] != null) { window[schl] = setTimeout(pruefen, 500); return; }
+      const tippt = a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && !a.disabled && a.type !== "file";
+      if (tippt) { window[schl] = setTimeout(pruefen, 500); return; }
       render(true);
     };
     window[schl] = setTimeout(pruefen, ms || 700);
@@ -7448,7 +7569,7 @@ const Objekte = (() => {
         "<div class='felder'>" +
         "<div class='feld'><label>Art der Sicherheit</label><select data-kau='" + i + "|art'>" +
         KAU_ART.map(([w, l]) => "<option value='" + w + "'" + ((k.art || "konto") === w ? " selected" : "") + ">" + esc(l) + "</option>").join("") + "</select></div>" +
-        "<div class='feld'><label>Vereinbarte Höhe €</label><input type='number' step='0.01' inputmode='decimal' data-kau='" + i + "|betrag' value='" + esc(k.betrag || "") + "'>" +
+        "<div class='feld'><label>Vereinbarte Höhe €</label><input type='text' inputmode='decimal' data-kau='" + i + "|betrag' value='" + esc(k.betrag || "") + "'>" +
         (hoechst ? "<small>Höchstens " + esc(eur2(hoechst)) + " € (drei Nettokaltmieten).</small>" : "<small>Beim Mieter ist keine Kaltmiete hinterlegt.</small>") + "</div>" +
         (geld ? "<div class='feld'><label>IBAN des Kautionskontos</label><input type='text' data-kau='" + i + "|iban' value='" + esc(k.iban || "") + "' placeholder='DE…'></div>" +
           "<div class='feld'><label>Bank</label><input type='text' data-kau='" + i + "|bank' value='" + esc(k.bank || "") + "'></div>" : "") +
@@ -7476,7 +7597,7 @@ const Objekte = (() => {
     let h = "<h4 class='az-ueber'>Zahlung</h4>";
     h += raten.length ? "<div class='kau-raten'>" + raten.map((r, j) => "<div class='kau-rate'>" +
       "<input type='date' data-kau='" + i + "|r" + j + "|faellig' value='" + esc(r.faellig || "") + "'>" +
-      "<input type='number' step='0.01' inputmode='decimal' data-kau='" + i + "|r" + j + "|betrag' value='" + esc(r.betrag || "") + "' placeholder='Betrag €'>" +
+      "<input type='text' inputmode='decimal' data-kau='" + i + "|r" + j + "|betrag' value='" + esc(r.betrag || "") + "' placeholder='Betrag €'>" +
       "<input type='date' data-kau='" + i + "|r" + j + "|am' value='" + esc(r.am || "") + "' title='eingegangen am'>" +
       "<span class='marke " + (r.am ? "s-erledigt" : String(r.faellig || "") < isoTag(new Date()) ? "s-fehler" : "s-neu") + "'>" +
       (r.am ? "eingegangen" : String(r.faellig || "") < isoTag(new Date()) ? "überfällig" : "offen") + "</span>" +
@@ -7496,8 +7617,8 @@ const Objekte = (() => {
     h += z.length ? "<div class='kau-zins'><div class='kau-zkopf'><span>Jahr</span><span>Zinsen brutto €</span><span>einbehaltene Steuer €</span><span>netto</span><span></span></div>" +
       z.map((x, j) => "<div class='kau-zrow'>" +
         "<input type='number' data-kau='" + i + "|z" + j + "|jahr' value='" + esc(x.jahr || "") + "' min='2000' max='2100'>" +
-        "<input type='number' step='0.01' inputmode='decimal' data-kau='" + i + "|z" + j + "|betrag' value='" + esc(x.betrag || "") + "'>" +
-        "<input type='number' step='0.01' inputmode='decimal' data-kau='" + i + "|z" + j + "|steuer' value='" + esc(x.steuer || "") + "'>" +
+        "<input type='text' inputmode='decimal' data-kau='" + i + "|z" + j + "|betrag' value='" + esc(x.betrag || "") + "'>" +
+        "<input type='text' inputmode='decimal' data-kau='" + i + "|z" + j + "|steuer' value='" + esc(x.steuer || "") + "'>" +
         "<span class='so-betrag'>" + esc(eur2(cent(betragZahl(x.betrag) - betragZahl(x.steuer)))) + " €</span>" +
         "<button class='btn klein gefahr' data-act='kau-z-weg' data-i='" + i + "' data-j='" + j + "'>×</button></div>").join("") + "</div>"
       : "<p class='unter'>Noch keine Zinsgutschrift erfasst – die Werte stehen auf dem Kontoauszug des Kautionskontos.</p>";
@@ -7509,7 +7630,7 @@ const Objekte = (() => {
     let h = "<h4 class='az-ueber'>Abrechnung beim Auszug</h4>";
     h += ab.length ? "<div class='kau-ab'>" + ab.map((a, j) => "<div class='kau-abrow'>" +
       "<input type='text' data-kau='" + i + "|a" + j + "|text' value='" + esc(a.text || "") + "' placeholder='Grund – z. B. Rückstand Miete 11/2026, Schaden Parkett laut Protokoll'>" +
-      "<input type='number' step='0.01' inputmode='decimal' data-kau='" + i + "|a" + j + "|betrag' value='" + esc(a.betrag || "") + "' placeholder='€'>" +
+      "<input type='text' inputmode='decimal' data-kau='" + i + "|a" + j + "|betrag' value='" + esc(a.betrag || "") + "' placeholder='€'>" +
       "<button class='btn klein gefahr' data-act='kau-a-weg' data-i='" + i + "' data-j='" + j + "'>×</button></div>").join("") + "</div>"
       : "<p class='unter'>Keine Abzüge erfasst – die Sicherheit wird vollständig zurückgezahlt.</p>";
     h += "<div class='leiste'><div><button class='btn klein' data-act='kau-abzug' data-i='" + i + "'>+ Abzug</button>" +
@@ -7615,7 +7736,7 @@ const Objekte = (() => {
       "Zahlungen und den laufenden Dienstleistungsverträgen. Einmalige Vorhaben tragen Sie als Zahlung ein, " +
       "dann erscheinen sie hier.</p>";
     h += "<div class='felder'><div class='feld'><label for='liq-start'>Kontostand heute €</label>" +
-      "<input type='number' step='0.01' inputmode='decimal' id='liq-start' data-liq='start' value='" + esc((o.liq && o.liq.start) || "") + "'>" +
+      "<input type='text' inputmode='decimal' id='liq-start' data-liq='start' value='" + esc((o.liq && o.liq.start) || "") + "'>" +
       "<small>Vom Kontoauszug des " + (weg ? "Gemeinschaftskontos" : "Objektkontos") + ". Ohne ihn zeigt die Vorschau nur die Veränderung.</small></div>" +
       "<div class='feld'><label>Erwartet je Monat</label><input type='text' value='" + esc(eur2(erg.erwartet)) + " €' disabled>" +
       "<small>" + (weg ? "Hausgeld" : "Miete und Vorauszahlungen") + " aus den letzten drei Monaten.</small></div></div>";
@@ -7774,6 +7895,13 @@ const Objekte = (() => {
       "<span class='so-betrag'>" + (Math.abs(sS - sH) < 0.005 ? "<span class='marke s-erledigt'>stimmt</span>" :
         "<span class='marke s-fehler'>" + esc(eur2(sS - sH)) + " €</span>") + "</span></div></div>"
       : "<p class='unter'>Noch keine Salden.</p>";
+    const belegt = gegenFelder(o).map(([k, l]) => ({ k, l, nr: String(g[k] || ""),
+      treffer: objektKonten(o).filter(x => String(x.nr || "") === String(g[k] || "")) }))
+      .filter(x => x.nr && x.treffer.length);
+    if (belegt.length) h += "<ul class='meldungen'><li class='m-fehler'>" +
+      belegt.map(x => "Die Nummer <strong>" + esc(x.nr) + "</strong> ist zugleich das Gegenkonto „" + esc(x.l) +
+        "“ und Ihr eigenes Konto „" + esc(x.treffer[0].name || "") + "“. Alles, was auf das Gegenkonto läuft, " +
+        "landet damit auf Ihrem Konto. Vergeben Sie eine der beiden Nummern neu.").join(" ") + "</li></ul>";
     h += "<h3 style='margin-top:22px'>Gegenkonten dieses Objekts</h3>" +
       "<p class='unter'>Bank, Forderungen und Verbindlichkeiten sind keine Konten Ihres Kontenrahmens, sondern Bestandskonten. " +
       "Die Nummern hier müssen zu denen Ihres Steuerberaters passen – fragen Sie ihn einmal, dann stimmt es für immer.</p>" +
@@ -7783,12 +7911,12 @@ const Objekte = (() => {
         "<small>" + esc(hilfe) + "</small></div>").join("") + "</div>";
     h += "<h3 style='margin-top:22px'>Für den Steuerberater</h3>" +
       "<div class='felder'>" +
-      "<div class='feld'><label for='dv-ber'>Beraternummer</label><input type='text' id='dv-ber' data-dv='datevBerater' value='" + esc(d.berater) + "' inputmode='numeric'><small>Steht auf jedem Schreiben Ihrer Kanzlei.</small></div>" +
-      "<div class='feld'><label for='dv-man'>Mandantennummer</label><input type='text' id='dv-man' data-dv='datevMandant' value='" + esc(d.mandant) + "' inputmode='numeric'><small>Ihre Nummer bei der Kanzlei.</small></div>" +
-      "<div class='feld'><label for='dv-skr'>Kontenrahmen</label><select id='dv-skr' data-dv='datevSkr'>" +
+      "<div class='feld'><label for='dv-ber'>Beraternummer</label><input type='text' id='dv-ber' data-datev='datevBerater' value='" + esc(d.berater) + "' inputmode='numeric'><small>Steht auf jedem Schreiben Ihrer Kanzlei.</small></div>" +
+      "<div class='feld'><label for='dv-man'>Mandantennummer</label><input type='text' id='dv-man' data-datev='datevMandant' value='" + esc(d.mandant) + "' inputmode='numeric'><small>Ihre Nummer bei der Kanzlei.</small></div>" +
+      "<div class='feld'><label for='dv-skr'>Kontenrahmen</label><select id='dv-skr' data-datev='datevSkr'>" +
       [["03", "SKR 03"], ["04", "SKR 04"]].map(([w, l]) => "<option value='" + w + "'" + (d.skr === w ? " selected" : "") + ">" + l + "</option>").join("") +
       "</select><small>Welchen die Kanzlei führt.</small></div>" +
-      "<div class='feld'><label for='dv-len'>Länge der Sachkonten</label><select id='dv-len' data-dv='datevLaenge'>" +
+      "<div class='feld'><label for='dv-len'>Länge der Sachkonten</label><select id='dv-len' data-datev='datevLaenge'>" +
       ["4", "5", "6", "7", "8"].map(w => "<option value='" + w + "'" + (d.laenge === w ? " selected" : "") + ">" + w + " Stellen</option>").join("") +
       "</select></div></div>";
     h += "<div class='leiste'><div>" +
@@ -8061,7 +8189,7 @@ const Objekte = (() => {
     const ab = skontoBetrag(x, naechsterTagFuer(zielTag(x)));
     const zu = x.zustimmung || {};
     return "<span class='ue-zusatz'>" +
-      "<label>Skonto %<input type='number' step='0.1' min='0' inputmode='decimal' data-ue='" + i + "|skontoProz' value='" + esc(x.skontoProz || "") + "' placeholder='0'></label>" +
+      "<label>Skonto %<input type='text' inputmode='decimal' data-ue='" + i + "|skontoProz' value='" + esc(x.skontoProz || "") + "' placeholder='0'></label>" +
       "<label>Skonto bis<input type='date' data-ue='" + i + "|skontoBis' value='" + esc(x.skontoBis || "") + "'></label>" +
       (ab ? "<span class='z-plus'>Abzug " + esc(eur2(ab)) + " € · zahlbar " + esc(eur2(zahlBetrag(x, naechsterTagFuer(zielTag(x))))) + " €</span>"
           : betragZahl(x.skontoProz) > 0 && x.skontoBis ? "<span class='fuer'>Skontofrist abgelaufen – voller Betrag</span>" : "") +
@@ -8107,7 +8235,7 @@ const Objekte = (() => {
           "<span><input type='text' data-ue='" + i + "|iban' value='" + esc(x.iban || "") + "' placeholder='DE…'" + (fest ? " disabled" : "") +
             (ibanOk ? "" : " style='box-shadow:inset 0 0 0 1.5px var(--err)'") + "></span>" +
           "<span><input type='text' data-ue='" + i + "|zweck' value='" + esc(x.zweck || "") + "'" + (fest ? " disabled" : "") + "></span>" +
-          "<span><input type='number' step='0.01' inputmode='decimal' data-ue='" + i + "|betrag' value='" + esc(x.betrag || "") + "'" + (fest ? " disabled" : "") + "></span>" +
+          "<span><input type='text' inputmode='decimal' data-ue='" + i + "|betrag' value='" + esc(x.betrag || "") + "'" + (fest ? " disabled" : "") + "></span>" +
           "<span><input type='date' data-ue='" + i + "|faellig' value='" + esc(x.faellig || "") + "'" + (fest ? " disabled" : "") + "></span>" +
           "<span><span class='marke " + (x.status === "bezahlt" ? "s-erledigt" : x.status === "erfasst" ? "s-neu"
               : (x.status === "frei" && braucht2(x) && !x.freigabe2Am) ? "s-fehler" : "s-warten") + "'>" +
@@ -8846,7 +8974,7 @@ const Objekte = (() => {
         "<span><input type='text' data-ih='" + esc(x.id) + "|bauteil' value='" + esc(x.bauteil || "") + "' placeholder='z. B. Dach'></span>" +
         "<span><input type='number' data-ih='" + esc(x.id) + "|baujahr' value='" + esc(x.baujahr || "") + "'></span>" +
         "<span><input type='number' data-ih='" + esc(x.id) + "|lebensdauer' value='" + esc(x.lebensdauer || "") + "' placeholder='Jahre'></span>" +
-        "<span><input type='number' step='0.01' data-ih='" + esc(x.id) + "|kosten' value='" + esc(x.kosten || "") + "'></span>" +
+        "<span><input type='text' inputmode='decimal' data-ih='" + esc(x.id) + "|kosten' value='" + esc(x.kosten || "") + "'></span>" +
         "<span><input type='number' data-ih='" + esc(x.id) + "|jahr' value='" + esc(x.jahr || String(ihJahr(x))) + "'></span>" +
         "<span><select data-ih='" + esc(x.id) + "|status'>" + IH_STATUS.map(([w, l]) =>
           "<option value='" + w + "'" + ((x.status || "geplant") === w ? " selected" : "") + ">" + l + "</option>").join("") + "</select></span>" +
@@ -9334,8 +9462,14 @@ const Objekte = (() => {
               "<div class='feld'><label>Steuerlich begünstigt (§ 35a EStG)</label>" +
               "<select aria-label='§ 35a EStG' data-kk='" + i + "|par35a'>" + PAR35A.map(([w, l]) =>
                 "<option value='" + w + "'" + (k.par35a === w ? " selected" : "") + ">" + l + "</option>").join("") + "</select></div></div>" +
-              "<div class='schalter-zeile'><div>Umlagefähig auf die Mieter<small>Nur umlagefähige Kosten dürfen in die Betriebskostenabrechnung (§ 2 BetrKV).</small></div>" +
-              "<button type='button' class='schalter klein' role='switch' aria-checked='" + !!k.umlage + "' aria-label='umlagefähig' data-act='kk-umlage' data-i='" + i + "'></button></div>"
+              "<div class='schalter-zeile'><div>Umlagefähig auf die Mieter<small>" +
+              (darfUmlage()
+                ? "Nur umlagefähige Kosten dürfen in die Betriebskostenabrechnung (§ 2 BetrKV)."
+                : "Steht auf <strong>" + (k.umlage ? "umlagefähig" : "nicht umlagefähig") + "</strong>. Ändern darf das nur, wer dafür berechtigt ist.") +
+              "</small></div>" +
+              (darfUmlage()
+                ? "<button type='button' class='schalter klein' role='switch' aria-checked='" + !!k.umlage + "' aria-label='umlagefähig' data-act='kk-umlage' data-i='" + i + "'></button>"
+                : "<span class='marke " + (k.umlage ? "s-erledigt" : "s-warten") + "'>" + (k.umlage ? "umlagefähig" : "nicht umlagefähig") + "</span>") + "</div>"
             : "<p class='unter' style='margin:0 0 12px'>" + (verw
                 ? "Dieses Konto trägt in der Sollstellung die <strong>" + esc(verw[1]) + "</strong>."
                 : "Verteilerschlüssel und § 35a gelten nur für Ausgabekonten. Ob dieses Konto einen Teil der Miete trägt, legen Sie unten in Schritt 3 fest.") + "</p>") +
@@ -10103,12 +10237,18 @@ const Objekte = (() => {
     betreuung: id => { const o = S.liste.find(x => x.id === id); if (!o) return "";
       return (o.betreuerIds && o.betreuerIds.length ? o.betreuerIds : [o.betreuerId]).map(x => teamName(x)).filter(Boolean).join(", "); },
     /* Protokoll beim Objekt ablegen und die Beschluss-Sammlung fortschreiben (§ 24 Abs. 7 WEG). */
+    /* Erkennt an Titel und Text, worüber beschlossen wurde, und trägt es ein. */
+    beschluesseAuswerten,
     protokollAblegen(objektId, daten) {
       const o = S.liste.find(x => x.id === objektId); if (!o) return false;
       o.beschluesse = (o.beschluesse || []).filter(b => b.etvId !== daten.etvId);
       let nr = o.beschluesse.reduce((m, b) => Math.max(m, Number(b.nr) || 0), 0);
-      (daten.beschluesse || []).forEach(b => o.beschluesse.push({ nr: ++nr, datum: daten.datum, titel: b.titel, text: b.text, ergebnis: b.ergebnis,
+      const neue = (daten.beschluesse || []).map(b => ({ nr: ++nr, datum: daten.datum, titel: b.titel, text: b.text, ergebnis: b.ergebnis,
         versammlung: daten.versammlung, etvId: daten.etvId, erfasst: new Date().toISOString() }));
+      neue.forEach(b => o.beschluesse.push(b));
+      /* Angenommene Beschlüsse über die Jahresabrechnung und den Wirtschaftsplan werden
+         gleich dort vermerkt, wo sie hingehören – samt Anfechtungsfrist nach § 45 WEG. */
+      beschluesseAuswerten(o, { datum: daten.datum, beschluesse: neue });
       o.dokumente = (o.dokumente || []).filter(d => d.etvId !== daten.etvId);
       o.dokumente.push({ id: "etv-" + daten.etvId, etvId: daten.etvId, quelle: "etv", name: "Protokoll " + (daten.datum ? Objekte.datum(daten.datum) : ""),
         art: "Protokoll Eigentümerversammlung", datum: daten.datum || "", hochgeladen: new Date().toISOString() });
@@ -10177,8 +10317,19 @@ const Objekte = (() => {
     mieteAktualisieren: (objektId, einheitId, neu, ab) => {
       const o = S.liste.find(x => x.id === objektId); if (!o) return false;
       const e = (o.einheitenListe || []).find(x => x.id === einheitId); const mie = e ? mieterVon(e.id, o) : null;
-      if (mie) { mie.kaltmiete = String(neu); mie.letzteErhoehung = ab || new Date().toISOString().slice(0, 10); personSichern(mie); }
-      if (e) { e.sollmiete = String(neu); const i = S.liste.findIndex(x => x.id === o.id); if (i >= 0) S.liste[i] = o;
+      const heute = isoTag(new Date());
+      const abIso = String(ab || heute).slice(0, 10);
+      if (mie) {
+        /* Die Erhöhung wird als Stufe hinterlegt. Bis zu ihrem Datum gilt die alte Miete –
+           das Programm stellt also nicht zu früh den höheren Betrag. */
+        mie.mietStufen = mietStufen(mie).filter(x => String(x.ab) !== abIso)
+          .concat({ ab: abIso, kaltmiete: String(neu), erfasst: new Date().toISOString() })
+          .sort((a, b) => String(a.ab).localeCompare(String(b.ab)));
+        mie.letzteErhoehung = abIso;
+        if (abIso <= heute) mie.kaltmiete = String(neu);
+        personSichern(mie);
+      }
+      if (e && abIso <= heute) { e.sollmiete = String(neu); const i = S.liste.findIndex(x => x.id === o.id); if (i >= 0) S.liste[i] = o;
         Speicher.speichern("objekte", o, S.liste).catch(() => {}); }
       return true;
     },
@@ -10263,7 +10414,17 @@ const Objekte = (() => {
   };
 
   /* ---------- Steuerung ---------- */
+  /* Wird neu gezeichnet, während der Browser noch ein Ereignis abarbeitet, kann er beim
+     Austauschen des Inhalts stolpern. Dann einmal im nächsten Durchgang wiederholen –
+     sichtbar ist davon nichts, und die Konsole bleibt sauber. */
   function render(behalteScroll) {
+    try { zeichnen(behalteScroll); }
+    catch (e) {
+      if (!/no longer a child|not a child/i.test(String(e && e.message))) throw e;
+      setTimeout(() => { try { zeichnen(behalteScroll); } catch (e2) {} }, 0);
+    }
+  }
+  function zeichnen(behalteScroll) {
     const y = window.scrollY;
     /* Erst anmelden, dann arbeiten. Wer das Startkennwort hat, muss es zuerst ändern. */
     const ich = angemeldet();
@@ -10655,10 +10816,10 @@ const Objekte = (() => {
       spaeterZeichnen("gk", 900);
       return;
     }
-    if (t.dataset.dv) {
-      S.einst[t.dataset.dv] = t.value; einstellungenSpeichern();
-      if (t.dataset.dv === "datevSkr" || t.dataset.dv === "datevLaenge") render(true);
-      else spaeterZeichnen("dv", 900);
+    if (t.dataset.datev) {
+      S.einst[t.dataset.datev] = t.value; einstellungenSpeichern();
+      if (t.dataset.datev === "datevSkr" || t.dataset.datev === "datevLaenge") render(true);
+      else spaeterZeichnen("datev", 900);
       return;
     }
     if (t.dataset.kobeleg) { S.koKonto = { ...(S.koKonto || {}) }; S.koKonto[t.dataset.kobeleg] = t.value; return; }
@@ -10876,7 +11037,9 @@ const Objekte = (() => {
       const [i, feld] = t.dataset.kk.split("|"); const r = rahmenVon(S.rahmenOffen) || rahmenListe()[0];
       const k = r.konten[Number(i)]; if (!k) return;
       k[feld] = t.value; rahmenSichern();
-      if (feld === "art" || feld === "klasse") render(true);
+      /* Erst den Browser mit dem laufenden Ereignis fertig werden lassen – sonst wird die
+         Zeile unter dem Element weggezogen, das gerade den Fokus abgibt. */
+      if (feld === "art" || feld === "klasse") setTimeout(() => render(true), 0);
       return;
     }
     if (t.dataset.rg && S.rgEntwurf) { S.rgEntwurf[t.dataset.rg] = t.value; return; }
@@ -11436,7 +11599,7 @@ const Objekte = (() => {
       case "m-nurlesen": {
         if (!istAdmin()) { toast("Rechte vergibt nur der Admin."); return; }
         const m = S.tEntwurf; if (!m) return;
-        const r = rechteVon(m); m.rechte = { gesperrt: r.gesperrt, nurLesen: !r.nurLesen };
+        const r = rechteVon(m); m.rechte = { gesperrt: r.gesperrt, nurLesen: !r.nurLesen, umlage: r.umlage };
         render(true); break;
       }
       case "m-pw-reset": {
@@ -11545,7 +11708,9 @@ const Objekte = (() => {
         app.querySelector("[data-kk='" + (r.konten.length - 1) + "|" + (neu.nr ? "name" : "nr") + "']")?.focus({ preventScroll: true });
         break;
       }
-      case "kk-umlage": { const r = rahmenVon(S.rahmenOffen) || rahmenListe()[0]; const k = r.konten[Number(b.dataset.i)];
+      case "kk-umlage": {
+        if (!darfUmlage()) { toast("Für die Umlagefähigkeit fehlt Ihnen die Berechtigung. Der Admin vergibt sie beim Mitarbeiter."); return; }
+        const r = rahmenVon(S.rahmenOffen) || rahmenListe()[0]; const k = r.konten[Number(b.dataset.i)];
         k.umlage = !k.umlage; b.setAttribute("aria-checked", k.umlage); rahmenSichern(); render(true); break; }
       case "kk-weg": {
         const i = Number(b.dataset.i);
@@ -11985,7 +12150,7 @@ const Objekte = (() => {
       case "hon-ok": {
         const o = S.liste.find(x => x.id === b.dataset.id); if (!o) return;
         const e = S.honEntwurf || {};
-        if (!zahlD(e.betrag)) { toast("Bitte einen Betrag eintragen."); return; }
+        if (!betragZahl(e.betrag)) { toast("Bitte einen Betrag eintragen."); return; }
         honorarListe(o).push({ id: Objekte.neueId(), datum: e.datum || new Date().toISOString().slice(0, 10),
           text: e.text || (e.art === "provision" ? "Provision Neuvermietung" : "Zusatzhonorar"), betrag: e.betrag, art: e.art || "" });
         S.honNeu = ""; S.honEntwurf = null;
@@ -12201,6 +12366,11 @@ const Objekte = (() => {
         toast("Offene Posten gespeichert"); break; }
       case "aw-wer": S.awWer = (S.awWer === (b.dataset.wert || "")) ? "" : (b.dataset.wert || ""); render(true); break;
       case "m-job": S.mJob = b.dataset.wert; render(true); break;
+      case "m-umlage": {
+        if (!istAdmin()) { toast("Rechte vergibt nur der Admin."); return; }
+        const m = S.tEntwurf; if (!m) return;
+        const r2 = rechteVon(m); m.rechte = { gesperrt: r2.gesperrt, nurLesen: r2.nurLesen, umlage: !r2.umlage };
+        render(true); break; }
       case "abr-oeffnen": {
         const o = S.liste.find(x => x.id === b.dataset.id); if (!o) return;
         S.entwurf = Objekte.betreuungSicherstellen(Objekte.listeSicherstellen(JSON.parse(JSON.stringify(o))));
@@ -13027,8 +13197,9 @@ const Objekte = (() => {
       if (!hinweisGezeigt) { toast(g.length === 1 ? "„" + objName(g[0]) + "“ wurde automatisch beendet" : g.length + " Objekte wurden automatisch beendet"); hinweisGezeigt = true; }
     };
     if (!S.liste.length) { try { const alt = JSON.parse(localStorage.getItem("ov_objekte") || "[]"); if (alt.length) S.liste = alt; } catch (e) {} }
-    await pruefeAblauf(); await Bank.laden(); render();
-    setInterval(async () => { await pruefeAblauf(); if (S.tab === "objekte" && S.ansicht === "liste" && document.activeElement?.id !== "suche") render(true); }, 60 * 60 * 1000);
+    await pruefeAblauf(); await sollstellungenAlle(); await Bank.laden(); render();
+    setInterval(async () => { await pruefeAblauf(); await sollstellungenAlle();
+      if (S.tab === "objekte" && S.ansicht === "liste" && document.activeElement?.id !== "suche") render(true); }, 60 * 60 * 1000);
     const online = await Speicher.verbinden(); await Dateien.laden(); await Bank.laden(); if (S.tab === "handwerker") render(true);
     $("#status").textContent = online ? "Ihre Daten werden in Ihrem Konto gespeichert." : "Ihre Daten werden in diesem Browser gespeichert.";
     if (!online) return;
@@ -13371,7 +13542,7 @@ const Pruefung = (() => {
       const e = b[t.id] || {}; const preis = e.preis !== undefined ? e.preis : t.preis;
       return "<div class='posten'><div class='p-name'>" + esc(t.name || "Einheit") + "</div>" +
         "<label class='p-feld'>Anzahl<input type='number' min='0' step='1' inputmode='numeric' placeholder='0' data-posten='" + esc(t.id) + "' data-teil='anzahl' value='" + esc(e.anzahl) + "'></label>" +
-        "<label class='p-feld'>je Einheit und Monat (netto)<div class='einheit'><input type='number' min='0' step='0.01' inputmode='decimal' data-posten='" + esc(t.id) + "' data-teil='preis' value='" + esc(preis) + "'><span>€</span></div></label>" +
+        "<label class='p-feld'>je Einheit und Monat (netto)<div class='einheit'><input type='text' inputmode='decimal' data-posten='" + esc(t.id) + "' data-teil='preis' value='" + esc(preis) + "'><span>€</span></div></label>" +
         "<div class='p-summe' id='ps-" + esc(t.id) + "'></div>" + (t.standard ? "" : "<button type='button' class='p-weg' data-act='p-entfernen' data-id='" + esc(t.id) + "' aria-label='" + esc(t.name) + " entfernen'>×</button>") + "</div>";
     }).join("") + "</div>" + (weitere.length ? "<div class='chips p-mehr'><span class='leise'>Weitere Einheit hinzufügen:</span>" +
       weitere.map(t => "<button type='button' data-act='p-hinzu' data-id='" + esc(t.id) + "'>+ " + esc(t.name || "Einheit") + "</button>").join("") + "</div>" : "") + "<div class='p-gesamt'><div>Monatlich gesamt<small id='p-anzahl'></small></div><div style='text-align:right'><strong id='p-netto'></strong><small id='p-brutto'></small></div></div>" +
@@ -13391,7 +13562,7 @@ const Pruefung = (() => {
   function renderEinheiten() {
     const zeilen = S.einheitenArten.map(t => "<div class='e-zeile'>" +
       "<div class='feld'><label for='en-" + esc(t.id) + "'>Bezeichnung</label><input type='text' id='en-" + esc(t.id) + "' data-eart='" + esc(t.id) + "' data-teil='name' value='" + esc(t.name) + "' placeholder='z. B. Tiefgaragenstellplatz'></div>" +
-      "<div class='feld'><label for='ep-" + esc(t.id) + "'>Standardpreis</label><div class='einheit'><input type='number' min='0' step='0.01' inputmode='decimal' id='ep-" + esc(t.id) + "' data-eart='" + esc(t.id) + "' data-teil='preis' value='" + esc(t.preis) + "'><span>€/Mon.</span></div></div>" +
+      "<div class='feld'><label for='ep-" + esc(t.id) + "'>Standardpreis</label><div class='einheit'><input type='text' inputmode='decimal' id='ep-" + esc(t.id) + "' data-eart='" + esc(t.id) + "' data-teil='preis' value='" + esc(t.preis) + "'><span>€/Mon.</span></div></div>" +
       "<div class='feld'><label>Gilt für</label><div class='segment'>" + [["miet", "Miete"], ["weg", "WEG"], ["beide", "Beide"]].map(([w, l]) =>
         "<button type='button' data-act='e-fuer' data-id='" + esc(t.id) + "' data-wert='" + w + "' aria-pressed='" + (t.fuer === w) + "'>" + l + "</button>").join("") + "</div></div>" +
       "<div class='feld'><label>Standard</label><button type='button' class='schalter' role='switch' aria-checked='" + !!t.standard + "' aria-label='Immer im Vertrag anzeigen' data-act='e-standard' data-id='" + esc(t.id) + "'></button></div>" +
@@ -14384,7 +14555,7 @@ const Pruefung = (() => {
   const MEHRHEITEN = [
     ["einfach", "einfache Mehrheit der abgegebenen Stimmen"],
     ["zweidrittel", "zwei Drittel der abgegebenen Stimmen und mehr als die Hälfte aller Miteigentumsanteile (§ 21 Abs. 2 WEG)"],
-    ["dreiviertel", "drei Viertel der abgegebenen Stimmen (§ 23 Abs. 1 Satz 2 WEG)"],
+    ["dreiviertel", "drei Viertel der abgegebenen Stimmen – etwa für die rein virtuelle Versammlung (§ 23 Abs. 1a WEG)"],
     ["all", "Allstimmigkeit – alle Wohnungseigentümer müssen zustimmen"]
   ];
   const mehrheitName = k => (MEHRHEITEN.find(x => x[0] === k) || MEHRHEITEN[0])[1];
