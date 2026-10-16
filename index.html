@@ -147,6 +147,13 @@ main{padding:8px clamp(16px,4vw,40px) 64px}
 .gruppe{background:var(--surface);border-radius:22px;padding:26px clamp(18px,4vw,32px);margin-bottom:16px}
 .gruppe h2{font-size:18px;margin:0 0 4px;letter-spacing:-.01em}
 .gruppe .unter{color:var(--muted);font-size:14.5px;margin:0 0 18px}
+.klapp{padding:0;overflow:hidden}
+.klapp-kopf{display:flex;align-items:baseline;gap:10px;width:100%;background:none;border:0;cursor:pointer;text-align:left;font:inherit;color:inherit;padding:20px clamp(18px,4vw,32px)}
+.klapp-kopf:hover{background:var(--surface-2,rgba(0,0,0,.03))}
+.klapp-kopf h2{margin:0;font-size:17px}
+.klapp-pfeil{color:var(--muted);font-size:12px;line-height:1.6}
+.klapp-inhalt{padding:0 clamp(18px,4vw,32px) 24px}
+.klapp.auf .klapp-kopf{padding-bottom:10px}
 .arten{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
 .arten button{text-align:left;border:2px solid transparent;background:var(--field);border-radius:16px;padding:16px 18px}
 .arten button strong{display:block;font-size:16.5px}
@@ -1412,7 +1419,7 @@ const Objekte = (() => {
   const S = { hwTab: "stamm", rgStapel: [], rgEntwurf: null, rgZu: {}, rahmen: [], rahmenOffen: "", kkAuf: {}, kkDetail: false, krProtAuf: false, krVorher: null, bank: null, lsMonat: "", lsDatum: "", sitzung: "", anFehler: "", anMail: "", pwWechsel: false, pwMeldung: "", pwMeldungOk: false, wpJahr: "", wpDatum: "", wpTop: "",
     sollOffen: "", zaNeu: "", zaEntwurf: null, bhFrei: "", bhGrund: "", infoAlle: false, vmtTab: "miete", vkOffen: null, vkWahl: false, vkSuche: "", bonOffen: null, bonHinweis: "", tObjSuche: "", anruferTreffer: null, tdTab: "vorgang", briefAnzeige: null, datFilter: { suche: "", quelle: "" }, eTab: "stamm", pTab: "stamm", pBearbeiten: false, eaHinweis: "", vermTab: "frei", vermOffen: null, vermFeedback: null, kiLaeuft: false, kiHinweis: "", kiStop: null, mails: [], mailTab: "eingang", mailFilter: { suche: "" }, mailImport: null, mailOffenId: null, mailRichtung: "ein",
     objTab: "stammdaten", bhTab: "konten", rundTab: "rund", ueEinheit: null, mvBausteine: [], mvOffen: "", mvDruck: null, mvbsEntwurf: null, ptAbr: null, rlDruck: null,
-    mahnEinst: null, mhDruck: null, mhVerzug: null, mhEinstAuf: false, rzEntwurf: null, rzOffen: "", rzDruck: null,
+    mahnEinst: null, vpi: null, ixDruck: null, pStaffel: { ab: "", anzahl: "3", schritt: "", art: "eur" }, mhDruck: null, mhVerzug: null, mhEinstAuf: false, rzEntwurf: null, rzOffen: "", rzDruck: null,
     gbTab: "gewaehr", gwOffen: "", gwRuege: "", ihJahre: 15, brJahr: "", brBericht: null, tickets: [], tAnsicht: "liste", kalDatum: "", kalModus: "monat", kalWer: [], tEntwurfTicket: null, ticketOffen: null, ticketBearbeiten: false, ticketVorher: null, mailNeuFuer: null, mailOffen: null, mailVerschieben: null, mailRichtung: "ein", ichBin: "", einst: { ichBin: "", zeitraum: "woche", nurMeine: true, ansicht: "liste", kalModus: "monat" }, tFilter: { status: "", suche: "", nurMeine: true, zeitraum: "woche" }, bearbeiten: false, uOffen: null, anlageOffen: null, team: [], tEntwurf: null, eigNeuFuer: null, mieterNeuFuer: null, pObjekte: {}, pDirty: new Set(), tab: "vertraege", liste: [], handwerker: [], personen: [], pEntwurf: null, pFilter: { rolle: "", suche: "", ehemalige: false }, ansicht: "liste", entwurf: null, istNeu: false, hwEntwurf: null, hwNeuFuer: null,
     filter: { art: "", suche: "", beendete: false }, loeschen: false };
   const app = $("#app");
@@ -2790,6 +2797,219 @@ const Objekte = (() => {
   const direktSchluessel = sch => sch === "verbrauch" || sch === "direkt";
   const standardSchluessel = o => istWeg(o) ? "mea" : "flaeche";
 
+  /* ---------- Vorauszahlung, Pauschale oder Inklusivmiete (§ 556 Abs. 2 BGB) ----------
+     Ist eine Pauschale vereinbart, bleibt es dabei: abgerechnet wird nicht. Erhöhen darf der
+     Vermieter sie nur, wenn der Mietvertrag das vorsieht (§ 560 Abs. 1 BGB); sinken die Kosten,
+     muss er sie senken (§ 560 Abs. 3 BGB). Für Heizung und Warmwasser ist eine Pauschale
+     dagegen nur in den Ausnahmefällen des § 11 HeizkostenV erlaubt – sonst gilt die Pflicht
+     zur verbrauchsabhängigen Abrechnung (§ 2 HeizkostenV). */
+  const BK_ART = [["voraus", "Vorauszahlung – wird abgerechnet"], ["pauschale", "Pauschale – keine Abrechnung"],
+    ["inklusiv", "in der Kaltmiete enthalten – keine Abrechnung"]];
+  const bkArtVon = p => BK_ART.some(([w]) => w === (p && p.bkArt)) ? p.bkArt : "voraus";
+  const hkArtVon = p => BK_ART.some(([w]) => w === (p && p.hkArt)) ? p.hkArt : "voraus";
+  const bkArtKurz = w => w === "pauschale" ? "Pauschale" : w === "inklusiv" ? "in der Kaltmiete enthalten" : "Vorauszahlung";
+  /* Welche Konten tragen Heiz- und Warmwasserkosten? Maßgeblich sind die Konten, die der
+     Verwalter für die CO2-Aufteilung gewählt hat; sonst werden sie am Namen erkannt. */
+  function heizKontenNrn(o, jahr) {
+    const c = co2Von(o, jahr);
+    const gew = (Array.isArray(c.konten) ? c.konten : []).map(String).filter(Boolean);
+    if (gew.length) return gew;
+    return objektKonten(o)
+      .filter(k => /heiz|warmwasser|brennstoff|fernw(ä|ae)rme|erdgas/i.test(String(k.name || "")))
+      .map(k => String(k.nr || ""));
+  }
+
+  /* ---------- Umstellung des Umlageschlüssels auf Verbrauch (§ 556a Abs. 2 BGB) ----------
+     Der Vermieter darf durch Erklärung in Textform bestimmen, dass Betriebskosten künftig nach
+     erfasstem Verbrauch verteilt werden. Die Erklärung ist nur vor Beginn eines
+     Abrechnungszeitraums möglich und wirkt erst ab diesem Zeitraum. */
+  const umstellungen = o => Array.isArray(o.umstellungen) ? o.umstellungen : (o.umstellungen = []);
+  const umstellungLeer = jahr => ({ id: Objekte.neueId(), kontoNr: "", abJahr: String(jahr || ""),
+    erklaertAm: "", neu: "verbrauch", angelegt: new Date().toISOString() });
+  function schluesselImJahr(o, k, jahr) {
+    const treffer = umstellungen(o).filter(u => String(u.kontoNr || "") === String(k.nr || "") && u.neu &&
+      String(u.abJahr || "") && String(u.abJahr) <= String(jahr))
+      .sort((a, b) => String(a.abJahr).localeCompare(String(b.abJahr)));
+    return treffer.length ? treffer[treffer.length - 1].neu : (k.schluessel || standardSchluessel(o));
+  }
+
+  /* ---------- Eigentümerwechsel im laufenden Jahr ----------
+     Verkauft ein Eigentümer seine Wohnung, bleibt der Voreigentümer mit seinem Zeitraum an der
+     Einheit hängen – sonst findet ihn die Jahresabrechnung nicht mehr. Geschuldet wird die
+     Abrechnungsspitze von dem, der im Zeitpunkt des Beschlusses Eigentümer ist (§ 28 Abs. 2 WEG);
+     die Aufteilung nach Tagen ist eine Frage zwischen Verkäufer und Käufer. */
+  const eigVerlauf = e => Array.isArray(e.eigVerlauf) ? e.eigVerlauf : (e.eigVerlauf = []);
+  function eigentumWechseln(e, neuId) {
+    const altId = e.eigentuemerId || "";
+    if (altId === String(neuId || "")) { e.eigentuemerId = neuId; return; }
+    if (altId) {
+      const alt = personVon(altId), neu = neuId ? personVon(neuId) : null;
+      const ab = neu ? String(neu.eigentumSeit || "").slice(0, 10) : "";
+      let bis = alt ? String(alt.eigentumBis || "").slice(0, 10) : "";
+      if (!bis && ab) bis = isoTag(new Date(new Date(ab + "T12:00:00").getTime() - 86400000));
+      const v = eigVerlauf(e);
+      if (!v.some(x => x.personId === altId))
+        v.push({ id: Objekte.neueId(), personId: altId,
+          von: alt ? String(alt.eigentumSeit || "").slice(0, 10) : "", bis, erfasst: new Date().toISOString() });
+    }
+    e.eigentuemerId = neuId;
+    if (neuId) e.eigVerlauf = eigVerlauf(e).filter(x => x.personId !== neuId);
+  }
+  const tageZwischen = (a, b) => Math.max(0, Math.round((new Date(b + "T12:00:00") - new Date(a + "T12:00:00")) / 86400000) + 1);
+  function eigentuemerImZeitraum(o, e, z) {
+    const gesamt = tageZwischen(z.von, z.bis);
+    const roh = eigVerlauf(e).filter(x => x.personId && x.personId !== e.eigentuemerId)
+      .map(x => ({ p: personVon(x.personId), von: x.von, bis: x.bis, alt: true }))
+      .concat(e.eigentuemerId ? [{ p: personVon(e.eigentuemerId), von: "", bis: "", alt: false }] : []);
+    return roh.filter(x => x.p).map(x => {
+      const pv = String(x.von || x.p.eigentumSeit || "").slice(0, 10);
+      const pb = String(x.bis || x.p.eigentumBis || "").slice(0, 10);
+      const von = pv && pv > z.von ? pv : z.von;
+      const bis = pb && pb < z.bis ? pb : z.bis;
+      if (bis < von) return null;
+      const t = tageZwischen(von, bis);
+      return { p: x.p, alt: x.alt, von, bis, tage: t, anteil: gesamt ? t / gesamt : 0 };
+    }).filter(Boolean).sort((a, b) => a.von.localeCompare(b.von));
+  }
+
+  /* ---------- Mietminderung (§ 536 BGB) ----------
+     Ein Mangel mindert die Miete von Gesetzes wegen, und zwar die Bruttomiete einschließlich der
+     Vorauszahlungen. Das Programm führt die Minderung als eigenen Vorgang mit Zeitraum und Grund
+     und zieht sie von der Sollstellung ab, damit kein falscher Rückstand entsteht. Ob und in
+     welcher Höhe gemindert werden darf, entscheidet das Programm nicht. */
+  /* ---------- Verbraucherpreisindex für die Indexmiete (§ 557b BGB) ----------
+     Das Programm kann den Index nicht selbst abrufen: es läuft allein im Browser. Deshalb wird
+     die Tabelle des Statistischen Bundesamtes einmal eingetragen oder als Datei eingelesen und
+     gilt dann für alle Mietverhältnisse. */
+  const vpiDaten = () => {
+    const g = (S.vpi && typeof S.vpi === "object") ? S.vpi : {};
+    return { id: "vpi", basis: g.basis || "2020",
+      werte: Array.isArray(g.werte) ? g.werte : [], stand: g.stand || "" };
+  };
+  async function vpiSichern(d) {
+    S.vpi = { ...d, stand: new Date().toISOString() };
+    try { await Speicher.speichern("indizes", S.vpi, [S.vpi]); } catch (e) {}
+  }
+  const vpiSortiert = () => vpiDaten().werte.filter(x => x && x.monat && betragZahl(x.wert) > 0)
+    .sort((a, b) => String(a.monat).localeCompare(String(b.monat)));
+  const vpiWert = monat => { const w = vpiSortiert().find(x => String(x.monat) === String(monat)); return w ? betragZahl(w.wert) : 0; };
+  const vpiLetzter = () => vpiSortiert().slice(-1)[0] || null;
+  /* Liest eine Tabelle ein: je Zeile ein Monat und sein Indexwert, in beliebiger Schreibweise. */
+  function vpiLesen(text) {
+    const MON = { januar: 1, februar: 2, "märz": 3, maerz: 3, april: 4, mai: 5, juni: 6, juli: 7,
+      august: 8, september: 9, oktober: 10, november: 11, dezember: 12 };
+    const aus = [];
+    String(text || "").split(/\r?\n/).forEach(z => {
+      const t = z.trim(); if (!t) return;
+      let jahr = "", mon = "";
+      const m = t.match(/\b(20\d{2})[-\/.](0?[1-9]|1[0-2])\b/);
+      if (m) { jahr = m[1]; mon = String(Number(m[2])).padStart(2, "0"); }
+      else {
+        const mn = t.toLowerCase().match(/(januar|februar|märz|maerz|april|mai|juni|juli|august|september|oktober|november|dezember)/);
+        const jh = t.match(/\b(20\d{2})\b/);
+        if (mn && jh) { jahr = jh[1]; mon = String(MON[mn[1]]).padStart(2, "0"); }
+      }
+      if (!jahr || !mon) return;
+      const zahlen = t.replace(/\b20\d{2}\b/g, " ").match(/\d{1,3}(?:[.,]\d{1,3})?/g);
+      if (!zahlen || !zahlen.length) return;
+      const wert = betragZahl(zahlen[zahlen.length - 1]);
+      if (!(wert > 0)) return;
+      const monat = jahr + "-" + mon;
+      if (!aus.some(x => x.monat === monat)) aus.push({ monat, wert: String(wert).replace(".", ",") });
+    });
+    return aus;
+  }
+  /* ---------- Obergrenze je Mietverhältnis ----------
+     Der Verwalter kann festlegen, dass eine Miete einen Betrag oder einen Preis je Quadratmeter
+     nicht überschreiten darf. Staffel und Index werden dann gekappt. */
+  function flaecheVonPerson(p) {
+    if (!p || !p.einheitId) return 0;
+    for (const o of (S.liste || [])) {
+      const e = (o.einheitenListe || []).find(x => x.id === p.einheitId);
+      if (e) return betragZahl(e.flaeche);
+    }
+    return 0;
+  }
+  function mietObergrenze(p) {
+    const fest = betragZahl(p && p.mietMax);
+    const qm = betragZahl(p && p.mietMaxQm);
+    const fl = flaecheVonPerson(p);
+    const werte = [fest, qm && fl ? cent(qm * fl) : 0].filter(x => x > 0);
+    return werte.length ? Math.min.apply(null, werte) : 0;
+  }
+  /* ---------- Art der Mietanpassung ---------- */
+  const MIET_ART = [["", "Erhöhung bis zur ortsüblichen Vergleichsmiete (§ 558 BGB)"],
+    ["staffel", "Staffelmiete – Erhöhungen stehen im Vertrag (§ 557a BGB)"],
+    ["index", "Indexmiete – gekoppelt an den Verbraucherpreisindex (§ 557b BGB)"]];
+  const mietArtVon = p => MIET_ART.some(([w]) => w === (p && p.mietArt)) ? (p.mietArt || "") : "";
+  const monatePlusIso = (iso, n) => { const d = new Date(String(iso) + "T12:00:00");
+    if (isNaN(d)) return ""; const tag = d.getDate(); d.setMonth(d.getMonth() + n);
+    if (d.getDate() !== tag) d.setDate(0); return isoTag(d); };
+  /* Prüft die Staffeln auf den Mindestabstand von einem Jahr (§ 557a Abs. 2 BGB). */
+  function staffelPruefen(p) {
+    const fehler = [];
+    const liste = mietStufen(p).slice().sort((a, b) => String(a.ab).localeCompare(String(b.ab)));
+    let vorher = String(p.mietbeginn || "").slice(0, 10);
+    let vorBetrag = betragZahl(p.kaltmiete);
+    liste.forEach(x => {
+      const ab = String(x.ab || "").slice(0, 10);
+      if (!ab) { fehler.push("Eine Staffel hat kein Datum."); return; }
+      if (vorher && ab < monatePlusIso(vorher, 12))
+        fehler.push("Die Staffel ab " + Objekte.datum(ab) + " liegt weniger als ein Jahr nach " +
+          Objekte.datum(vorher) + ". Jede Staffel muss mindestens ein Jahr gelten (§ 557a Abs. 2 BGB).");
+      if (betragZahl(x.kaltmiete) < vorBetrag - 0.005)
+        fehler.push("Die Staffel ab " + Objekte.datum(ab) + " liegt unter dem Betrag davor.");
+      vorher = ab; vorBetrag = betragZahl(x.kaltmiete);
+    });
+    return fehler;
+  }
+  /* Indexmiete: neue Miete aus der Veränderung des Index (§ 557b Abs. 2 BGB). */
+  function indexRechnen(p) {
+    const basisMonat = String(p.indexBasisMonat || "").slice(0, 7);
+    const basis = betragZahl(p.indexBasisWert) || vpiWert(basisMonat);
+    const letzt = vpiLetzter();
+    const neuWert = letzt ? betragZahl(letzt.wert) : 0;
+    const stufen = mietStufen(p).slice().sort((a, b) => String(a.ab).localeCompare(String(b.ab)));
+    const zuletzt = stufen.length ? String(stufen[stufen.length - 1].ab).slice(0, 10) : String(p.mietbeginn || "").slice(0, 10);
+    const alt = stufen.length ? betragZahl(stufen[stufen.length - 1].kaltmiete) : betragZahl(p.kaltmiete);
+    const heute = isoTag(new Date());
+    const jahrUm = zuletzt ? monatePlusIso(zuletzt, 12) <= heute : true;
+    if (!basis || !neuWert || !alt) return { moeglich: false, basis, basisMonat, neuWert,
+      neuMonat: letzt ? letzt.monat : "", alt, jahrUm, zuletzt };
+    const faktor = neuWert / basis;
+    const roh = cent(alt * faktor);
+    const grenze = mietObergrenze(p);
+    const neu = grenze && roh > grenze ? grenze : roh;
+    /* Wirksam ab dem Beginn des zweiten Monats nach Zugang der Erklärung (§ 557b Abs. 3 BGB). */
+    const ab = monatPlus(heute.slice(0, 7), 2) + "-01";
+    return { moeglich: true, basis, basisMonat, neuWert, neuMonat: letzt.monat, alt, roh, neu,
+      gekappt: grenze && roh > grenze ? grenze : 0, proz: cent((faktor - 1) * 100), ab, jahrUm, zuletzt };
+  }
+  const minderungen = p => Array.isArray(p && p.minderungen) ? p.minderungen : [];
+  const minderungLeer = () => ({ id: Objekte.neueId(), von: "", bis: "", proz: "", betrag: "", grund: "",
+    basis: "brutto", angelegt: new Date().toISOString() });
+  function minderungAbzug(p, ym, brutto, kalt) {
+    const tage = tageImMonat(ym);
+    const erster = ym + "-01", letzter = ym + "-" + String(tage).padStart(2, "0");
+    let summe = 0; const texte = [];
+    minderungen(p).forEach(m => {
+      const von = String(m.von || "").slice(0, 10), bis = String(m.bis || "").slice(0, 10);
+      if (!von || von > letzter) return;
+      if (bis && bis < erster) return;
+      const a = von > erster ? Number(von.slice(8, 10)) : 1;
+      const b = bis && bis < letzter ? Number(bis.slice(8, 10)) : tage;
+      const t = b - a + 1; if (t <= 0) return;
+      const proz = betragZahl(m.proz);
+      const basis = m.basis === "kalt" ? kalt : brutto;
+      const voll = betragZahl(m.betrag) || cent(basis * proz / 100);
+      const ab = cent(voll * t / tage);
+      if (ab <= 0) return;
+      summe = cent(summe + ab);
+      texte.push((String(m.grund || "").trim() || "Mangel") + (proz ? " · " + String(m.proz).replace(".", ",") + " %" : ""));
+    });
+    return { betrag: summe, text: texte.join("; ") };
+  }
+
   /* Zeitanteil eines Mietverhältnisses am Abrechnungszeitraum (§ 556 BGB). */
   function mieterImZeitraum(o, e, z) {
     const tage = (a, b) => Math.max(0, Math.round((new Date(b + "T12:00:00") - new Date(a + "T12:00:00")) / 86400000) + 1);
@@ -2856,7 +3076,7 @@ const Objekte = (() => {
     const mieter = {}; liste.forEach(e => { mieter[e.id] = mieterImZeitraum(o, e, z); });
     const hinweise = [];
     const zeilen = konten.map(k => {
-      const sch = k.schluessel || standardSchluessel(o);
+      const sch = schluesselImJahr(o, k, jahr);
       const anteile = {};
       if (direktSchluessel(sch)) {
         let summe = 0;
@@ -2875,10 +3095,11 @@ const Objekte = (() => {
     const co2Anteil = posten => (co2.an && co2.heizGesamt > 0.005)
       ? cent(co2.vermBetrag * cent(posten.filter(p => co2.konten.includes(String(p.nr))).reduce((n, p) => n + p.betrag, 0)) / co2.heizGesamt)
       : 0;
+    const heizNrn = heizKontenNrn(o, jahr);
     const einheiten = liste.map(e => {
       const s2 = soll[e.id] || { rollen: {}, soll: 0, gezahlt: 0 };
       const posten = zeilen.map(k => ({ nr: k.nr, name: k.name, sch: k.sch, gesamt: k.summe, umlage: k.umlage, par35a: k.par35a,
-        betrag: cent(k.anteile[e.id] || 0) }));
+        heiz: heizNrn.includes(String(k.nr || "")), betrag: cent(k.anteile[e.id] || 0) }));
       const co2Ab = co2Anteil(posten);
       const umlagefaehig = cent(posten.filter(p => p.umlage).reduce((n, p) => n + p.betrag, 0) - co2Ab);
       const gesamtAnteil = cent(posten.reduce((n, p) => n + p.betrag, 0));
@@ -2887,22 +3108,44 @@ const Objekte = (() => {
         : cent((s2.rollen.bkVoraus || 0) + (s2.rollen.hkVoraus || 0));
       const ruecklage = weg ? cent(s2.rollen.hgRuecklage || 0) : 0;
       const last = weg ? cent(gesamtAnteil + ruecklage) : umlagefaehig;
-      /* Wer nur einen Teil des Zeitraums gemietet hat, zahlt auch nur den zeitanteiligen Betrag. */
+      /* Wer nur einen Teil des Zeitraums gemietet hat, zahlt auch nur den zeitanteiligen Betrag.
+         Eine Pauschale oder eine Inklusivmiete wird nicht abgerechnet (§ 556 Abs. 2 BGB); dieser
+         Teil der umlagefähigen Kosten bleibt beim Eigentümer. */
       const mieterZeilen = (mieter[e.id] || []).map(m => {
         const sm = sollP[m.p.id] || { rollen: {}, soll: 0, gezahlt: 0 };
         const mp = posten.map(p => ({ ...p, betrag: cent(p.betrag * m.anteil) }));
         const mco2 = cent(co2Ab * m.anteil);
-        const mu = cent(mp.filter(p => p.umlage).reduce((n, p) => n + p.betrag, 0) - mco2);
-        const mv = cent((sm.rollen.bkVoraus || 0) + (sm.rollen.hkVoraus || 0));
-        return { ...m, posten: mp, umlagefaehig: mu, co2: mco2, p35: cent(mp.filter(p => p.par35a).reduce((n, p) => n + p.betrag, 0)),
+        const bkArt = bkArtVon(m.p), hkArt = hkArtVon(m.p);
+        const abBk = bkArt === "voraus", abHk = hkArt === "voraus";
+        const dabei = p => (p.heiz ? abHk : abBk);
+        const uBk = cent(mp.filter(p => p.umlage && !p.heiz).reduce((n, p) => n + p.betrag, 0));
+        const uHk = cent(mp.filter(p => p.umlage && p.heiz).reduce((n, p) => n + p.betrag, 0) - mco2);
+        const vBk = cent(sm.rollen.bkVoraus || 0), vHk = cent(sm.rollen.hkVoraus || 0);
+        const mu = cent((abBk ? uBk : 0) + (abHk ? uHk : 0));
+        const mv = cent((abBk ? vBk : 0) + (abHk ? vHk : 0));
+        return { ...m, posten: mp.filter(dabei), alle: mp, umlagefaehig: mu, co2: abHk ? mco2 : 0,
+          bkArt, hkArt, abBk, abHk, uBk, uHk, vBk, vHk,
+          pauschal: cent((abBk ? 0 : uBk) + (abHk ? 0 : uHk)),
+          p35: cent(mp.filter(p => p.par35a && dabei(p)).reduce((n, p) => n + p.betrag, 0)),
           voraus: mv, gezahlt: sm.gezahlt, soll: sm.soll, rueckstand: cent((sm.soll || 0) - (sm.gezahlt || 0)),
           ergebnis: cent(mu - mv) };
       });
+      /* Wechselt der Eigentümer im Abrechnungszeitraum, teilt das Programm die Kosten nach Tagen. */
+      const eigZeilen = weg ? eigentuemerImZeitraum(o, e, z).map(g => {
+        const sg = sollP[g.p.id] || { rollen: {}, soll: 0, gezahlt: 0 };
+        const gp = posten.map(p => ({ ...p, betrag: cent(p.betrag * g.anteil) }));
+        const kost = cent(gp.reduce((n, p) => n + p.betrag, 0));
+        const rl = cent(ruecklage * g.anteil);
+        const vs = cent((sg.rollen.hgBewirt || 0) + (sg.rollen.hgRuecklage || 0));
+        return { ...g, posten: gp, last: cent(kost + rl), ruecklage: rl, voraus: vs,
+          gezahlt: sg.gezahlt, soll: sg.soll, ergebnis: cent(kost + rl - vs) };
+      }) : [];
       const getragen = cent(mieterZeilen.reduce((n, m) => n + m.umlagefaehig, 0));
+      const pauschal = cent(mieterZeilen.reduce((n, m) => n + m.pauschal, 0));
       return { e, posten, umlagefaehig, gesamtAnteil, p35, voraus, ruecklage, last, co2: co2Ab,
-        soll: s2.soll, gezahlt: s2.gezahlt, mieter: mieter[e.id] || [], mieterZeilen,
-        leerstand: weg ? 0 : cent(umlagefaehig - getragen),
-        ergebnis: cent(last - voraus) };
+        soll: s2.soll, gezahlt: s2.gezahlt, mieter: mieter[e.id] || [], mieterZeilen, eigZeilen, pauschal,
+        leerstand: weg ? 0 : cent(umlagefaehig - getragen - pauschal),
+        ergebnis: weg ? cent(last - voraus) : cent(mieterZeilen.reduce((n, m) => n + m.ergebnis, 0)) };
     });
     const kostenGesamt = cent(zeilen.reduce((n, k) => n + k.summe, 0));
     const umlageGesamt = cent(zeilen.filter(k => k.umlage).reduce((n, k) => n + k.summe, 0) -
@@ -2922,7 +3165,29 @@ const Objekte = (() => {
       hinweise.push("Nicht umlagefähige Kosten bleiben in der Betriebskostenabrechnung außen vor – sie erscheinen nur in der Übersicht.");
     if (co2.an && !co2.heizGesamt)
       hinweise.push("Die CO₂-Aufteilung ist eingeschaltet, aber es ist kein Heizkostenkonto dafür gewählt – der Anteil des Vermieters wird noch nicht abgezogen.");
-    return { z, weg, zeilen, einheiten, kostenGesamt, umlageGesamt, vorausGesamt, ruecklageGesamt, hinweise, co2 };
+    /* Pauschale und Inklusivmiete: diese Kosten werden nicht abgerechnet (§ 556 Abs. 2 BGB). */
+    const pauschalGesamt = cent(einheiten.reduce((n, x) => n + (x.pauschal || 0), 0));
+    if (!weg && pauschalGesamt > 0.02)
+      hinweise.push("Für mindestens ein Mietverhältnis ist eine Pauschale oder eine Inklusivmiete vereinbart. " +
+        eur2(pauschalGesamt) + " € umlagefähige Kosten werden deshalb nicht abgerechnet (§ 556 Abs. 2 BGB) und bleiben beim Eigentümer.");
+    if (!weg && einheiten.some(x => x.mieterZeilen.some(m => !m.abHk && m.uHk > 0.02)))
+      hinweise.push("Für Heizung und Warmwasser ist eine Pauschale nur in den Ausnahmefällen des § 11 HeizkostenV zulässig " +
+        "(etwa im Zweifamilienhaus, in dem der Vermieter selbst eine Wohnung bewohnt). Sonst muss verbrauchsabhängig " +
+        "abgerechnet werden (§ 2 HeizkostenV) – prüfen Sie die Vereinbarung.");
+    umstellungen(o).filter(u => String(u.abJahr || "") === String(jahr)).forEach(u => {
+      const kk = kontoVonNr(objektKonten(o), u.kontoNr);
+      const nm = (kk && kk.name) || ("Konto " + (u.kontoNr || "–"));
+      if (!u.erklaertAm)
+        hinweise.push("Für die Umstellung auf Verbrauch bei „" + nm + "“ fehlt das Datum der Erklärung an die Mieter (§ 556a Abs. 2 BGB).");
+      else if (String(u.erklaertAm) >= z.von)
+        hinweise.push("Die Erklärung zur Umstellung bei „" + nm + "“ ist vom " + Objekte.datum(u.erklaertAm) +
+          ", der Abrechnungszeitraum begann aber bereits am " + Objekte.datum(z.von) +
+          ". Die Umstellung wirkt erst ab dem Zeitraum, der nach der Erklärung beginnt (§ 556a Abs. 2 BGB).");
+    });
+    if (weg && einheiten.some(x => (x.eigZeilen || []).length > 1))
+      hinweise.push("In mindestens einer Einheit hat der Eigentümer im Abrechnungszeitraum gewechselt. Die Einzelabrechnung " +
+        "geht an den jetzigen Eigentümer; die Aufteilung nach Tagen weist das Programm zusätzlich aus.");
+    return { z, weg, zeilen, einheiten, kostenGesamt, umlageGesamt, vorausGesamt, ruecklageGesamt, pauschalGesamt, hinweise, co2 };
   }
 
   /* ================= CO2-Kostenaufteilung (CO2KostAufG, seit 2023) =================
@@ -3320,6 +3585,143 @@ const Objekte = (() => {
       "</ul></section>";
     return h;
   }
+  /* ---------- Umstellung des Umlageschlüssels (§ 556a Abs. 2 BGB) ----------
+     Was bisher nach Fläche oder Personen verteilt wurde, darf künftig nach erfasstem Verbrauch
+     abgerechnet werden. Dafür braucht es eine Erklärung in Textform vor Beginn des Zeitraums. */
+  const UM_ZIEL = [["verbrauch", "Verbrauch (Zähler)"], ["direkt", "direkt zugeordnet"]];
+  function umstellungBlockHtml(o, jahr) {
+    if (istWeg(o) || !["miet", "garantie"].includes(o.art)) return "";
+    const liste = umstellungen(o);
+    const waehlbar = objektKonten(o).filter(k => !k.inaktiv && k.art !== "einnahme" && k.umlage);
+    let h = "<section class='gruppe voll'><h2>Umlageschlüssel umstellen <span class='fuer'>§ 556a Abs. 2 BGB</span></h2>" +
+      "<p class='unter'>Betriebskosten, die bisher nach Fläche oder Personen verteilt werden, dürfen Sie künftig nach dem " +
+      "erfassten Verbrauch abrechnen. Dazu gehört eine Erklärung in Textform an die Mieter, und sie wirkt erst ab dem " +
+      "Abrechnungszeitraum, der nach dieser Erklärung beginnt.</p>";
+    h += liste.map((u, i) => {
+      const k = kontoVonNr(objektKonten(o), u.kontoNr);
+      const z2 = abrZeitraum(o, u.abJahr || jahr);
+      const spaet = u.erklaertAm && String(u.erklaertAm) >= z2.von;
+      return "<div class='abr-einheit'><div class='felder'>" +
+        "<div class='feld'><label>Kostenart</label><select data-um='" + i + "|kontoNr'><option value=''>– bitte wählen –</option>" +
+          waehlbar.map(x => "<option value='" + esc(x.nr) + "'" + (String(x.nr) === String(u.kontoNr) ? " selected" : "") + ">" +
+            esc((x.nr ? x.nr + " " : "") + x.name) + "</option>").join("") + "</select>" +
+          (k ? "<small>bisher " + esc((SCHLUESSEL.find(y => y[0] === (k.schluessel || standardSchluessel(o))) || [, "–"])[1]) + "</small>" : "") + "</div>" +
+        "<div class='feld'><label>Künftiger Schlüssel</label><select data-um='" + i + "|neu'>" +
+          UM_ZIEL.map(([w, t]) => "<option value='" + w + "'" + ((u.neu || "verbrauch") === w ? " selected" : "") + ">" + esc(t) + "</option>").join("") +
+          "</select></div>" +
+        "<div class='feld'><label>Erklärung an die Mieter vom</label><input type='date' data-um='" + i + "|erklaertAm' value='" + esc(u.erklaertAm) + "'></div>" +
+        "<div class='feld'><label>Gilt ab Abrechnungsjahr</label><input type='text' inputmode='numeric' data-um='" + i + "|abJahr' value='" + esc(u.abJahr) + "'></div>" +
+        "</div><ul class='meldungen'>" +
+        (k ? "" : "<li class='m-fehler'>Bitte eine Kostenart wählen – ohne sie wirkt die Umstellung nicht.</li>") +
+        (!u.erklaertAm
+          ? "<li class='m-fehler'>Ohne das Datum der Erklärung ist die Umstellung nicht belegt (§ 556a Abs. 2 BGB).</li>"
+          : spaet
+          ? "<li class='m-fehler'>Die Erklärung vom " + esc(Objekte.datum(u.erklaertAm)) + " liegt nicht vor dem Beginn des Zeitraums am " +
+            esc(Objekte.datum(z2.von)) + ". Die Umstellung wirkt erst ab " + esc(String(Number(u.abJahr || jahr) + 1)) + ".</li>"
+          : "<li class='m-ok'>Die Erklärung vom " + esc(Objekte.datum(u.erklaertAm)) + " liegt vor dem " + esc(Objekte.datum(z2.von)) +
+            " – die Umstellung ab " + esc(String(u.abJahr || jahr)) + " ist rechtzeitig.</li>") +
+        "</ul><div class='leiste'><div><button class='btn klein' data-act='um-brief' data-i='" + i + "'>Erklärung erzeugen</button></div>" +
+        "<button class='btn gefahr klein' data-act='um-weg' data-i='" + i + "'>" +
+        (S.loeschen === "um" + i ? "Wirklich entfernen?" : "Entfernen") + "</button></div></div>";
+    }).join("");
+    h += "<div class='leiste'><div><button class='btn klein' data-act='um-neu'>+ Umstellung erfassen</button></div></div>" +
+      "<ul class='meldungen'>" +
+      "<li class='m-hinweis'>Tragen Sie danach die Zählerwerte je Einheit unter „Verbrauch“ ein. Ohne Werte verteilt das Programm " +
+      "ersatzweise nach Einheiten und sagt das in den Hinweisen.</li>" +
+      "<li class='m-hinweis'>Für Heizung und Warmwasser ergibt sich die verbrauchsabhängige Abrechnung schon aus der " +
+      "Heizkostenverordnung – dort brauchen Sie keine Erklärung nach § 556a Abs. 2 BGB.</li></ul></section>";
+    return h;
+  }
+  /* Die Erklärung selbst – ein Blatt je Mieter, zum Drucken oder Mailen. */
+  function umstellungDruckHtml(o, i) {
+    const u = umstellungen(o)[i];
+    const vw = (() => { try { return window.Firmendaten ? window.Firmendaten.daten() : {}; } catch (x) { return {}; } })();
+    if (!u) return "<p class='unter'>Die Umstellung wurde nicht gefunden.</p>";
+    const k = kontoVonNr(objektKonten(o), u.kontoNr);
+    const z2 = abrZeitraum(o, u.abJahr || new Date().getFullYear());
+    const alt = (SCHLUESSEL.find(y => y[0] === (k ? (k.schluessel || standardSchluessel(o)) : "")) || [, "dem bisherigen Schlüssel"])[1];
+    const neu = (UM_ZIEL.find(y => y[0] === (u.neu || "verbrauch")) || [, "Verbrauch"])[1];
+    const empf = (o.einheitenListe || []).map(e => ({ e, p: mieterVon(e.id, o) })).filter(x => x.p);
+    let h = "<div class='seite'><div class='md-werkzeug'><div>" +
+      "<button class='btn klein' data-act='um-brief-zu'>‹ Zurück</button>" +
+      "<button class='btn klein haupt' data-act='mandat-drucken'>Drucken / als PDF speichern</button></div>" +
+      "<span class='fuer'>" + esc(empf.length + (empf.length === 1 ? " Mieter" : " Mieter")) + "</span></div>";
+    if (!empf.length) h += "<div class='md-blatt'><p class='md-text'>In diesem Objekt ist kein Mieter hinterlegt – " +
+      "ordnen Sie die Mieter zuerst den Einheiten zu.</p></div>";
+    empf.forEach(({ e, p }) => {
+      h += "<div class='md-blatt'><header class='md-kopf'>" +
+        (vw.logo ? "<img class='md-logo' src='" + esc(vw.logo) + "' alt='" + esc(vw.name || "Logo") + "'>"
+          : "<div class='md-firma'>" + esc(vw.name || "Hausverwaltung") + "</div>") +
+        "<div class='fuer'>" + esc(Objekte.datum(new Date().toISOString().slice(0, 10))) + "</div></header>" +
+        "<div class='md-empf'>" + esc([Objekte.personName(p), p.strasse, [p.plz, p.ort].filter(Boolean).join(" ")]
+          .filter(Boolean).join("\n")) + "</div>" +
+        "<h1>Umstellung der Betriebskostenabrechnung auf den erfassten Verbrauch</h1>" +
+        "<p class='md-art'>" + esc(objName(o)) + " · " + esc(e.nr || e.art) + (e.lage ? " · " + esc(e.lage) : "") + "</p>" +
+        "<p class='md-text'>" + esc((p.anrede === "Frau" ? "Sehr geehrte Frau " : p.anrede === "Herr" ? "Sehr geehrter Herr " : "Sehr geehrte Damen und Herren")) +
+        esc(p.anrede === "Frau" || p.anrede === "Herr" ? (p.nachname || "") : "") + ",</p>" +
+        "<p class='md-text'>die Kosten für " + esc(k ? k.name : "die betroffene Kostenart") + " wurden bisher nach " + esc(alt) +
+        " auf die Wohnungen verteilt. Nach § 556a Abs. 2 BGB bestimme ich hiermit, dass diese Kosten künftig nach " + esc(neu) +
+        " abgerechnet werden.</p>" +
+        "<p class='md-text'>Die Umstellung gilt ab dem Abrechnungszeitraum, der am " + esc(Objekte.datum(z2.von)) +
+        " beginnt, also erstmals für die Abrechnung " + esc(String(u.abJahr || "")) + ". Für frühere Zeiträume bleibt es " +
+        "beim bisherigen Schlüssel.</p>" +
+        "<p class='md-text'>Ihre monatliche Vorauszahlung bleibt zunächst unverändert. Ergibt die erste Abrechnung nach der " +
+        "Umstellung dauerhaft einen anderen Bedarf, teile ich Ihnen eine Anpassung gesondert mit.</p>" +
+        "<p class='md-text'>Mit freundlichen Grüßen</p>" +
+        "<p class='md-text' style='margin-top:36px'>" + esc(vw.name || "Hausverwaltung") + "</p>" +
+        "<p class='md-fuss'>Diese Erklärung ergeht in Textform nach § 556a Abs. 2 BGB. Bitte bewahren Sie sie zu Ihren " +
+        "Mietunterlagen auf.</p></div>";
+    });
+    return h + "</div>";
+  }
+  /* ---------- Eigentümerwechsel im Abrechnungszeitraum ---------- */
+  function eigWechselBlockHtml(o, jahr, erg) {
+    if (!istWeg(o)) return "";
+    const liste = o.einheitenListe || [];
+    const alleEig = S.personen.filter(x => x.rolle === "eigentuemer")
+      .sort((a, b) => Objekte.personName(a).localeCompare(Objekte.personName(b), "de"));
+    let h = "<section class='gruppe voll'><h2>Eigentümerwechsel im Abrechnungszeitraum</h2>" +
+      "<p class='unter'>Wechselt der Eigentümer im laufenden Jahr, trägt jeder die Kosten seiner Tage. Geschuldet wird der " +
+      "Nachschuss allerdings von dem, der im Zeitpunkt des Beschlusses Eigentümer ist (§ 28 Abs. 2 WEG); die Aufteilung zwischen " +
+      "Verkäufer und Käufer regelt der Kaufvertrag. Das Programm weist sie nachrichtlich aus.</p>";
+    h += liste.map((e, ui) => {
+      const v = eigVerlauf(e);
+      const x = erg.einheiten.find(y => y.e.id === e.id);
+      const jetzt = personVon(e.eigentuemerId);
+      if (!v.length && !(x && (x.eigZeilen || []).length > 1) && S.evNeu !== e.id)
+        return "<div class='abe-row'><span><strong>" + esc(e.nr || e.art) + "</strong></span>" +
+          "<span>" + esc(jetzt ? Objekte.personName(jetzt) : "– kein Eigentümer hinterlegt –") + "</span>" +
+          "<span class='fuer'>kein Wechsel erfasst</span><span></span><span></span>" +
+          "<span><button class='btn klein' data-act='ev-neu' data-u='" + ui + "'>+ Voreigentümer</button></span></div>";
+      return "<div class='abr-einheit'><div class='abr-kopf'><strong>" + esc(e.nr || e.art) + "</strong> · jetzt " +
+        esc(jetzt ? Objekte.personName(jetzt) : "– niemand hinterlegt –") + "</div>" +
+        v.map((w, vi) => "<div class='felder'>" +
+          "<div class='feld'><label>Voreigentümer</label><select data-ev='" + ui + "|" + vi + "|personId'>" +
+            "<option value=''>– bitte wählen –</option>" + alleEig.map(pp => "<option value='" + esc(pp.id) + "'" +
+              (pp.id === w.personId ? " selected" : "") + ">" + esc(Objekte.personName(pp)) + "</option>").join("") + "</select></div>" +
+          "<div class='feld'><label>Eigentümer von</label><input type='date' data-ev='" + ui + "|" + vi + "|von' value='" + esc(w.von) + "'></div>" +
+          "<div class='feld'><label>bis</label><input type='date' data-ev='" + ui + "|" + vi + "|bis' value='" + esc(w.bis) + "'>" +
+          "<small>Letzter Tag seines Eigentums.</small></div>" +
+          "<div class='feld'><label>&nbsp;</label><button class='btn gefahr klein' data-act='ev-weg' data-u='" + ui + "' data-i='" + vi + "'>" +
+          (S.loeschen === "ev" + ui + "-" + vi ? "Wirklich entfernen?" : "Entfernen") + "</button></div></div>").join("") +
+        (x && (x.eigZeilen || []).length > 1
+          ? "<table class='lv-tab abr-tab' style='margin-top:10px'><thead><tr><th>Eigentümer</th><th>Zeitraum</th>" +
+            "<th>Tage</th><th>Kostenanteil</th><th>Vorschüsse</th><th>Ergebnis</th></tr></thead><tbody>" +
+            x.eigZeilen.map(g => "<tr><td>" + esc(Objekte.personName(g.p)) + (g.alt ? " <span class='fuer'>(Voreigentümer)</span>" : "") +
+              "</td><td>" + esc(Objekte.datum(g.von) + " – " + Objekte.datum(g.bis)) + "</td><td>" + g.tage + "</td><td>" +
+              esc(eur2(g.last)) + " €</td><td>" + esc(eur2(g.voraus)) + " €</td><td>" +
+              (g.ergebnis > 0 ? "Nachschuss " + esc(eur2(g.ergebnis)) : g.ergebnis < 0 ? "Guthaben " + esc(eur2(-g.ergebnis)) : "ausgeglichen") +
+              (g.ergebnis ? " €" : "") + "</td></tr>").join("") + "</tbody></table>"
+          : "") +
+        "<div class='leiste'><div><button class='btn klein' data-act='ev-neu' data-u='" + ui + "'>+ weiterer Voreigentümer</button>" +
+        "<button class='btn klein' data-act='ev-rechnen'>Hausgeld nachtragen</button></div></div></div>";
+    }).join("");
+    h += "<ul class='meldungen'><li class='m-hinweis'>Beim Umstellen des Eigentümers im Objekt merkt sich das Programm den " +
+      "Voreigentümer mit seinem Zeitraum automatisch. Hier können Sie die Daten nachtragen oder korrigieren.</li>" +
+      "<li class='m-hinweis'>Die Vorschüsse ordnet das Programm dem zu, der sie geschuldet hat – jeder sieht nur seine eigenen.</li>" +
+      "</ul></section>";
+    return h;
+  }
   function abrechnungSeiteHtml(o) {
     const jahr = abrJahrVon();
     const erg = abrechnungRechnen(o, jahr);
@@ -3338,6 +3740,7 @@ const Objekte = (() => {
       esc(eur2(cent(erg.einheiten.reduce((n, x) => n + x.ergebnis, 0)))) + " €</b><span>" + (erg.weg ? "Abrechnungsspitze" : "Nachzahlung gesamt") + "</span></div></div>";
     h += kostenBlockHtml(o, jahr);
     h += verbrauchBlockHtml(o, jahr, erg);
+    h += umstellungBlockHtml(o, jahr);
     h += co2BlockHtml(o, jahr, erg);
     h += "<section class='gruppe voll'><h2>Ergebnis je Einheit</h2>" +
       "<div class='ue-tab'><div class='abe-kopf'><span>Einheit</span><span>" + (erg.weg ? "Eigentümer" : "Mieter") + "</span>" +
@@ -3354,22 +3757,35 @@ const Objekte = (() => {
             "<span>" + esc(eur2(x.last)) + " €" + (x.ruecklage ? "<br><span class='fuer'>davon Rücklage " + esc(eur2(x.ruecklage)) + " €</span>" : "") + "</span>" +
             "<span>" + esc(eur2(x.voraus)) + " €" + (x.gezahlt !== x.soll ? "<br><span class='fuer'>gezahlt " + esc(eur2(x.gezahlt)) + " €</span>" : "") + "</span>" +
             erg2(x.ergebnis, "Nachschuss ") +
-            "<span><button class='btn klein' data-act='abr-drucken' data-id='" + esc(x.e.id) + "'>Abrechnung</button></span></div>";
+            "<span><button class='btn klein' data-act='abr-drucken' data-id='" + esc(x.e.id) + "'>Abrechnung</button></span></div>" +
+            ((x.eigZeilen || []).length > 1 ? x.eigZeilen.map(g => "<div class='abe-row'><span class='fuer'>davon nach Tagen</span>" +
+              "<span class='fuer'>" + esc(Objekte.personName(g.p)) + (g.alt ? " (Voreigentümer)" : "") + "<br>" +
+              esc(Objekte.datum(g.von) + " – " + Objekte.datum(g.bis)) + " · " + g.tage + " Tage</span>" +
+              "<span class='fuer'>" + esc(eur2(g.last)) + " €</span><span class='fuer'>" + esc(eur2(g.voraus)) + " €</span>" +
+              "<span class='fuer'>" + esc(g.ergebnis > 0 ? "Nachschuss " + eur2(g.ergebnis) + " €"
+                : g.ergebnis < 0 ? "Guthaben " + eur2(-g.ergebnis) + " €" : "ausgeglichen") + "</span><span></span></div>").join("") : "");
         }
         if (!x.mieterZeilen.length) return "<div class='abe-row'>" + kopf + "<span>leer stehend</span>" +
           "<span>" + esc(eur2(x.umlagefaehig)) + " €</span><span>–</span>" +
           "<span class='fuer'>trägt der Eigentümer</span><span></span></div>";
         return x.mieterZeilen.map(m => "<div class='abe-row'>" + kopf +
-          "<span>" + esc(Objekte.personName(m.p)) + (m.anteil < 0.999 ? "<br><span class='fuer'>" + esc(Objekte.datum(m.von) + " – " + Objekte.datum(m.bis)) + " · " + m.tage + " Tage</span>" : "") + "</span>" +
-          "<span>" + esc(eur2(m.umlagefaehig)) + " €</span>" +
+          "<span>" + esc(Objekte.personName(m.p)) + (m.anteil < 0.999 ? "<br><span class='fuer'>" + esc(Objekte.datum(m.von) + " – " + Objekte.datum(m.bis)) + " · " + m.tage + " Tage</span>" : "") +
+          (m.abBk && m.abHk ? "" : "<br><span class='fuer'>" +
+            (!m.abBk ? "Betriebskosten: " + esc(bkArtKurz(m.bkArt)) : "") + (!m.abBk && !m.abHk ? " · " : "") +
+            (!m.abHk ? "Heizkosten: " + esc(bkArtKurz(m.hkArt)) : "") + "</span>") + "</span>" +
+          "<span>" + esc(eur2(m.umlagefaehig)) + " €" +
+          (m.pauschal > 0.02 ? "<br><span class='fuer'>" + esc(eur2(m.pauschal)) + " € nicht abgerechnet</span>" : "") + "</span>" +
           "<span>" + esc(eur2(m.voraus)) + " €" + (m.rueckstand > 0.02 ? "<br><span class='fuer z-minus'>Rückstand " + esc(eur2(m.rueckstand)) + " €</span>" : "") + "</span>" +
           erg2(m.ergebnis) +
           "<span><button class='btn klein' data-act='abr-drucken' data-id='" + esc(x.e.id) + "' data-wer='" + esc(m.p.id) + "'>Abrechnung</button></span></div>" +
-          (x.leerstand > 0.02 && m === x.mieterZeilen[x.mieterZeilen.length - 1]
+          (m === x.mieterZeilen[x.mieterZeilen.length - 1] && x.leerstand > 0.02
             ? "<div class='abe-row'>" + kopf + "<span class='fuer'>Zeit ohne Mieter</span><span>" + esc(eur2(x.leerstand)) +
-              " €</span><span>–</span><span class='fuer'>trägt der Eigentümer</span><span></span></div>" : "")).join("");
+              " €</span><span>–</span><span class='fuer'>trägt der Eigentümer</span><span></span></div>" : "") +
+          (m === x.mieterZeilen[x.mieterZeilen.length - 1] && x.pauschal > 0.02
+            ? "<div class='abe-row'>" + kopf + "<span class='fuer'>durch Pauschale abgedeckt</span><span>" + esc(eur2(x.pauschal)) +
+              " €</span><span>–</span><span class='fuer'>keine Abrechnung · § 556 Abs. 2 BGB</span><span></span></div>" : "")).join("");
       }).join("") + "</div></section>";
-    if (erg.weg) h += vermoegenBlockHtml(o, jahr, erg) + ruecklageBlockHtml(o, jahr, erg);
+    if (erg.weg) h += eigWechselBlockHtml(o, jahr, erg) + vermoegenBlockHtml(o, jahr, erg) + ruecklageBlockHtml(o, jahr, erg);
     h += abrFreigabeHtml(o, jahr, erg);
     (() => { const st2 = abrStand(o, jahr); if (!erg.weg || !st2.beschlussAm) return;
       const an = anfechtungStand(st2.beschlussAm);
@@ -3447,6 +3863,28 @@ const Objekte = (() => {
       if (einzel.p35) h += "<p class='md-text'><strong>Steuerlich begünstigt nach § 35a EStG:</strong> " + esc(eur2(einzel.p35)) +
         " € Ihres Anteils entfallen auf haushaltsnahe Dienstleistungen und Handwerkerleistungen (Arbeitslohnanteil). " +
         "Den Betrag können Sie in Ihrer Steuererklärung geltend machen.</p>";
+      /* Pauschale oder Inklusivmiete: der Mieter muss erfahren, was nicht abgerechnet wurde. */
+      if (!erg.weg && mz && (!mz.abBk || !mz.abHk))
+        h += "<p class='md-text'><strong>Nicht abgerechnet:</strong> " +
+          (!mz.abBk ? "Für die Betriebskosten ist " + esc(bkArtKurz(mz.bkArt)) + " vereinbart. " : "") +
+          (!mz.abHk ? "Für Heizung und Warmwasser ist " + esc(bkArtKurz(mz.hkArt)) + " vereinbart. " : "") +
+          "Über diese Kosten wird nach § 556 Abs. 2 BGB nicht abgerechnet; es bleibt beim vereinbarten Betrag.</p>";
+      /* Eigentümerwechsel im Zeitraum: die Aufteilung nach Tagen nachrichtlich ausweisen. */
+      if (erg.weg) {
+        const eigZ = ((erg.einheiten.find(x => x.e.id === einzel.e.id) || {}).eigZeilen) || [];
+        if (eigZ.length > 1)
+          h += "<h2>Aufteilung zwischen Vor- und Nacheigentümer</h2>" +
+            "<table class='lv-tab abr-tab'><thead><tr><th>Eigentümer</th><th>Zeitraum</th><th>Tage</th>" +
+            "<th>Kostenanteil</th><th>Vorschüsse</th><th>Ergebnis</th></tr></thead><tbody>" +
+            eigZ.map(g => "<tr><td>" + esc(Objekte.personName(g.p)) + "</td><td>" +
+              esc(Objekte.datum(g.von) + " – " + Objekte.datum(g.bis)) + "</td><td>" + g.tage + "</td><td>" +
+              esc(eur2(g.last)) + " €</td><td>" + esc(eur2(g.voraus)) + " €</td><td><strong>" +
+              esc((g.ergebnis > 0 ? "+ " : g.ergebnis < 0 ? "− " : "") + eur2(Math.abs(g.ergebnis))) +
+              " €</strong></td></tr>").join("") + "</tbody></table>" +
+            "<p class='md-text'>Diese Aufteilung ist eine Rechenhilfe. Den Nachschuss schuldet der Gemeinschaft gegenüber, " +
+            "wer im Zeitpunkt des Beschlusses Eigentümer ist (§ 28 Abs. 2 WEG). Wie Verkäufer und Käufer sich untereinander " +
+            "ausgleichen, richtet sich nach dem Kaufvertrag.</p>";
+      }
       h += erg.weg
         ? "<p class='md-text'>Die Eigentümerversammlung beschließt nach § 28 Abs. 2 WEG über die Einforderung von Nachschüssen und die Anpassung der Vorschüsse. " +
           "Der Zahlbetrag wird mit dem Beschluss fällig.</p>"
@@ -3486,6 +3924,26 @@ const Objekte = (() => {
       ". Rechnerisch geprüft; maßgeblich sind die Belege, die bei der Verwaltung eingesehen werden können.</p></div>";
     return h + "</div>";
   }
+  /* ---------- Zugeklappte Stammdaten ----------
+     Die Stammdaten sind lang geworden. Deshalb ist jeder Block zunächst zu und wird einzeln
+     geöffnet; was offen ist, merkt sich das Programm für die Sitzung. */
+  const objAufListe = () => Array.isArray(S.objAuf) ? S.objAuf : (S.objAuf = []);
+  const objAuf = k => objAufListe().includes(k);
+  function klapp(k, titel, inhalt, voll) {
+    const auf = objAuf(k);
+    return "<section class='gruppe klapp" + (voll ? " voll" : "") + (auf ? " auf" : "") + "'>" +
+      "<button type='button' class='klapp-kopf' data-act='obj-klapp' data-wert='" + esc(k) + "' aria-expanded='" + auf + "'>" +
+      "<span class='klapp-pfeil'>" + (auf ? "▾" : "▸") + "</span><h2>" + titel + "</h2></button>" +
+      (auf ? "<div class='klapp-inhalt'>" + inhalt + "</div>" : "") + "</section>";
+  }
+  /* Macht aus einem fertigen Block einen zugeklappten Block. */
+  function klappAus(k, html) {
+    const m = String(html || "").match(/^<section class='([^']*)'><h2>([\s\S]*?)<\/h2>([\s\S]*)<\/section>$/);
+    if (!m) return html;
+    return klapp(k, m[2], m[3], m[1].indexOf("voll") >= 0);
+  }
+  const KLAPP_ALLE = ["blick", "tickets", "einheiten", "notfall", "schliess", "anlagen", "eigentum",
+    "dienste", "rechnungen", "unterlagen", "beschluesse", "notizen"];
   function objektAnsichtHtml(o) {
     if (S.nfDruck === o.id) return "<div class='seite'>" + notfallDruckHtml(o) + "</div>";
     const weg = o.art === "weg"; const liste = o.einheitenListe || []; const summe = Objekte.meaSumme(liste);
@@ -3527,43 +3985,48 @@ const Objekte = (() => {
     }
     if (S.objTab === "etv") return h + "<p class='unter' style='margin:14px 0 0'>Die Einladung wird mit den Daten dieses Objekts vorbereitet.</p>" +
       "<div class='leiste'><div><button class='btn' data-act='abbrechen'>Zurück zur Übersicht</button></div></div></div>";
+    const alleAuf = KLAPP_ALLE.every(k => objAuf(k));
+    h += "<div class='leiste' style='padding:14px 0 0'><div>" +
+      "<button class='btn klein' data-act='obj-klapp-alle'>" + (alleAuf ? "Alles zuklappen" : "Alles aufklappen") + "</button>" +
+      "</div><span class='fuer'>Jeden Block einzeln öffnen – tippen Sie auf die Überschrift.</span></div>";
     h += "<div class='formular-raster'>";
-    h += "<section class='gruppe'>" + h2("Auf einen Blick") +
+    h += klapp("blick", "Auf einen Blick",
       zeile(weg ? "Gemeinschaft" : "Eigentümer", esc(o.auftraggeber || "–")) +
       zeile(weg ? "Beiratsvorsitz" : "Ansprechpartner", esc(weg ? (beiratName(o, "vorsitz") || "–") : (o.ansprechpartner || "–"))) +
       zeile("Einheiten", liste.length ? esc(Objekte.zaehlen(liste).map(z => z.anzahl + " × " + z.art).join(" · ")) + (summe !== null ? " · MEA " + summe.toLocaleString("de-DE") : "") : "–") +
       zeile(weg ? "Bestellt" : "Vertrag", (o.beginn ? Objekte.datum(o.beginn) : "–") + (o.ende ? " bis " + Objekte.datum(o.ende) : "")) +
       zeile("Objektbetreuung", esc(betreuung || "–")) +
       zeile("Buchhaltung", esc(teamName(o.buchhaltungId) || "–")) + zeile("Technik", esc(teamName(o.technikId) || "–")) +
-      (o.art === "garantie" && o.garantiemiete ? zeile("Garantiemiete", esc(o.garantiemiete) + " € / Monat") : "") + "</section>";
-    h += "<section class='gruppe'>" + h2("Offene Tickets <span class='fuer'>" + tickets.length + "</span>") +
+      (o.art === "garantie" && o.garantiemiete ? zeile("Garantiemiete", esc(o.garantiemiete) + " € / Monat") : ""));
+    h += klapp("tickets", "Offene Tickets <span class='fuer'>" + tickets.length + "</span>",
       (tickets.length ? "<ul class='ue-liste'>" + tickets.slice(0, 6).map(t => "<li><button class='link' data-act='t-oeffnen-objekt' data-id='" + esc(t.id) + "'>" + esc(ticketTitel(t)) + "</button>" +
         " <span class='fuer'>" + esc(Objekte.label(Objekte.DRINGLICHKEIT, t.dringlichkeit)) + " · " + esc(Objekte.label(Objekte.STATUS, Objekte.ticketStatus(t))) + (t.termin ? " · WV " + Objekte.datum(t.termin) : "") + "</span></li>").join("") + "</ul>"
-        : "<p class='unter' style='margin:0'>Keine offenen Vorgänge.</p>") + "</section>";
+        : "<p class='unter' style='margin:0'>Keine offenen Vorgänge.</p>"));
     if (liste.length) {
       const offenE = liste.find(e => e.id === S.ueEinheit);
-      h += "<section class='gruppe voll'>" + h2("Einheiten <span class='fuer'>" + liste.length + "</span>") +
+      h += klapp("einheiten", "Einheiten <span class='fuer'>" + liste.length + "</span>",
         "<div class='we-chips'>" + liste.map(e => "<button type='button' class='we-chip" + (offenE && e.id === offenE.id ? " an" : "") + "' data-act='ue-einheit' data-id='" + esc(e.id) + "'>" + esc(e.nr || e.art) + "</button>").join("") + "</div>" +
-        (offenE ? einheitAnsichtHtml(o, offenE) : "<p class='unter' style='margin:10px 0 0'>Einheit antippen, um alle Angaben zu sehen.</p>") + "</section>";
+        (offenE ? einheitAnsichtHtml(o, offenE) : "<p class='unter' style='margin:10px 0 0'>Einheit antippen, um alle Angaben zu sehen.</p>"), true);
     }
-    h += notfallAnsichtHtml(o);
+    h += klappAus("notfall", notfallAnsichtHtml(o));
     (() => { const a = schlAnlage(o), liste = schlListe(o);
       const ges = liste.reduce((n, x) => n + (Number(x.anzahl) || 1), 0);
       const drau = liste.filter(x => x.ausgabe && !x.rueckgabe).reduce((n, x) => n + (Number(x.anzahl) || 1), 0);
       if (!a.hersteller && !a.nummer && !a.karte && !a.nachbestellung && !ges) return;
-      h += "<section class='gruppe'>" + h2("Schließanlage") +
+      h += klapp("schliess", "Schließanlage",
         zeile("Hersteller", esc(a.hersteller || "–")) + zeile("Anlagennummer", esc(a.nummer || "–")) +
         zeile("Sicherungskarte bei", esc(a.karte || "–")) + zeile("Nachbestellung über", esc(a.nachbestellung || "–")) +
         zeile("Schlüssel", ges + " erfasst · " + drau + " ausgegeben") +
-        "<div class='leiste'><div><button class='btn klein' data-act='obj-tab' data-wert='gebaeude'>Schlüsselausgabe</button></div></div></section>";
+        "<div class='leiste'><div><button class='btn klein' data-act='obj-tab' data-wert='gebaeude'>Schlüsselausgabe</button></div></div>");
     })();
-    if (anlagen.length) h += "<section class='gruppe'>" + h2("Technische Anlagen <span class='fuer'>" + anlagen.length + "</span>") + "<ul class='ue-liste'>" +
+    if (anlagen.length) h += klapp("anlagen", "Technische Anlagen <span class='fuer'>" + anlagen.length + "</span>",
+      "<ul class='ue-liste'>" +
       anlagen.map(a => { const hw = S.handwerker.find(x => x.id === a.handwerkerId);
         return "<li><strong>" + esc(a.art || "Anlage") + "</strong>" + (a.standort ? " · " + esc(a.standort) : "") +
-          "<span class='fuer'><br>" + (hw ? esc(hw.firma) + " · " + kontaktZeile(hw, a.kontaktId) : "kein Handwerker") + (a.naechste ? " · Prüfung " + Objekte.datum(a.naechste) : "") + "</span></li>"; }).join("") + "</ul></section>";
-    h += eigentumAnsichtHtml(o);
+          "<span class='fuer'><br>" + (hw ? esc(hw.firma) + " · " + kontaktZeile(hw, a.kontaktId) : "kein Handwerker") + (a.naechste ? " · Prüfung " + Objekte.datum(a.naechste) : "") + "</span></li>"; }).join("") + "</ul>");
+    h += klappAus("eigentum", eigentumAnsichtHtml(o));
     const dienste = diensteListe(o).filter(dienstAktiv);
-    if (dienste.length) h += "<section class='gruppe voll'>" + h2("Dienstleistungsverträge <span class='fuer'>" + dienste.length + "</span>") +
+    if (dienste.length) h += klapp("dienste", "Dienstleistungsverträge <span class='fuer'>" + dienste.length + "</span>",
       "<div class='ue-tab'><div class='dv-kopf-tab'><span>Leistung</span><span>Firma</span><span>Vergütung</span><span>Leistungen</span><span></span></div>" +
       dienste.map(d => "<div class='dv-row'><span><strong>" + esc(dienstArtName(d.art)) + "</strong>" +
         (d.beginn ? "<br><span class='fuer'>seit " + esc(Objekte.datum(d.beginn)) + (d.ende ? " bis " + esc(Objekte.datum(d.ende)) : "") + "</span>" : "") + "</span>" +
@@ -3572,19 +4035,20 @@ const Objekte = (() => {
           (d.umlage === false ? "<br><span class='fuer'>nicht umlagefähig</span>" : "<br><span class='fuer'>umlagefähig</span>") : "–") + "</span>" +
         "<span>" + dienstLeistungen(d).length + "</span>" +
         "<span><button class='btn klein' data-act='dienst-vertrag' data-id='" + esc(d.id) + "'>Vertrag</button></span></div>").join("") + "</div>" +
-      "<div class='leiste'><div><button class='btn klein' data-act='obj-tab' data-wert='dienste'>Verträge bearbeiten</button></div></div></section>";
+      "<div class='leiste'><div><button class='btn klein' data-act='obj-tab' data-wert='dienste'>Verträge bearbeiten</button></div></div>", true);
     const rgDok = dok.map((d, i) => ({ d, i })).filter(x => x.d.art === "Rechnung");
     const uebrig = dok.filter(d => d.art !== "Rechnung");
-    if (rgDok.length) h += "<section class='gruppe voll'>" + h2("Rechnungen <span class='fuer'>" + rgDok.length + "</span>") +
+    if (rgDok.length) h += klapp("rechnungen", "Rechnungen <span class='fuer'>" + rgDok.length + "</span>",
       "<p class='unter'>Nach Jahr und Monat geordnet – maßgeblich ist das Rechnungsdatum.</p>" +
       p35Summen().filter(z => z.oid === o.id).map(z => "<p class='unter' style='margin:0 0 8px'><strong>§ 35a " + esc(z.jahr) + ":</strong> haushaltsnah " + eur2(z.h) + " € · Handwerker " + eur2(z.w) + " €</p>").join("") +
-      rechnungsGliederungHtml(rgDok, true) + "</section>";
-    if (uebrig.length) h += "<section class='gruppe'>" + h2("Unterlagen <span class='fuer'>" + uebrig.length + "</span>") + "<ul class='ue-liste'>" +
+      rechnungsGliederungHtml(rgDok, true), true);
+    if (uebrig.length) h += klapp("unterlagen", "Unterlagen <span class='fuer'>" + uebrig.length + "</span>",
+      "<ul class='ue-liste'>" +
       uebrig.map(d => "<li>" + (d.quelle === "etv" ? "<button class='link' data-act='dok-etv' data-id='" + esc(d.etvId) + "'>" + esc(d.name) + "</button>"
         : "<a href='/_blob/" + esc(d.id) + "' target='_blank' rel='noopener'>" + esc(d.name || d.datei) + "</a>") +
-        " <span class='fuer'>" + esc([d.art, d.datum ? Objekte.datum(d.datum) : ""].filter(Boolean).join(" · ")) + "</span></li>").join("") + "</ul></section>";
+        " <span class='fuer'>" + esc([d.art, d.datum ? Objekte.datum(d.datum) : ""].filter(Boolean).join(" · ")) + "</span></li>").join("") + "</ul>");
     const bs = (o.beschluesse || []).slice().sort((a, b) => (Number(b.nr) || 0) - (Number(a.nr) || 0));
-    if (bs.length) h += "<section class='gruppe voll'>" + h2("Beschluss-Sammlung <span class='fuer'>" + bs.length + "</span>") +
+    if (bs.length) h += klapp("beschluesse", "Beschluss-Sammlung <span class='fuer'>" + bs.length + "</span>",
       "<p class='unter'>Fortlaufend nach § 24 Abs. 7 WEG. Neue Beschlüsse kommen automatisch aus dem Protokoll dazu.</p><div class='ue-tab'>" +
       "<div class='bs-kopf'><span>Nr.</span><span>Datum</span><span>Beschluss</span><span>Ergebnis</span></div>" +
       bs.map(b => { const an = anfechtungStand(b.datum);
@@ -3595,8 +4059,8 @@ const Objekte = (() => {
         "<span class='" + (String(b.ergebnis).startsWith("angenommen") ? "bs-ja" : "bs-nein") + "'>" + esc(b.ergebnis || "") + "</span></div>"; }).join("") + "</div>" +
       (bs.some(b => { const an = anfechtungStand(b.datum); return an && an.offen; })
         ? "<ul class='meldungen'><li class='m-hinweis'>Solange die Monatsfrist des § 45 WEG läuft, kann ein Beschluss noch angefochten werden. " +
-          "Setzen Sie ihn in dieser Zeit nur um, wenn ein Aufschub der Gemeinschaft schadet.</li></ul>" : "") + "</section>";
-    if (String(o.notizen || "").trim()) h += "<section class='gruppe'>" + h2("Notizen") + "<p class='t-text'>" + esc(o.notizen).replace(/\n/g, "<br>") + "</p></section>";
+          "Setzen Sie ihn in dieser Zeit nur um, wenn ein Aufschub der Gemeinschaft schadet.</li></ul>" : ""), true);
+    if (String(o.notizen || "").trim()) h += klapp("notizen", "Notizen", "<p class='t-text'>" + esc(o.notizen).replace(/\n/g, "<br>") + "</p>");
     h += "</div><div class='leiste'><div><button class='btn haupt' data-act='bearbeiten'>Bearbeiten</button><button class='btn' data-act='abbrechen'>Zurück zur Übersicht</button>" +
       (o.art === "miet" || o.art === "weg" ? "<button class='btn' data-act='vertrag-erstellen'>Verwaltervertrag erstellen</button>" : "") + "</div></div></div>";
     return h;
@@ -3660,7 +4124,10 @@ const Objekte = (() => {
     if (!o.eigentum.teile || typeof o.eigentum.teile !== "object") o.eigentum.teile = {};
     if (!Array.isArray(o.eigentum.eigene)) o.eigentum.eigene = [];
     if (!o.eigentum.te || typeof o.eigentum.te !== "object") o.eigentum.te = {};
+    if (typeof o.eigentum.modus !== "string") o.eigentum.modus = "";
     return o.eigentum; };
+  /* Wer die Vorschlagsliste nicht will, trägt alles selbst ein. */
+  const seEigenModus = o => eigentumVon(o).modus === "eigen";
   /* Zwingendes Gemeinschaftseigentum bleibt Gemeinschaftseigentum – egal was eingetragen wird. */
   const seWert = (o, k) => { const kat = seKat(k); if (!kat) return "offen";
     if (kat[4]) return "gemein";
@@ -3676,6 +4143,7 @@ const Objekte = (() => {
   function eigentumAnsichtHtml(o) {
     if (!["weg", "miet", "garantie"].includes(o.art)) return "";
     const e = eigentumVon(o);
+    if (seEigenModus(o)) return eigentumAnsichtEigenHtml(o, e);
     const alle = SE_KATALOG.map(k => ({ k, zu: seWert(o, k[0]) }));
     const abw = alle.filter(x => !x.k[4] && x.zu !== x.k[3]);
     const offen = alle.filter(x => x.zu === "offen");
@@ -3701,6 +4169,30 @@ const Objekte = (() => {
       esc(offen.map(x => x.k[1]).slice(0, 5).join(", ")) + (offen.length > 5 ? " und weitere" : "") + ".</li></ul>";
     return h + "<div class='leiste'><div><button class='btn klein' data-act='bearbeiten'>Ändern</button></div></div></section>";
   }
+  /* Ansicht ohne Vorschlagsliste: nur, was der Verwalter selbst eingetragen hat. */
+  function eigentumAnsichtEigenHtml(o, e) {
+    const liste = e.eigene || [];
+    let h = "<section class='gruppe voll'><h2>Sondereigentum und Gemeinschaftseigentum <span class='fuer'>" +
+      liste.length + "</span></h2>";
+    if (!liste.length && !e.te.datum && !e.te.notar && !e.te.urnr && !e.te.hinweis)
+      return h + "<p class='unter'>Noch nichts eingetragen. Tragen Sie unter „Bearbeiten“ Punkt für Punkt ein, " +
+        "was Ihre Teilungserklärung regelt.</p>" +
+        "<div class='leiste'><div><button class='btn klein' data-act='bearbeiten'>Eintragen</button></div></div></section>";
+    h += "<div class='se-zahlen'>" + SE_ZU.map(([w, l]) => "<div class='se-zahl" +
+      (w === "offen" && liste.some(x => (x.zu || "offen") === "offen") ? " se-rot" : "") + "'>" +
+      "<strong>" + liste.filter(x => (x.zu || "offen") === w).length + "</strong><span>" + esc(l) + "</span></div>").join("") + "</div>";
+    if (e.te.datum || e.te.notar || e.te.urnr) h += "<p class='unter' style='margin-top:12px'>Teilungserklärung: " +
+      esc([e.te.datum ? Objekte.datum(e.te.datum) : "", e.te.notar, e.te.urnr].filter(Boolean).join(" · ")) + "</p>";
+    if (e.te.hinweis) h += "<p class='unter' style='white-space:pre-line'>" + esc(e.te.hinweis) + "</p>";
+    if (liste.length) h += "<div class='ue-tab' style='margin-top:12px'>" + SE_ZU.map(([w, l]) => {
+      const teil = liste.filter(x => (x.zu || "offen") === w);
+      if (!teil.length) return "";
+      return "<h3 style='margin:14px 0 6px'>" + esc(l) + "</h3><ul class='ue-liste'>" +
+        teil.map(x => "<li><strong>" + esc(x.name || "ohne Bezeichnung") + "</strong>" +
+          (x.notiz ? " <span class='fuer'>" + esc(x.notiz) + "</span>" : "") + "</li>").join("") + "</ul>";
+    }).join("") + "</div>";
+    return h + "<div class='leiste'><div><button class='btn klein' data-act='bearbeiten'>Ändern</button></div></div></section>";
+  }
   function eigentumHtml(o) {
     if (!["weg", "miet", "garantie"].includes(o.art)) return "";
     const e = eigentumVon(o), weg = istWeg(o);
@@ -3712,15 +4204,22 @@ const Objekte = (() => {
         ? "Woran hängt, wer eine Reparatur bezahlt. Maßgeblich ist Ihre Teilungserklärung – tragen Sie hier ein, was dort steht. Wo sie schweigt, gilt der Vorschlag des Gesetzes."
         : "Liegt diese Wohnung in einer Eigentümergemeinschaft, entscheidet diese Aufstellung, welche Reparatur Sie für den Eigentümer beauftragen dürfen und welche Sache der WEG-Verwaltung ist.") +
       " Einige Punkte sind nach § 5 Abs. 2 WEG zwingend Gemeinschaftseigentum – sie lassen sich nicht umstellen, auch nicht durch die Teilungserklärung.</p>";
-    h += "<div class='se-zahlen'>" + SE_ZU.map(([w, l]) => "<div class='se-zahl" + (w === "offen" && offen ? " se-rot" : "") + "'>" +
+    const eigenMod = seEigenModus(o);
+    h += "<div class='schalter-zeile' style='margin-top:4px'><div>Alles selbst eintragen" +
+      "<small>Ohne die Vorschlagsliste. Sie legen jeden Punkt einzeln an, so wie Ihre Teilungserklärung ihn nennt.</small></div>" +
+      "<button type='button' class='schalter' role='switch' aria-checked='" + eigenMod +
+      "' aria-label='Alles selbst eintragen' data-act='se-modus'></button></div>";
+    if (!eigenMod) h += "<div class='se-zahlen'>" + SE_ZU.map(([w, l]) => "<div class='se-zahl" + (w === "offen" && offen ? " se-rot" : "") + "'>" +
       "<strong>" + zaehl(w) + "</strong><span>" + esc(l) + "</span></div>").join("") + "</div>";
+    else h += "<div class='se-zahlen'>" + SE_ZU.map(([w, l]) => "<div class='se-zahl'>" +
+      "<strong>" + e.eigene.filter(x => (x.zu || "offen") === w).length + "</strong><span>" + esc(l) + "</span></div>").join("") + "</div>";
     h += "<h3 style='margin-top:18px'>Teilungserklärung</h3><div class='felder'>" +
       "<div class='feld'><label for='se-te-datum'>Datum</label><input type='date' id='se-te-datum' data-se='te|datum' value='" + esc(e.te.datum || "") + "'></div>" +
       "<div class='feld'><label for='se-te-notar'>Notar</label><input type='text' id='se-te-notar' data-se='te|notar' value='" + esc(e.te.notar || "") + "' placeholder='Name und Ort'></div>" +
       "<div class='feld'><label for='se-te-ur'>Urkundennummer</label><input type='text' id='se-te-ur' data-se='te|urnr' value='" + esc(e.te.urnr || "") + "' placeholder='z. B. UR-Nr. 412/1998'></div>" +
       "<div class='feld breit'><label for='se-te-hinweis'>Besondere Regelungen der Teilungserklärung</label>" +
       "<textarea id='se-te-hinweis' data-se='te|hinweis' rows='3' placeholder='z. B. § 7: Die Instandhaltung der Fenster trägt abweichend der jeweilige Sondereigentümer – unwirksam, siehe oben. Oder: Gartenflächen sind den Erdgeschosswohnungen zur alleinigen Nutzung zugewiesen.'>" + esc(e.te.hinweis || "") + "</textarea></div></div>";
-    h += SE_GRUPPEN.map(([g, titel]) => {
+    h += eigenMod ? "" : SE_GRUPPEN.map(([g, titel]) => {
       const teile = SE_KATALOG.filter(k => k[2] === g);
       return "<h3 style='margin-top:20px'>" + esc(titel) + "</h3>" +
         "<div class='se-tab'>" + teile.map(k => { const zu = seWert(o, k[0]);
@@ -3734,15 +4233,29 @@ const Objekte = (() => {
             "<span><input type='text' data-se='teil|" + esc(k[0]) + "|notiz' value='" + esc(seNotiz(o, k[0])) + "' placeholder='Fundstelle in der Teilungserklärung'></span>" +
             "</div>"; }).join("") + "</div>";
     }).join("");
-    h += "<h3 style='margin-top:20px'>Eigene Punkte <span class='fuer'>" + e.eigene.length + "</span></h3>" +
-      "<p class='unter'>Was in Ihrer Teilungserklärung sonst noch geregelt ist und oben nicht vorkommt.</p>";
+    h += "<h3 style='margin-top:20px'>" + (eigenMod ? "Ihre Punkte" : "Eigene Punkte") +
+      " <span class='fuer'>" + e.eigene.length + "</span></h3>" +
+      "<p class='unter'>" + (eigenMod
+        ? "Je Zeile ein Punkt: Bezeichnung, Zuordnung und die Fundstelle in der Teilungserklärung."
+        : "Was in Ihrer Teilungserklärung sonst noch geregelt ist und oben nicht vorkommt.") + "</p>";
     h += e.eigene.length ? "<div class='se-tab'>" + e.eigene.map((x, i) => "<div class='se-row'>" +
       "<span><input type='text' data-se='eigen|" + i + "|name' value='" + esc(x.name || "") + "' placeholder='z. B. Hobbyraum im Untergeschoss'></span>" +
       "<span><select data-se='eigen|" + i + "|zu'>" + SE_ZU.map(([w, l]) =>
         "<option value='" + w + "'" + ((x.zu || "offen") === w ? " selected" : "") + ">" + esc(l) + "</option>").join("") + "</select></span>" +
       "<span style='display:flex;gap:6px'><input type='text' data-se='eigen|" + i + "|notiz' value='" + esc(x.notiz || "") + "' placeholder='Fundstelle'>" +
       "<button class='btn klein gefahr' data-act='se-weg' data-i='" + i + "'>" + (S.loeschen === "se" + i ? "Wirklich?" : "×") + "</button></span></div>").join("") + "</div>" : "";
-    h += "<div class='leiste'><div><button class='btn klein' data-act='se-neu'>+ Eigener Punkt</button></div></div>";
+    h += "<div class='leiste'><div><button class='btn klein' data-act='se-neu'>+ " + (eigenMod ? "Punkt" : "Eigener Punkt") + "</button>" +
+      (eigenMod && !e.eigene.length ? "<button class='btn klein' data-act='se-vorlage'>Vorschlagsliste als Punkte übernehmen</button>" : "") +
+      "</div></div>";
+    if (eigenMod) return h + "<ul class='meldungen'>" +
+      "<li class='m-hinweis'>Dach, Fassade, tragende Teile, Fenster, Wohnungseingangstür, Estrich, Balkonkonstruktion, " +
+      "Heizungsanlage, Aufzug, gemeinschaftliche Leitungen und das Grundstück sind nach § 5 Abs. 2 WEG zwingend " +
+      "Gemeinschaftseigentum. Eine abweichende Regelung in der Teilungserklärung ist insoweit unwirksam.</li>" +
+      "<li class='m-hinweis'>Gemeinschaftseigentum: " + esc(SE_WER.gemein) + " Sondereigentum: " + esc(SE_WER.sonder) +
+      " Sondernutzungsrecht: " + esc(SE_WER.snr) + "</li>" +
+      "<li class='m-hinweis'>Diese Aufstellung ersetzt die Teilungserklärung nicht. Sie hält fest, was Sie dort gelesen " +
+      "haben, damit es beim nächsten Schaden nicht wieder nachgeschlagen werden muss. Im Zweifel gilt die Urkunde.</li>" +
+      "</ul></section>";
     const offeneNamen = alle.filter(x => x.zu === "offen").map(x => x.k[1]);
     if (offeneNamen.length) h += "<ul class='meldungen'><li class='m-hinweis'>Noch nicht geklärt: " +
       esc(offeneNamen.slice(0, 6).join(", ")) + (offeneNamen.length > 6 ? " und " + (offeneNamen.length - 6) + " weitere" : "") +
@@ -4190,7 +4703,16 @@ const Objekte = (() => {
       z("E-Mail", p.email ? "<a href='mailto:" + esc(p.email) + "'>" + esc(p.email) + "</a>" : "");
     const vertrag = mieter
       ? z("Mietbeginn", p.mietbeginn ? Objekte.datum(p.mietbeginn) : "") + z("Mietende", p.mietende ? Objekte.datum(p.mietende) : "") +
-        z("Kaltmiete", eur(p.kaltmiete)) + z("Betriebskosten", eur(p.bkVoraus)) + z("Heizkosten", eur(p.hkVoraus)) + z("Kaution", eur(p.kaution)) +
+        z("Kaltmiete", eur(p.kaltmiete)) +
+        z("Betriebskosten", bkArtVon(p) === "inklusiv" ? "in der Kaltmiete enthalten"
+          : eur(p.bkVoraus) ? eur(p.bkVoraus) + " · " + esc(bkArtKurz(bkArtVon(p))) : "") +
+        z("Heizkosten", hkArtVon(p) === "inklusiv" ? "in der Kaltmiete enthalten"
+          : eur(p.hkVoraus) ? eur(p.hkVoraus) + " · " + esc(bkArtKurz(hkArtVon(p))) : "") +
+        z("Kaution", eur(p.kaution)) +
+        (minderungen(p).filter(m => m.von && (!m.bis || m.bis >= isoTag(new Date()))).length
+          ? z("Mietminderung", minderungen(p).filter(m => m.von && (!m.bis || m.bis >= isoTag(new Date()))).map(m =>
+            esc((m.proz ? String(m.proz).replace(".", ",") + " % " : betragZahl(m.betrag) ? eur2(betragZahl(m.betrag)) + " € " : "") +
+              "seit " + Objekte.datum(m.von) + (m.grund ? " · " + m.grund : ""))).join("<br>")) : "") +
         (mietStufenOffen(p).length ? z("Vereinbarte Erhöhung", mietStufenOffen(p).map(x =>
           eur(x.kaltmiete) + " ab " + Objekte.datum(x.ab)).join("<br>")) : "") +
         z("Abnahmetermin", p.abnahme ? Objekte.datum(p.abnahme) : "")
@@ -4391,13 +4913,290 @@ const Objekte = (() => {
       "</li><li class='m-hinweis'>Das Original gehört in die Ablage: unter „Dokumente“ als „SEPA-Mandat“ ablegen.</li></ul></section>";
     return h + "</div>";
   }
+  /* ---------- Mietverhältnis: Miete, Art der Nebenkosten, Minderungen ----------
+     Alles, was monatlich geschuldet ist, an einer Stelle. Die Art der Nebenkosten entscheidet,
+     ob überhaupt abgerechnet wird (§ 556 Abs. 2 BGB); eine Minderung nach § 536 BGB wird als
+     eigener Vorgang geführt und von der Sollstellung abgezogen. */
+  /* ---------- Mietanpassung: Staffel, Index und Obergrenze ----------
+     Bei der Staffelmiete stehen die Erhöhungen schon im Vertrag und wirken von selbst
+     (§ 557a BGB). Bei der Indexmiete wird die Miete an den Verbraucherpreisindex gekoppelt und
+     durch Erklärung in Textform angepasst (§ 557b BGB). In beiden Fällen sind Erhöhungen bis zur
+     ortsüblichen Vergleichsmiete ausgeschlossen. Eine Obergrenze kappt beides. */
+  /* Tabelle des Statistischen Bundesamtes aus einer Datei übernehmen. */
+  function vpiDateiLaden(datei) {
+    const leser = new FileReader();
+    leser.onload = async () => {
+      const neue = vpiLesen(String(leser.result || ""));
+      if (!neue.length) { toast("In der Datei waren keine Monate mit Indexwerten zu erkennen."); return; }
+      const d = vpiDaten();
+      neue.forEach(x => { const alt = d.werte.find(y => String(y.monat) === x.monat);
+        if (alt) alt.wert = x.wert; else d.werte.push(x); });
+      await vpiSichern(d); render(true);
+      toast(neue.length + (neue.length === 1 ? " Monat übernommen" : " Monate übernommen"));
+    };
+    leser.onerror = () => toast("Die Datei konnte nicht gelesen werden.");
+    leser.readAsText(datei, "ISO-8859-1");
+  }
+  /* ---------- Erklärung zur Indexmiete (§ 557b Abs. 3 BGB) ----------
+     Sie muss die Veränderung des Index und die neue Miete beziffern. */
+  function indexBriefHtml(p) {
+    const vw = (() => { try { return window.Firmendaten ? window.Firmendaten.daten() : {}; } catch (x) { return {}; } })();
+    const ix = indexRechnen(p);
+    const paar = S.liste.map(o => ({ o, e: (o.einheitenListe || []).find(x => x.id === p.einheitId) }))
+      .find(x => x.e) || { o: null, e: null };
+    const o = paar.o, e = paar.e;
+    let h = "<div class='seite'><div class='md-werkzeug'><div>" +
+      "<button class='btn klein' data-act='ix-brief-zu'>‹ Zurück</button>" +
+      "<button class='btn klein haupt' data-act='mandat-drucken'>Drucken / als PDF speichern</button></div>" +
+      "<span class='fuer'>Erklärung nach § 557b Abs. 3 BGB</span></div>";
+    if (!ix.moeglich)
+      return h + "<div class='md-blatt'><p class='md-text'>Für die Erklärung fehlen noch der Ausgangsmonat, sein " +
+        "Indexwert oder die Kaltmiete. Ergänzen Sie das im Reiter „Mietverhältnis“.</p></div></div>";
+    const anrede = p.anrede === "Frau" ? "Sehr geehrte Frau " + (p.nachname || "")
+      : p.anrede === "Herr" ? "Sehr geehrter Herr " + (p.nachname || "") : "Sehr geehrte Damen und Herren";
+    h += "<div class='md-blatt'><header class='md-kopf'>" +
+      (vw.logo ? "<img class='md-logo' src='" + esc(vw.logo) + "' alt='" + esc(vw.name || "Logo") + "'>"
+        : "<div class='md-firma'>" + esc(vw.name || "Hausverwaltung") + "</div>") +
+      "<div class='fuer'>" + esc(Objekte.datum(new Date().toISOString().slice(0, 10))) + "</div></header>" +
+      "<div class='md-empf'>" + esc([Objekte.personName(p), p.strasse, [p.plz, p.ort].filter(Boolean).join(" ")]
+        .filter(Boolean).join("\n")) + "</div>" +
+      "<h1>Anpassung der Indexmiete</h1>" +
+      "<p class='md-art'>" + esc([o ? objName(o) : "", e ? (e.nr || e.art) : "", e && e.lage ? e.lage : ""]
+        .filter(Boolean).join(" · ")) + "</p>" +
+      "<p class='md-text'>" + esc(anrede) + ",</p>" +
+      "<p class='md-text'>in Ihrem Mietvertrag ist eine Indexmiete vereinbart. Die Miete folgt damit dem " +
+      "Verbraucherpreisindex für Deutschland, den das Statistische Bundesamt veröffentlicht. Dieser Index hat sich " +
+      "wie folgt verändert:</p>" +
+      "<table class='lv-tab abr-tab'><tbody>" +
+      "<tr><td>Indexstand " + esc(monatText(ix.basisMonat)) + " (Grundlage bisher)</td><td>" +
+      esc(String(ix.basis).replace(".", ",")) + " Punkte</td></tr>" +
+      "<tr><td>Indexstand " + esc(monatText(ix.neuMonat)) + "</td><td>" +
+      esc(String(ix.neuWert).replace(".", ",")) + " Punkte</td></tr>" +
+      "<tr><td>Veränderung</td><td>" + esc((ix.proz >= 0 ? "+ " : "− ") + eur2(Math.abs(ix.proz))) + " %</td></tr>" +
+      "<tr><td>Bisherige Nettokaltmiete</td><td>" + esc(eur2(ix.alt)) + " €</td></tr>" +
+      (ix.gekappt ? "<tr><td>Rechnerisch ergäbe sich</td><td>" + esc(eur2(ix.roh)) + " €</td></tr>" : "") +
+      "<tr class='abr-summe'><td><strong>Neue Nettokaltmiete</strong></td><td><strong>" +
+      esc(eur2(ix.neu)) + " €</strong></td></tr></tbody></table>" +
+      (ix.gekappt ? "<p class='md-text'>Wir machen die Erhöhung nur bis zu dem Betrag geltend, der zwischen uns als " +
+        "Höchstmiete gilt.</p>" : "") +
+      "<p class='md-text'>Die neue Nettokaltmiete gilt ab dem " + esc(Objekte.datum(ix.ab)) +
+      ", also mit Beginn des zweiten Monats nach Zugang dieser Erklärung (§ 557b Abs. 3 BGB). Ihre " +
+      "Vorauszahlungen für Betriebs- und Heizkosten bleiben unverändert; zu zahlen sind ab diesem Monat " +
+      "insgesamt " + esc(eur2(cent(ix.neu + betragZahl(p.bkVoraus) + betragZahl(p.hkVoraus)))) + " €.</p>" +
+      "<p class='md-text'>Bitte passen Sie einen Dauerauftrag entsprechend an. Liegt uns ein " +
+      "SEPA-Lastschriftmandat vor, übernehmen wir die Änderung selbst.</p>" +
+      "<p class='md-text'>Mit freundlichen Grüßen</p>" +
+      "<p class='md-text' style='margin-top:36px'>" + esc(vw.name || "Hausverwaltung") + "</p>" +
+      "<p class='md-fuss'>Diese Erklärung ergeht in Textform nach § 557b Abs. 3 BGB. Eine Zustimmung ist nicht " +
+      "erforderlich. Den Indexstand können Sie beim Statistischen Bundesamt nachprüfen.</p></div></div>";
+    return h;
+  }
+  function mietAnpassungHtml(p) {
+    const art = mietArtVon(p);
+    const grenze = mietObergrenze(p);
+    const fl = flaecheVonPerson(p);
+    const heute = isoTag(new Date());
+    const stufen = mietStufen(p).slice().sort((a, b) => String(a.ab).localeCompare(String(b.ab)));
+    const geld = (n, l, ein, hilfe) => "<div class='feld'><label for='pa-" + n + "'>" + l + "</label><div class='einheit'>" +
+      "<input type='text' inputmode='decimal' id='pa-" + n + "' data-p='" + n + "' value='" + esc(p[n]) + "'><span>" + ein + "</span></div>" +
+      (hilfe ? "<small>" + hilfe + "</small>" : "") + "</div>";
+    let h = "<section class='gruppe'><h2>Mietanpassung</h2>" +
+      "<div class='feld'><label for='pa-art'>Wie wird die Miete angepasst?</label><select id='pa-art' data-p='mietArt'>" +
+      MIET_ART.map(([w, t]) => "<option value='" + w + "'" + (art === w ? " selected" : "") + ">" + esc(t) + "</option>").join("") +
+      "</select></div>";
+    /* Obergrenze */
+    h += "<h3 style='margin-top:18px'>Obergrenze</h3>" +
+      "<p class='unter'>Darüber stellt das Programm nie – auch dann nicht, wenn eine Staffel oder der Index höher liegt.</p>" +
+      "<div class='felder'>" + geld("mietMax", "Höchstens", "€/Mon.") +
+      geld("mietMaxQm", "oder höchstens", "€/m²", fl ? "Bei " + String(fl).replace(".", ",") + " m² sind das " +
+        eur2(cent(betragZahl(p.mietMaxQm) * fl)) + " €." : "Für diese Wohnung ist noch keine Fläche hinterlegt.") + "</div>" +
+      (grenze ? "<ul class='meldungen'><li class='" + (betragZahl(p.kaltmiete) > grenze + 0.005 ? "m-fehler" : "m-ok") + "'>" +
+        "Die Obergrenze liegt bei " + esc(eur2(grenze)) + " € Nettokaltmiete." +
+        (betragZahl(p.kaltmiete) > grenze + 0.005 ? " Die hinterlegte Kaltmiete liegt darüber – gestellt werden " +
+          esc(eur2(grenze)) + " €." : "") + "</li></ul>" : "");
+    /* Staffelmiete */
+    if (art === "staffel") {
+      const fehler = staffelPruefen(p);
+      const naechste = stufen.find(x => String(x.ab) > heute);
+      h += "<h3 style='margin-top:22px'>Staffeln</h3>" +
+        "<p class='unter'>Tragen Sie die Staffeln so ein, wie sie im Mietvertrag stehen. Das Programm stellt jede Staffel " +
+        "von ihrem Datum an automatisch – ein Schreiben ist dafür nicht nötig, viele Verwalter kündigen sie aber trotzdem " +
+        "freundlich an.</p>" +
+        (stufen.length ? "<div class='ue-tab'>" + stufen.map(x => {
+          const i = mietStufen(p).indexOf(x);
+          const roh = betragZahl(x.kaltmiete);
+          return "<div class='pz-zeile'><input type='date' aria-label='gültig ab' data-pst='" + i + "|ab' value='" + esc(x.ab) + "'>" +
+            "<div class='einheit'><input type='text' inputmode='decimal' aria-label='Nettokaltmiete' data-pst='" + i +
+            "|kaltmiete' value='" + esc(x.kaltmiete) + "'><span>€</span></div>" +
+            "<button type='button' class='e-weg' data-act='pst-weg' data-i='" + i + "' aria-label='Staffel entfernen'>" +
+            (S.loeschen === "pst" + i ? "↺?" : "×") + "</button></div>" +
+            (grenze && roh > grenze + 0.005 ? "<p class='unter' style='color:var(--warn)'>Diese Staffel liegt über der " +
+              "Obergrenze – gestellt werden " + esc(eur2(grenze)) + " €.</p>" : "");
+        }).join("") + "</div>" : "<p class='unter'>Noch keine Staffel eingetragen.</p>") +
+        "<div class='felder' style='margin-top:14px'>" +
+        "<div class='feld'><label>Erste Staffel ab</label><input type='date' data-pstg='ab' value='" + esc(S.pStaffel.ab) + "'></div>" +
+        "<div class='feld'><label>Anzahl Staffeln</label><input type='text' inputmode='numeric' data-pstg='anzahl' value='" + esc(S.pStaffel.anzahl) + "'></div>" +
+        "<div class='feld'><label>Schritt</label><div class='einheit'><input type='text' inputmode='decimal' data-pstg='schritt' value='" +
+        esc(S.pStaffel.schritt) + "'><span>" + (S.pStaffel.art === "proz" ? "%" : "€") + "</span></div></div>" +
+        "<div class='feld'><label>Schritt rechnen als</label><select data-pstg='art'>" +
+        [["eur", "fester Betrag in Euro"], ["proz", "Prozent der Vormiete"]].map(([w, t]) =>
+          "<option value='" + w + "'" + (S.pStaffel.art === w ? " selected" : "") + ">" + esc(t) + "</option>").join("") +
+        "</select></div></div>" +
+        "<div class='leiste'><div><button class='btn klein' data-act='pst-erzeugen'>Staffeln erzeugen</button>" +
+        "<button class='btn klein' data-act='pst-neu'>+ einzelne Staffel</button></div>" +
+        (naechste ? "<span class='fuer'>nächste Staffel am " + esc(Objekte.datum(naechste.ab)) + " auf " +
+          esc(eur2(betragZahl(naechste.kaltmiete))) + " €</span>" : "") + "</div>" +
+        "<ul class='meldungen'>" +
+        fehler.map(t => "<li class='m-fehler'>" + esc(t) + "</li>").join("") +
+        (fehler.length ? "" : stufen.length ? "<li class='m-ok'>Die Abstände von mindestens einem Jahr sind eingehalten (§ 557a Abs. 2 BGB).</li>" : "") +
+        "<li class='m-hinweis'>Während der Staffelmiete sind Erhöhungen auf die ortsübliche Vergleichsmiete (§ 558 BGB) und " +
+        "wegen Modernisierung (§ 559 BGB) ausgeschlossen. Betriebskosten dürfen Sie weiterhin anpassen.</li>" +
+        "<li class='m-hinweis'>Die Staffeln müssen im Mietvertrag mit dem jeweiligen Betrag oder der Erhöhung in Euro " +
+        "vereinbart sein (§ 557a Abs. 1 BGB). Eine Vereinbarung nur in Prozent ist unwirksam – der Prozentrechner hier " +
+        "hilft nur beim Ausrechnen.</li>" +
+        "<li class='m-hinweis'>Ein Kündigungsausschluss zulasten des Mieters ist höchstens vier Jahre lang wirksam " +
+        "(§ 557a Abs. 3 BGB).</li></ul>";
+    }
+    /* Indexmiete */
+    if (art === "index") {
+      const ix = indexRechnen(p);
+      const alleMonate = vpiSortiert();
+      h += "<h3 style='margin-top:22px'>Indexmiete</h3>" +
+        "<p class='unter'>Die Miete folgt dem Verbraucherpreisindex für Deutschland. Die Werte pflegen Sie einmalig in den " +
+        "Einstellungen unter „Verbraucherpreisindex“ – danach rechnet das Programm hier.</p>" +
+        "<div class='felder'><div class='feld'><label for='pa-ibm'>Ausgangsmonat laut Vertrag</label>" +
+        "<select id='pa-ibm' data-p='indexBasisMonat'><option value=''>– bitte wählen –</option>" +
+        alleMonate.map(x => "<option value='" + esc(x.monat) + "'" + (String(p.indexBasisMonat) === x.monat ? " selected" : "") + ">" +
+          esc(monatText(x.monat)) + " · " + esc(String(x.wert)) + "</option>").join("") + "</select>" +
+        "<small>Der Monat, dessen Indexwert bei der letzten Anpassung zugrunde lag.</small></div>" +
+        geld("indexBasisWert", "Ausgangswert abweichend", "Punkte", "Nur ausfüllen, wenn der Wert nicht in der Tabelle steht.") +
+        "</div>";
+      if (!alleMonate.length)
+        h += "<ul class='meldungen'><li class='m-fehler'>Es sind noch keine Indexwerte hinterlegt. Tragen Sie sie in den " +
+          "Einstellungen unter „Verbraucherpreisindex“ ein.</li></ul>";
+      else if (!ix.moeglich)
+        h += "<ul class='meldungen'><li class='m-hinweis'>Für die Rechnung fehlen noch der Ausgangsmonat, sein Indexwert " +
+          "oder die Kaltmiete.</li></ul>";
+      else
+        h += "<div class='ue-tab' style='margin-top:12px'>" +
+          "<div class='ue-zeile'><span class='ue-l'>Ausgangsmonat " + esc(monatText(ix.basisMonat)) + "</span><span class='ue-w'>" +
+          esc(String(ix.basis).replace(".", ",")) + " Punkte</span></div>" +
+          "<div class='ue-zeile'><span class='ue-l'>Letzter Monat " + esc(monatText(ix.neuMonat)) + "</span><span class='ue-w'>" +
+          esc(String(ix.neuWert).replace(".", ",")) + " Punkte</span></div>" +
+          "<div class='ue-zeile'><span class='ue-l'>Veränderung</span><span class='ue-w'>" +
+          esc((ix.proz >= 0 ? "+ " : "− ") + eur2(Math.abs(ix.proz))) + " %</span></div>" +
+          "<div class='ue-zeile'><span class='ue-l'>Bisherige Nettokaltmiete</span><span class='ue-w'>" + esc(eur2(ix.alt)) + " €</span></div>" +
+          (ix.gekappt ? "<div class='ue-zeile'><span class='ue-l'>Rechnerisch</span><span class='ue-w'>" + esc(eur2(ix.roh)) + " €</span></div>" : "") +
+          "<div class='ue-zeile'><span class='ue-l'><strong>Neue Nettokaltmiete</strong></span><span class='ue-w'><strong>" +
+          esc(eur2(ix.neu)) + " €</strong></span></div>" +
+          "<div class='ue-zeile'><span class='ue-l'>Wirksam ab</span><span class='ue-w'>" + esc(Objekte.datum(ix.ab)) + "</span></div></div>" +
+          "<div class='leiste'><div><button class='btn klein haupt' data-act='pix-uebernehmen'>Erhöhung festlegen</button>" +
+          "<button class='btn klein' data-act='pix-brief'>Erklärung erzeugen</button></div>" +
+          "<span class='fuer'>" + (ix.jahrUm ? "" : "Jahresfrist noch nicht um") + "</span></div>" +
+          "<ul class='meldungen'>" +
+          (ix.gekappt ? "<li class='m-hinweis'>Rechnerisch ergäben sich " + esc(eur2(ix.roh)) +
+            " €; wegen Ihrer Obergrenze bleibt es bei " + esc(eur2(ix.neu)) + " €.</li>" : "") +
+          (ix.jahrUm ? "" : "<li class='m-fehler'>Die Miete muss mindestens ein Jahr unverändert geblieben sein (§ 557b Abs. 2 BGB). " +
+            "Zuletzt geändert zum " + esc(Objekte.datum(ix.zuletzt)) + " – frühestens möglich ab " +
+            esc(Objekte.datum(monatePlusIso(ix.zuletzt, 12))) + ".</li>") +
+          "<li class='m-hinweis'>Die Änderung wirkt mit dem Beginn des zweiten Monats nach Zugang Ihrer Erklärung " +
+          "(§ 557b Abs. 3 BGB). Die Erklärung muss den Indexstand und die neue Miete nennen.</li>" +
+          "<li class='m-hinweis'>Während der Indexmiete sind Erhöhungen auf die ortsübliche Vergleichsmiete ausgeschlossen; " +
+          "nach einer Modernisierung nur, wenn Sie zu ihr gesetzlich verpflichtet waren (§ 557b Abs. 2 BGB).</li></ul>";
+    }
+    if (art === "") {
+      h += "<ul class='meldungen' style='margin-top:18px'>" +
+        "<li class='m-hinweis'>Erhöhungen bereiten Sie im Objekt unter „Forderungen“ bzw. über „Schreiben“ vor. Dort prüft " +
+        "das Programm Jahresfrist, Kappungsgrenze und Zustimmung.</li>" +
+        (stufen.length ? "<li class='m-ok'>Hinterlegte Erhöhungen: " + stufen.map(x =>
+          esc(eur2(betragZahl(x.kaltmiete)) + " € ab " + Objekte.datum(x.ab))).join(", ") + "</li>" : "") + "</ul>";
+    }
+    return h + "</section>";
+  }
+  function mietVerhaeltnisHtml(p) {
+    const geld = (n, l, ein, hilfe) => "<div class='feld'><label for='pm-" + n + "'>" + l + "</label><div class='einheit'>" +
+      "<input type='text' inputmode='decimal' id='pm-" + n + "' data-p='" + n + "' value='" + esc(p[n]) + "'><span>" + ein + "</span></div>" +
+      (hilfe ? "<small>" + hilfe + "</small>" : "") + "</div>";
+    const wahl = (n, l, wert) => "<div class='feld'><label for='pm-" + n + "'>" + l + "</label>" +
+      "<select id='pm-" + n + "' data-p='" + n + "'>" + BK_ART.map(([w, t]) =>
+        "<option value='" + w + "'" + (wert === w ? " selected" : "") + ">" + esc(t) + "</option>").join("") + "</select></div>";
+    const bk = bkArtVon(p), hk = hkArtVon(p);
+    const heute = isoTag(new Date());
+    let h = "<section class='gruppe'><h2>Miete</h2>" +
+      "<p class='unter'>Was monatlich geschuldet ist. Daraus entstehen die Sollstellungen.</p>" +
+      "<div class='felder'>" + geld("kaltmiete", "Nettokaltmiete", "€/Mon.") + geld("kaution", "Kaution", "€") + "</div>" +
+      "<div class='felder' style='margin-top:14px'>" +
+      (bk === "inklusiv" ? "" : geld("bkVoraus", "Betriebskosten", "€/Mon.")) + wahl("bkArt", "Art der Betriebskosten", bk) + "</div>" +
+      "<div class='felder' style='margin-top:14px'>" +
+      (hk === "inklusiv" ? "" : geld("hkVoraus", "Heizung und Warmwasser", "€/Mon.")) + wahl("hkArt", "Art der Heizkosten", hk) + "</div>";
+    const meld = [];
+    if (bk === "pauschale") meld.push(["m-hinweis", "Die Betriebskosten werden nicht abgerechnet. Erhöhen dürfen Sie eine Pauschale " +
+      "nur, wenn der Mietvertrag das ausdrücklich vorsieht (§ 560 Abs. 1 BGB); sinken die Kosten, müssen Sie sie senken (§ 560 Abs. 3 BGB)."]);
+    if (bk === "inklusiv") meld.push(["m-hinweis", "Die Betriebskosten sind in der Nettokaltmiete enthalten. Es wird nichts gesondert " +
+      "gefordert und nichts abgerechnet. Eine Erhöhung ist nur über die ortsübliche Vergleichsmiete möglich (§ 558 BGB)."]);
+    if (hk !== "voraus") meld.push(["m-fehler", "Heizung und Warmwasser müssen grundsätzlich verbrauchsabhängig abgerechnet werden " +
+      "(§ 2 HeizkostenV). Ohne Abrechnung darf der Mieter den Anteil um 15 Prozent kürzen (§ 12 HeizkostenV). Zulässig ist eine Pauschale " +
+      "nur in den Ausnahmefällen des § 11 HeizkostenV – etwa im Gebäude mit nicht mehr als zwei Wohnungen, von denen der Vermieter " +
+      "eine selbst bewohnt."]);
+    if (!betragZahl(p.kaltmiete)) meld.push(["m-hinweis", "Ohne Nettokaltmiete entsteht keine Sollstellung."]);
+    h += "<ul class='meldungen'>" + meld.map(([k, t]) => "<li class='" + k + "'>" + t + "</li>").join("") + "</ul></section>";
+    h += mietAnpassungHtml(p);
+    /* Mietminderung als eigener Vorgang. */
+    const liste = minderungen(p);
+    h += "<section class='gruppe'><h2>Mietminderung <span class='fuer'>" + liste.length +
+      (liste.length === 1 ? " Vorgang" : " Vorgänge") + "</span></h2>" +
+      "<p class='unter'>Ein Mangel mindert die Miete von Gesetzes wegen (§ 536 BGB). Tragen Sie Zeitraum, Höhe und Grund ein – " +
+      "das Programm zieht den Betrag von der Sollstellung ab, damit kein falscher Rückstand entsteht.</p>";
+    h += liste.map((m, i) => {
+      const laeuft = m.von && m.von <= heute && (!m.bis || m.bis >= heute);
+      const kuenftig = m.von && m.von > heute;
+      return "<div class='abr-einheit'><div class='abr-kopf'>" +
+        "<strong>" + esc(String(m.grund || "").trim() || "Mangel ohne Beschreibung") + "</strong> · " +
+        "<span class='marke " + (laeuft ? "s-fehler" : kuenftig ? "s-neu" : "s-erledigt") + "'>" +
+        (laeuft ? "läuft" : kuenftig ? "ab " + esc(Objekte.datum(m.von)) : "beendet") + "</span></div><div class='felder'>" +
+        "<div class='feld'><label>Mangel seit</label><input type='date' data-pmd='" + i + "|von' value='" + esc(m.von) + "'></div>" +
+        "<div class='feld'><label>Behoben am</label><input type='date' data-pmd='" + i + "|bis' value='" + esc(m.bis) + "'>" +
+        "<small>Leer lassen, solange der Mangel besteht.</small></div>" +
+        "<div class='feld'><label>Minderung</label><div class='einheit'><input type='text' inputmode='decimal' data-pmd='" + i +
+          "|proz' value='" + esc(m.proz) + "'><span>%</span></div></div>" +
+        "<div class='feld'><label>oder fester Betrag</label><div class='einheit'><input type='text' inputmode='decimal' data-pmd='" + i +
+          "|betrag' value='" + esc(m.betrag) + "'><span>€/Mon.</span></div>" +
+        "<small>Ein Betrag hat Vorrang vor dem Prozentsatz.</small></div>" +
+        "<div class='feld'><label>Gerechnet von</label><select data-pmd='" + i + "|basis'>" +
+          [["brutto", "Bruttomiete einschließlich Vorauszahlungen"], ["kalt", "nur Nettokaltmiete"]].map(([w, t]) =>
+            "<option value='" + w + "'" + ((m.basis || "brutto") === w ? " selected" : "") + ">" + esc(t) + "</option>").join("") +
+          "</select><small>Regelfall ist die Bruttomiete.</small></div>" +
+        "<div class='feld breit'><label>Mangel und Grund</label><input type='text' data-pmd='" + i + "|grund' value='" + esc(m.grund) +
+          "' placeholder='z. B. Heizung vom 12.01. bis 20.01. ausgefallen'></div></div>" +
+        "<div class='leiste'><div><span class='fuer'>erfasst am " +
+        esc(Objekte.datum(String(m.angelegt || "").slice(0, 10))) + "</span></div>" +
+        "<button class='btn gefahr klein' data-act='pmd-weg' data-i='" + i + "'>" +
+        (S.loeschen === "pmd" + i ? "Wirklich entfernen?" : "Entfernen") + "</button></div></div>";
+    }).join("");
+    h += "<div class='leiste'><div><button class='btn klein' data-act='pmd-neu'>+ Minderung erfassen</button>" +
+      (liste.length ? "<button class='btn klein' data-act='pmd-rechnen'>Sollstellungen nachrechnen</button>" : "") + "</div></div>" +
+      "<ul class='meldungen'>" +
+      "<li class='m-hinweis'>Ob und in welcher Höhe gemindert werden darf, entscheidet das Programm nicht. Halten Sie Mangelanzeige, " +
+      "Besichtigung und Behebung in der Akte fest – im Streitfall zählt genau das.</li>" +
+      "<li class='m-hinweis'>Für die Betriebskostenabrechnung bleiben die vereinbarten Vorauszahlungen maßgeblich. Die Minderung ist " +
+      "ein eigener Anspruch des Mieters und wird nicht als geringere Vorauszahlung behandelt.</li>" +
+      "<li class='m-hinweis'>Bereits abgerechnete und festgeschriebene Jahre werden beim Nachrechnen nicht mehr verändert.</li>" +
+      "</ul></section>";
+    h += "<div class='leiste'><div>" +
+      (S.pBearbeiten ? "<button class='btn haupt' data-act='p-speichern'>Speichern</button>"
+        : "<button class='btn haupt' data-act='p-bearbeiten-an'>Bearbeiten</button>") +
+      "<button class='btn' data-act='p-abbrechen'>Zurück zur Übersicht</button></div></div>";
+    return h;
+  }
   function personFormHtml() {
     const p = S.pEntwurf; const neu = !S.personen.some(x => x.id === p.id);
     const f = (n, l, t = "text", ex = "", hilfe = "") => "<div class='feld'><label for='p-" + n + "'>" + l + "</label><input type='" + t + "' id='p-" + n + "' data-p='" + n + "' value='" + esc(p[n]) + "' " + ex + ">" + (hilfe ? "<small>" + hilfe + "</small>" : "") + "</div>";
     const sel = (n, l, opts) => "<div class='feld'><label for='p-" + n + "'>" + l + "</label><select id='p-" + n + "' data-p='" + n + "'>" + opts.map(([w, t]) => "<option value='" + esc(w) + "'" + (String(p[n] || "") === w ? " selected" : "") + ">" + esc(t) + "</option>").join("") + "</select></div>";
     const objekte = S.liste.filter(o => !o.beendet || o.id === p.objektId).sort((a, b) => objName(a).localeCompare(objName(b), "de"));
     const mieter = p.rolle === "mieter";
-    const pTabs = "<nav class='reiter e-reiter'>" + [["stamm", "Stammdaten"], ["konto", "Kontodaten"], ["dok", "Dokumente"]]
+    const pTabs = "<nav class='reiter e-reiter'>" + [["stamm", "Stammdaten"]]
+      .concat(!neu && mieter ? [["miete", "Mietverhältnis"]] : [])
+      .concat([["konto", "Kontodaten"], ["dok", "Dokumente"]])
       .concat(neu ? [] : [["portal", "Portal"]])
       .concat(!neu && p.rolle === "eigentuemer" ? [["mieter", "Mieter"]] : []).map(([w, l]) =>
       "<button data-act='p-tab' data-wert='" + w + "'" + (S.pTab === w ? " aria-current='page'" : "") + ">" + l + "</button>").join("") + "</nav>";
@@ -4407,6 +5206,7 @@ const Objekte = (() => {
       "<div class='leiste'><div>" + (S.pBearbeiten || neu ? "<button class='btn haupt' data-act='p-speichern'>Speichern</button>" : "") +
       "<button class='btn' data-act='p-abbrechen'>Schließen</button></div></div></section>";
     if (S.pTab === "portal" && !neu) return pTabs + portalBlockHtml(p);
+    if (S.pTab === "miete" && !neu && mieter) return pTabs + mietVerhaeltnisHtml(p);
     if (S.pTab === "mieter" && !neu && p.rolle === "eigentuemer") return pTabs + mieterZuEigentuemerHtml(p);
     if (S.pTab === "konto" && !neu && !S.pBearbeiten) {
       const z = (l, w) => String(w || "").trim() ? "<div class='ue-zeile'><span class='ue-l'>" + l + "</span><span class='ue-w'>" + w + "</span></div>" : "";
@@ -6931,15 +7731,18 @@ const Objekte = (() => {
   function kaltmieteAm(p, ym) {
     const bis = mietStufen(p).filter(x => x.ab && String(x.ab).slice(0, 7) <= ym)
       .sort((a, b) => String(a.ab).localeCompare(String(b.ab)));
-    return bis.length ? betragZahl(bis[bis.length - 1].kaltmiete) : betragZahl(p && p.kaltmiete);
+    const roh = bis.length ? betragZahl(bis[bis.length - 1].kaltmiete) : betragZahl(p && p.kaltmiete);
+    /* Eine hinterlegte Obergrenze kappt Staffel und Index – gestellt wird nie mehr. */
+    const max = mietObergrenze(p);
+    return max && roh > max ? max : roh;
   }
   const mietStufenOffen = p => mietStufen(p).filter(x => x.ab && String(x.ab) > isoTag(new Date()))
     .sort((a, b) => String(a.ab).localeCompare(String(b.ab)));
-  function sollPositionen(o, e, partei, ym) {
+  function sollPositionen(o, e, partei, ym, zeit) {
     const weg = istWeg(o);
     const tage = tageImMonat(ym);
-    const von = String((weg ? partei.eigentumSeit : partei.mietbeginn) || "").slice(0, 10);
-    const bis = String((weg ? partei.eigentumBis : partei.mietende) || "").slice(0, 10);
+    const von = String((zeit && zeit.von) || (weg ? partei.eigentumSeit : partei.mietbeginn) || "").slice(0, 10);
+    const bis = String((zeit && zeit.bis) || (weg ? partei.eigentumBis : partei.mietende) || "").slice(0, 10);
     const erster = ym + "-01", letzter = ym + "-" + String(tage).padStart(2, "0");
     if (von && von > letzter) return null;
     if (bis && bis < erster) return null;
@@ -6950,7 +7753,9 @@ const Objekte = (() => {
     if (anteil <= 0) return null;
     const konten = objektKonten(o);
     const betraege = weg ? hausgeldBetraege(o, e, ym) : {
-      kaltmiete: kaltmieteAm(partei, ym), bkVoraus: betragZahl(partei.bkVoraus), hkVoraus: betragZahl(partei.hkVoraus) };
+      kaltmiete: kaltmieteAm(partei, ym),
+      bkVoraus: bkArtVon(partei) === "inklusiv" ? 0 : betragZahl(partei.bkVoraus),
+      hkVoraus: hkArtVon(partei) === "inklusiv" ? 0 : betragZahl(partei.hkVoraus) };
     const aus = [];
     const mitUst = !weg && ustPflichtig(e);
     const satz = mitUst ? ustSatzVon(e) : 0;
@@ -6964,6 +7769,17 @@ const Objekte = (() => {
         netto, ust, ustSatz: satz });
     });
     if (!aus.length) return null;
+    /* Mietminderung (§ 536 BGB): von der Bruttomiete, taggenau, als eigene Zeile sichtbar. */
+    if (!weg) {
+      const brutto = cent(aus.reduce((n, x) => n + x.betrag, 0));
+      const kaltK = kontoFuer(konten, "kaltmiete");
+      const kalt = cent((betraege.kaltmiete || 0) * anteil * (mitUst ? 1 + satz / 100 : 1));
+      const md = minderungAbzug(partei, ym, brutto, kalt);
+      if (md.betrag > 0.004 && kaltK)
+        aus.push({ kontoNr: kaltK.nr || "", minderung: true,
+          name: "Mietminderung (§ 536 BGB)" + (md.text ? " · " + md.text : ""),
+          betrag: -Math.min(md.betrag, brutto) });
+    }
     return { positionen: aus, anteil, abTag, bisTag, tage };
   }
   const sollListe = o => Array.isArray(o.soll) ? o.soll : [];
@@ -6971,6 +7787,17 @@ const Objekte = (() => {
   /* Fehlende Sollstellungen bis zum laufenden Monat nachtragen. */
   /* Wer schuldet die monatliche Zahlung: bei Miete der Mieter, bei WEG der Eigentümer. */
   const zahlerVon = (o, e) => istWeg(o) ? (personVon(e.eigentuemerId) || null) : mieterVon(e.id, o);
+  /* Alle, die für eine Einheit im Laufe der Zeit zahlen – bei WEG auch die Voreigentümer mit
+     ihrem eigenen Zeitraum. Sonst fehlte das Hausgeld der Monate vor dem Verkauf vollständig. */
+  function parteienVon(o, e) {
+    if (!istWeg(o)) { const m = mieterVon(e.id, o); return m ? [{ p: m, von: "", bis: "" }] : []; }
+    const aus = [];
+    eigVerlauf(e).forEach(x => { const p = personVon(x.personId);
+      if (p && !aus.some(y => y.p.id === p.id)) aus.push({ p, von: x.von || "", bis: x.bis || "" }); });
+    const jetzt = personVon(e.eigentuemerId);
+    if (jetzt && !aus.some(y => y.p.id === jetzt.id)) aus.push({ p: jetzt, von: "", bis: "" });
+    return aus;
+  }
   /* Miete ist am 3. Werktag fällig (§ 556b BGB), Hausgeld zum 1. des Monats laut Beschluss. */
   const faelligAm = (o, ym) => istWeg(o) ? ym + "-01" : dritterWerktag(ym);
   function sollstellungenErzeugen(o) {
@@ -6981,27 +7808,50 @@ const Objekte = (() => {
     o.soll = sollListe(o);
     let neu = 0;
     (o.einheitenListe || []).forEach(e => {
-      const partei = zahlerVon(o, e); if (!partei) return;
-      let ym = start;
-      for (let n = 0; n < 240 && ym <= bis; n++) {
-        if (periodeFest(o, ym.slice(0, 4))) { ym = monatPlus(ym, 1); continue; }
-        const da = o.soll.some(s => s.einheitId === e.id && s.monat === ym);
-        if (!da) {
-          const p = sollPositionen(o, e, partei, ym);
-          if (p) {
-            o.soll.push({ id: Objekte.neueId(), einheitId: e.id, mieterId: partei.id, monat: ym,
-              faellig: faelligAm(o, ym), positionen: p.positionen, anteilig: p.anteil < 1,
-              summe: Math.round(p.positionen.reduce((s, x) => s + x.betrag, 0) * 100) / 100,
-              angelegt: new Date().toISOString(), storniert: false });
-            neu++;
+      parteienVon(o, e).forEach(({ p: partei, von, bis: pBis }) => {
+        let ym = start;
+        for (let n = 0; n < 240 && ym <= bis; n++) {
+          if (periodeFest(o, ym.slice(0, 4))) { ym = monatPlus(ym, 1); continue; }
+          /* Posten ohne Zahler stammen aus älteren Beständen – sie gelten als vorhanden. */
+          const da = o.soll.some(s => s.einheitId === e.id && s.monat === ym &&
+            (!s.mieterId || s.mieterId === partei.id));
+          if (!da) {
+            const p = sollPositionen(o, e, partei, ym, { von, bis: pBis });
+            if (p) {
+              o.soll.push({ id: Objekte.neueId(), einheitId: e.id, mieterId: partei.id, monat: ym,
+                faellig: faelligAm(o, ym), positionen: p.positionen, anteilig: p.anteil < 1,
+                summe: Math.round(p.positionen.reduce((s, x) => s + x.betrag, 0) * 100) / 100,
+                angelegt: new Date().toISOString(), storniert: false });
+              neu++;
+            }
           }
+          ym = monatPlus(ym, 1);
         }
-        ym = monatPlus(ym, 1);
-      }
+      });
     });
     return neu;
   }
   const periodeFest = (o, jahr) => !!((o.perioden || {})[jahr] || {}).fest;
+  /* Bestehende Sollstellungen nachrechnen. Nötig, wenn der Wirtschaftsplan, eine Mietstufe oder
+     eine Mietminderung erst später erfasst wird – sonst bliebe der alte Betrag stehen.
+     Festgeschriebene Jahre und stornierte Posten bleiben unberührt, Zahlungen bleiben zugeordnet. */
+  function sollNeuRechnen(o) {
+    let n = 0;
+    sollListe(o).forEach(sx => {
+      if (sx.storniert) return;
+      if (periodeFest(o, String(sx.monat).slice(0, 4))) return;
+      const e = (o.einheitenListe || []).find(x => x.id === sx.einheitId); if (!e) return;
+      const partei = (sx.mieterId && personVon(sx.mieterId)) || zahlerVon(o, e); if (!partei) return;
+      const zeit = parteienVon(o, e).find(x => x.p.id === partei.id) || null;
+      const p = sollPositionen(o, e, partei, sx.monat, zeit); if (!p) return;
+      const summe = Math.round(p.positionen.reduce((a, x) => a + x.betrag, 0) * 100) / 100;
+      if (JSON.stringify(p.positionen) === JSON.stringify(sx.positionen) &&
+          Math.abs(summe - (Number(sx.summe) || 0)) < 0.005) return;
+      sx.positionen = p.positionen; sx.summe = summe; sx.anteilig = p.anteil < 1;
+      sx.geaendert = new Date().toISOString(); n++;
+    });
+    return n;
+  }
   /* Sollstellungen für alle Objekte nachtragen. Früher geschah das nur beim Öffnen eines
      Objekts – dadurch fehlten in Rückständen, offenen Posten, Mahnwesen und Abrechnung die
      Monate jedes Objekts, das gerade niemand aufgeschlagen hatte. */
@@ -7103,6 +7953,7 @@ const Objekte = (() => {
         "<input type='text' inputmode='decimal' style='max-width:150px' aria-label='Anfangsstand in Euro' data-anfang='" + esc(e.id) + "'" +
         " value='" + esc(anf && betragZahl(anf.betrag) ? eur2(betragZahl(anf.betrag)) : "") + "' placeholder='z. B. -250,00'>" +
         "<button class='btn klein' data-act='so-anfang' data-e='" + esc(e.id) + "'>Übernehmen</button>" : "") +
+      "<button class='btn klein' data-act='so-rechnen'>Sollstellungen nachrechnen</button>" +
       "<span class='fuer'>Rückstand mit Minus. Zahlungen werden nur innerhalb ihres Monats verrechnet.</span></div></div>";
     if (!liste.length) return h + "<p class='unter'>Noch keine Sollstellungen. Sie entstehen automatisch ab dem Monat, den Sie im Objekt unter „Buchhaltung“ eingestellt haben.</p></div>";
     h += liste.map(s => {
@@ -9860,6 +10711,48 @@ const Objekte = (() => {
       "<p class='unter'>Arbeitsvertrag, Standardzeiten, Urlaubsanspruch und Sollstunden stehen beim jeweiligen Mitarbeiter unter „Mitarbeiter“ – ändern kann sie nur der Admin.</p>" +
       felder + "</section>";
   }
+  /* ---------- Indextabelle für die Indexmiete ---------- */
+  function indexTabelleHtml() {
+    const d = vpiDaten();
+    const liste = vpiSortiert();
+    const letzt = vpiLetzter();
+    let h = "<section class='gruppe'><h2>Verbraucherpreisindex <span class='fuer'>für Indexmieten</span></h2>" +
+      "<p class='unter'>Bei einer Indexmiete richtet sich die Erhöhung nach dem Verbraucherpreisindex für Deutschland " +
+      "(§ 557b BGB). Diesen Index kann das Programm nicht selbst abrufen – es läuft allein in Ihrem Browser. " +
+      "Tragen Sie die Werte deshalb hier ein oder lesen Sie die Tabelle des Statistischen Bundesamtes als Datei ein. " +
+      "Die Tabelle gilt dann für alle Mietverhältnisse.</p>" +
+      "<div class='felder'><div class='feld'><label for='vpi-basis'>Basisjahr der Reihe</label>" +
+      "<input type='text' id='vpi-basis' data-vpib='1' value='" + esc(d.basis) + "' placeholder='2020'>" +
+      "<small>Steht in der Tabelle, meist „2020 = 100“.</small></div>" +
+      "<div class='feld breit'><label for='vpi-datei'>Tabelle einlesen</label>" +
+      "<input type='file' id='vpi-datei' accept='.csv,.txt,text/csv,text/plain'>" +
+      "<small>CSV oder Textdatei vom Statistischen Bundesamt. Vorhandene Monate werden überschrieben.</small></div></div>" +
+      "<div class='feld' style='margin-top:12px'><label for='vpi-text'>Oder Werte einfügen</label>" +
+      "<textarea id='vpi-text' rows='3' placeholder='2026-01;120,5&#10;2026-02;120,8'></textarea>" +
+      "<small>Je Zeile ein Monat und sein Wert. „Januar 2026 120,5“ versteht das Programm auch.</small></div>" +
+      "<div class='leiste'><div><button class='btn klein haupt' data-act='vpi-text'>Werte übernehmen</button>" +
+      "<button class='btn klein' data-act='vpi-zeile'>+ einzelner Monat</button></div>" +
+      "<span class='fuer'>" + liste.length + (liste.length === 1 ? " Monat" : " Monate") +
+      (letzt ? " · zuletzt " + esc(monatText(letzt.monat)) + " = " + esc(String(letzt.wert)) : "") + "</span></div>";
+    if (liste.length) {
+      const zeige = liste.slice(-18).reverse();
+      h += "<div class='ue-tab' style='margin-top:12px'>" + zeige.map(x => {
+        const i = vpiDaten().werte.indexOf(x);
+        return "<div class='pz-zeile'><input type='text' inputmode='numeric' aria-label='Monat' data-vpi='" + i +
+          "|monat' value='" + esc(x.monat) + "' placeholder='2026-01'>" +
+          "<input type='text' inputmode='decimal' aria-label='Indexwert' data-vpi='" + i + "|wert' value='" + esc(x.wert) + "'>" +
+          "<button type='button' class='e-weg' data-act='vpi-weg' data-i='" + i + "' aria-label='Monat entfernen'>×</button></div>";
+      }).join("") + "</div>" +
+      (liste.length > 18 ? "<p class='unter'>Es werden die letzten 18 Monate gezeigt; gespeichert sind alle.</p>" : "");
+    }
+    h += "<ul class='meldungen' style='margin-top:12px'>" +
+      (liste.length ? "" : "<li class='m-hinweis'>Ohne Werte kann das Programm keine Indexerhöhung rechnen.</li>") +
+      "<li class='m-hinweis'>Beim Statistischen Bundesamt finden Sie die Reihe unter „Verbraucherpreisindex für Deutschland“ " +
+      "(Tabelle 61111). Für die Indexmiete zählt der Gesamtindex, nicht ein einzelner Teilindex.</li>" +
+      "<li class='m-hinweis'>Pflegen Sie die Tabelle einmal im Monat nach, dann stehen Erhöhungen immer sofort bereit.</li>" +
+      "</ul></section>";
+    return h;
+  }
   function einstellungenHtml() {
     const ich = angemeldet();
     if (S.gobd && istVerwalter()) return "<div class='seite'>" + gobdHtml() + "</div>";
@@ -9904,7 +10797,7 @@ const Objekte = (() => {
       "<li><strong>Dateien:</strong> In Outlook ausgewählte Mails als .eml oder .txt speichern und im selben Fenster auswählen.</li>" +
       "<li><strong>Automatische Zuordnung:</strong> Steht die Ticketnummer im Betreff, zum Beispiel [#2026-001], landet die Mail sofort beim richtigen Ticket.</li></ol>" +
       "<p class='unter'>Eine dauerhafte Verbindung, die Ihr Postfach von selbst abruft, ist aus dem Browser heraus nicht möglich. Dafür braucht es einen Server, der sich per Microsoft 365 anmeldet – das gehört zum selben Schritt wie die Zugangsdaten für Mitarbeiter.</p></section>" +
-      (istVerwalter() ? bankzugangHtml() + bankverzeichnisHtml(true) + gobdBlockHtml() + kontenrahmenHtml() : "") +
+      (istVerwalter() ? bankzugangHtml() + bankverzeichnisHtml(true) + indexTabelleHtml() + gobdBlockHtml() + kontenrahmenHtml() : "") +
       "<div class='hero' style='padding-bottom:4px'><h1 style='font-size:28px'>Dokumente</h1><p>Briefkopf und Fußzeile für Verträge und Schreiben. Diese Angaben gelten für das ganze Unternehmen, nicht nur für Sie.</p></div></div>";
   }
   /* Alle Vorgänge, in denen dieser Handwerker beauftragt oder angefragt wurde. */
@@ -10230,6 +11123,11 @@ const Objekte = (() => {
   };
   window.Objektdaten = {
     liste: () => JSON.parse(JSON.stringify(S.liste.filter(o => !o.beendet))),
+    /* Fertig gerechnete Abrechnung eines Objekts – für Auswertungen und zur Prüfung. */
+    abrechnungRechnen: (objektId, jahr) => { const o = S.liste.find(x => x.id === objektId);
+      return o ? abrechnungRechnen(o, String(jahr)) : null; },
+    sollNeuRechnen: objektId => { const o = S.liste.find(x => x.id === objektId);
+      if (!o) return 0; const n = sollNeuRechnen(o); if (n) objektSichern(o); return n; },
     name: id => { const o = S.liste.find(x => x.id === id); return o ? objName(o) : ""; },
     eigentuemer: id => { const o = S.liste.find(x => x.id === id); if (!o) return [];
       return (o.einheitenListe || []).map(e => { const pn = personVon(e.eigentuemerId); return pn ? { einheit: e.nr || e.art, name: Objekte.personName(pn),
@@ -10450,16 +11348,33 @@ const Objekte = (() => {
       return;
     }
     /* Das Mandat füllt die ganze Seite, damit es sauber gedruckt werden kann. */
+    const ixD = (!S.mandatFuer && S.ixDruck && S.pEntwurf && S.pEntwurf.id === S.ixDruck) ? S.pEntwurf : null;
+    if (ixD) {
+      $("#neu-knopf").hidden = true; $("#status").hidden = true; $("#lese-hinweis").hidden = true;
+      $("#ze").hidden = true; $("#vv").hidden = true; app.hidden = false;
+      document.body.classList.add("mandat-an");
+      app.innerHTML = indexBriefHtml(ixD);
+      window.scrollTo({ top: behalteScroll ? y : 0 });
+      return;
+    }
     const mdP = S.mandatFuer ? mandatPerson() : null;
     const dvD = (!mdP && S.dienstDruck && S.entwurf) ? diensteListe(S.entwurf).find(x => x.id === S.dienstDruck) : null;
-    const abrD = (!mdP && !dvD && S.abrDruck && S.entwurf) ? S.abrDruck : null;
+    const umD = (!mdP && !dvD && S.umDruck !== null && S.umDruck !== undefined && S.entwurf) ? S.umDruck : null;
+    const abrD = (!mdP && !dvD && umD === null && S.abrDruck && S.entwurf) ? S.abrDruck : null;
     const mvD = (!mdP && !dvD && !abrD && S.mvDruck && S.entwurf) ? mvListe(S.entwurf).find(x => x.id === S.mvDruck) : null;
     const rlD = (!mdP && !dvD && !abrD && !mvD && S.rlDruck && S.entwurf) ? S.rlDruck : null;
     const mhD = (!mdP && !dvD && !abrD && !mvD && !rlD && S.entwurf && (S.mhDruck || S.mhVerzug || S.rzDruck)) ? true : null;
     const gwD = (!mdP && !dvD && !abrD && !mvD && !rlD && !mhD && S.gwRuege && S.entwurf)
       ? gwListe(S.entwurf).find(x => x.id === S.gwRuege) : null;
     const brD = (!mdP && !dvD && !abrD && !mvD && !rlD && !mhD && !gwD && S.brBericht && S.entwurf) ? S.brBericht : null;
-    document.body.classList.toggle("mandat-an", !!mdP || !!dvD || !!abrD || !!mvD || !!rlD || !!mhD || !!gwD || !!brD);
+    document.body.classList.toggle("mandat-an", !!mdP || !!dvD || umD !== null || !!abrD || !!mvD || !!rlD || !!mhD || !!gwD || !!brD);
+    if (umD !== null) {
+      $("#neu-knopf").hidden = true; $("#status").hidden = true; $("#lese-hinweis").hidden = true;
+      $("#ze").hidden = true; $("#vv").hidden = true; app.hidden = false;
+      app.innerHTML = umstellungDruckHtml(S.entwurf, umD);
+      window.scrollTo({ top: behalteScroll ? y : 0 });
+      return;
+    }
     if (brD) {
       $("#neu-knopf").hidden = true; $("#status").hidden = true; $("#lese-hinweis").hidden = true;
       $("#ze").hidden = true; $("#vv").hidden = true; app.hidden = false;
@@ -10603,7 +11518,7 @@ const Objekte = (() => {
       if (pn) { pn[feld] = t.value; S.pDirty.add(pid); if (feld === "iban") ibanAuswerten(t); } return; }
     if (t.dataset.uperson) {
       const [ui, rolle] = t.dataset.uperson.split("|"); const e = S.entwurf.einheitenListe[Number(ui)]; const val = t.value;
-      if (rolle === "eigentuemer") { e.eigentuemerId = val; }
+      if (rolle === "eigentuemer") { eigentumWechseln(e, val); }
       else { const alt = mieterVon(e.id); if (alt && alt.id !== val) { alt.einheitId = ""; alt.einheit = ""; S.pDirty.add(alt.id); }
         if (val) { const m = S.personen.find(x => x.id === val); if (m) { m.objektId = S.entwurf.id; m.einheitId = e.id; m.einheit = e.nr || e.art; S.pDirty.add(m.id); } } }
       render(true); return;
@@ -10628,8 +11543,45 @@ const Objekte = (() => {
       render(true); return;
     }
     if (t.dataset.uf) { const [oid, idx, feld] = t.dataset.uf.split("|"); const o = objFuer(oid); if (o) o.einheitenListe[Number(idx)][feld] = t.value; return; }
+    if (t.dataset.vpib !== undefined) { const d = vpiDaten(); d.basis = t.value; vpiSichern(d); return; }
+    if (t.dataset.vpi !== undefined) {
+      const [i, feld] = t.dataset.vpi.split("|"); const d = vpiDaten();
+      if (d.werte[Number(i)]) { d.werte[Number(i)][feld] = t.value; vpiSichern(d); }
+      return;
+    }
+    if (t.dataset.pstg !== undefined) {
+      S.pStaffel[t.dataset.pstg] = t.value;
+      if (t.dataset.pstg === "art") render(true);
+      return;
+    }
+    if (t.dataset.pst !== undefined && S.pEntwurf) {
+      const [i, feld] = t.dataset.pst.split("|");
+      const liste = mietStufen(S.pEntwurf);
+      if (liste[Number(i)]) { liste[Number(i)][feld] = t.value; S.pEntwurf.mietStufen = liste; spaeterZeichnen("pst", 800); }
+      return;
+    }
+    if (t.dataset.um && S.entwurf) {
+      const [i, feld] = t.dataset.um.split("|");
+      const u = umstellungen(S.entwurf)[Number(i)];
+      if (u) { u[feld] = t.value; objektSichern(S.entwurf); if (feld === "abJahr") spaeterZeichnen("um", 900); else render(true); }
+      return;
+    }
+    if (t.dataset.ev && S.entwurf) {
+      const [ui, vi, feld] = t.dataset.ev.split("|");
+      const e = (S.entwurf.einheitenListe || [])[Number(ui)];
+      const w = e && eigVerlauf(e)[Number(vi)];
+      if (w) { w[feld] = t.value; objektSichern(S.entwurf); render(true); }
+      return;
+    }
+    if (t.dataset.pmd && S.pEntwurf) {
+      const [i, feld] = t.dataset.pmd.split("|");
+      const m = minderungen(S.pEntwurf)[Number(i)];
+      if (m) { m[feld] = t.value; if (feld === "basis") render(true); }
+      return;
+    }
     if (t.dataset.p && S.pEntwurf) {
       S.pEntwurf[t.dataset.p] = t.value;
+      if (t.dataset.p === "bkArt" || t.dataset.p === "hkArt") { render(true); return; }
       if (t.dataset.p === "einheitId") { const o = objDraft(S.pEntwurf.objektId); const e = o && (o.einheitenListe || []).find(x => x.id === t.value); S.pEntwurf.einheit = e ? (e.nr || e.art) : ""; render(true); return; }
       if (t.dataset.p === "iban") ibanAuswerten(t);
       if (t.dataset.p === "objektId") { S.pEntwurf.einheitId = ""; S.pEntwurf.einheit = ""; render(true); }
@@ -11237,6 +12189,7 @@ const Objekte = (() => {
     if (e.target.id === "ea-datei") { const f = e.target.files[0]; e.target.value = ""; if (f) ausweisUebernehmen(f); return; }
     if (e.target.id === "dok-datei") { dokumenteHochladen([...e.target.files]); e.target.value = ""; return; }
     if (e.target.id === "bank-datei" || e.target.classList.contains("bank-datei-inline")) { bankDateiLaden(e.target.files[0]); return; }
+    if (e.target.id === "vpi-datei") { const f = e.target.files[0]; e.target.value = ""; if (f) vpiDateiLaden(f); return; }
     const t = e.target; if (!S.entwurf || t.dataset.a === undefined) return;
     const a = S.entwurf.anlagen[Number(t.dataset.a)];
     if (t.tagName === "SELECT") {
@@ -11283,7 +12236,7 @@ const Objekte = (() => {
     if (!["loeschen", "hw-loeschen", "p-loeschen", "m-loeschen", "td-loeschen", "v-weg", "mail-weg", "dok-weg", "mail-loeschen", "abl-weg",
       "bh-fest", "za-weg", "kk-weg", "kr-weg", "kr-klasse-weg", "kr-leeren",
       "nf-weg", "au-weg", "dienst-weg", "lv-weg", "org-weg", "hon-weg", "bs-weg", "ko-weg", "zl-weg",
-      "mv-weg", "mvbs-weg", "mvst-weg", "mvs-weg", "abr-frei-alle-zu", "rl-weg", "mh-weg", "rz-weg", "gw-weg", "gw-m-weg", "ih-weg", "schl-weg", "lf-weg", "zl-zust", "se-weg", "kau-weg", "kau-abrechnen"].includes(act)) S.loeschen = false;
+      "mv-weg", "mvbs-weg", "mvst-weg", "mvs-weg", "abr-frei-alle-zu", "rl-weg", "mh-weg", "rz-weg", "gw-weg", "gw-m-weg", "ih-weg", "schl-weg", "lf-weg", "zl-zust", "se-weg", "kau-weg", "kau-abrechnen", "pmd-weg", "um-weg", "ev-weg", "pst-weg", "vpi-weg"].includes(act)) S.loeschen = false;
     switch (act) {
       case "tab": S.tab = b.dataset.tab; S.ansicht = "liste"; S.entwurf = null; S.hwEntwurf = null; S.pEntwurf = null; S.tEntwurf = null; S.tEntwurfTicket = null; S.ticketOffen = null;
         S.vermOffen = null; S.mailOffenId = null; S.mailImport = null; render(); break;
@@ -12090,7 +13043,120 @@ const Objekte = (() => {
           const i2 = S.liste.findIndex(x => x.id === oid); if (i2 >= 0) S.liste[i2] = o;
           try { await Speicher.speichern("objekte", o, S.liste); } catch (e) { toast("Die Einheiten-Daten konnten nicht gespeichert werden."); }
         }
+        /* Miete, Nebenkostenart oder Minderung geändert: die betroffenen Sollstellungen nachrechnen. */
+        if (pn.rolle === "mieter") {
+          for (const o of S.liste.filter(x => !x.beendet && ["miet", "garantie"].includes(x.art))) {
+            if (!sollNeuRechnen(o)) continue;
+            try { await Speicher.speichern("objekte", o, S.liste); } catch (e) {}
+          }
+        }
         S.pObjekte = {}; S.pEntwurf = null; render(); toast("Gespeichert"); break;
+      }
+      /* Verbraucherpreisindex pflegen */
+      case "vpi-text": {
+        const el = $("#vpi-text"); const roh = el ? el.value : "";
+        const neue = vpiLesen(roh);
+        if (!neue.length) { toast("In dem Text waren keine Monate mit Werten zu erkennen."); return; }
+        const d = vpiDaten();
+        neue.forEach(x => { const alt = d.werte.find(y => String(y.monat) === x.monat);
+          if (alt) alt.wert = x.wert; else d.werte.push(x); });
+        await vpiSichern(d); if (el) el.value = "";
+        render(true); toast(neue.length === 1 ? "Ein Monat übernommen" : neue.length + " Monate übernommen"); break;
+      }
+      case "vpi-zeile": { const d = vpiDaten();
+        d.werte.push({ monat: heuteMonat(), wert: "" }); await vpiSichern(d); render(true); break; }
+      case "vpi-weg": { const i = Number(b.dataset.i);
+        if (S.loeschen !== "vpi" + i) { S.loeschen = "vpi" + i; render(true); return; }
+        const d = vpiDaten(); d.werte.splice(i, 1); S.loeschen = false; await vpiSichern(d); render(true); break; }
+      /* Staffelmiete */
+      case "pst-neu": {
+        if (!S.pEntwurf) return;
+        if (!S.pBearbeiten) { toast("Bitte zuerst auf „Bearbeiten“ gehen."); return; }
+        const liste = mietStufen(S.pEntwurf);
+        const letzte = liste.slice().sort((a2, b2) => String(a2.ab).localeCompare(String(b2.ab))).slice(-1)[0];
+        const ab = letzte && letzte.ab ? monatePlusIso(letzte.ab, 12)
+          : (S.pEntwurf.mietbeginn ? monatePlusIso(String(S.pEntwurf.mietbeginn).slice(0, 10), 12) : isoTag(new Date()));
+        S.pEntwurf.mietStufen = liste.concat({ ab, kaltmiete: "", erfasst: new Date().toISOString() });
+        render(true); break;
+      }
+      case "pst-weg": {
+        if (!S.pEntwurf) return; const i = Number(b.dataset.i);
+        if (S.loeschen !== "pst" + i) { S.loeschen = "pst" + i; render(true); return; }
+        S.pEntwurf.mietStufen = mietStufen(S.pEntwurf).filter((x, j) => j !== i);
+        S.loeschen = false; render(true); break;
+      }
+      case "pst-erzeugen": {
+        if (!S.pEntwurf) return;
+        if (!S.pBearbeiten) { toast("Bitte zuerst auf „Bearbeiten“ gehen."); return; }
+        const g = S.pStaffel;
+        const ab = String(g.ab || "").slice(0, 10);
+        const anzahl = Math.max(1, Math.min(20, Number(g.anzahl) || 0));
+        const schritt = betragZahl(g.schritt);
+        if (!ab) { toast("Bitte das Datum der ersten Staffel eintragen."); return; }
+        if (!schritt) { toast("Bitte den Schritt eintragen."); return; }
+        let betrag = betragZahl(S.pEntwurf.kaltmiete);
+        if (!betrag) { toast("Ohne Nettokaltmiete lassen sich keine Staffeln rechnen."); return; }
+        const neue = [];
+        for (let i = 0; i < anzahl; i++) {
+          betrag = cent(g.art === "proz" ? betrag * (1 + schritt / 100) : betrag + schritt);
+          neue.push({ ab: monatePlusIso(ab, i * 12), kaltmiete: String(betrag).replace(".", ","),
+            erfasst: new Date().toISOString() });
+        }
+        S.pEntwurf.mietStufen = neue;
+        render(true);
+        toast(anzahl + (anzahl === 1 ? " Staffel erzeugt" : " Staffeln erzeugt") + " – bitte prüfen und speichern");
+        break;
+      }
+      /* Indexmiete */
+      case "pix-uebernehmen": {
+        if (!S.pEntwurf) return;
+        if (!S.pBearbeiten) { toast("Bitte zuerst auf „Bearbeiten“ gehen."); return; }
+        const ix = indexRechnen(S.pEntwurf);
+        if (!ix.moeglich) { toast("Für die Rechnung fehlen noch Angaben."); return; }
+        if (!ix.jahrUm) { toast("Die Jahresfrist nach § 557b Abs. 2 BGB ist noch nicht um."); return; }
+        S.pEntwurf.mietStufen = mietStufen(S.pEntwurf).filter(x => String(x.ab) !== ix.ab)
+          .concat({ ab: ix.ab, kaltmiete: String(ix.neu).replace(".", ","), grund: "Indexmiete § 557b BGB",
+            indexVon: ix.basisMonat, indexBis: ix.neuMonat, erfasst: new Date().toISOString() })
+          .sort((a2, b2) => String(a2.ab).localeCompare(String(b2.ab)));
+        S.pEntwurf.indexBasisMonat = ix.neuMonat;
+        S.pEntwurf.indexBasisWert = "";
+        render(true);
+        toast("Erhöhung auf " + eur2(ix.neu) + " € ab " + Objekte.datum(ix.ab) + " festgelegt – bitte speichern");
+        break;
+      }
+      case "pix-brief": {
+        if (!S.pEntwurf) return;
+        if (S.pBearbeiten) { toast("Bitte zuerst speichern."); return; }
+        S.ixDruck = S.pEntwurf.id; render(); break;
+      }
+      case "ix-brief-zu": { S.ixDruck = null; S.pTab = "miete"; render(); break; }
+      case "pmd-neu": {
+        if (!S.pEntwurf) return;
+        if (!S.pBearbeiten) { toast("Bitte zuerst auf „Bearbeiten“ gehen."); return; }
+        S.pEntwurf.minderungen = minderungen(S.pEntwurf).concat(minderungLeer());
+        render(true); break;
+      }
+      case "pmd-weg": {
+        if (!S.pEntwurf) return;
+        const i = Number(b.dataset.i);
+        if (S.loeschen !== "pmd" + i) { S.loeschen = "pmd" + i; render(true); return; }
+        S.pEntwurf.minderungen = minderungen(S.pEntwurf).filter((x, j) => j !== i);
+        S.loeschen = false; render(true); break;
+      }
+      /* Nach einer Minderung oder einer Mietänderung die bereits angelegten Sollstellungen nachrechnen. */
+      case "pmd-rechnen": {
+        if (!S.pEntwurf) return;
+        if (S.pBearbeiten) { toast("Bitte zuerst speichern."); return; }
+        let n = 0;
+        for (const o of S.liste.filter(x => !x.beendet && ["miet", "garantie"].includes(x.art))) {
+          const k = sollNeuRechnen(o);
+          if (!k) continue;
+          n += k;
+          try { await Speicher.speichern("objekte", o, S.liste); } catch (e) {}
+        }
+        render(true);
+        toast(n ? (n === 1 ? "Eine Sollstellung nachgerechnet" : n + " Sollstellungen nachgerechnet") : "Alle Sollstellungen stimmen bereits");
+        break;
       }
       case "p-loeschen":
         if (S.loeschen !== id) { S.loeschen = id; render(true); return; }
@@ -12116,7 +13182,7 @@ const Objekte = (() => {
       case "oeffnen": { const o = S.liste.find(x => x.id === id); if (!o) return;
         S.entwurf = Objekte.betreuungSicherstellen(Objekte.listeSicherstellen(JSON.parse(JSON.stringify(o)))); S.entwurf.beirat = S.entwurf.beirat || []; S.bearbeiten = false; S.objTab = "stammdaten"; S.ueEinheit = null; S.eigNeuFuer = null; S.uOffen = null;
         S.entwurf.anlagen = S.entwurf.anlagen || []; S.tab = "objekte"; S.istNeu = false; S.ansicht = "formular";
-        S.sollOffen = ""; S.zaNeu = ""; S.bhFrei = ""; S.bhGrund = "";
+        S.sollOffen = ""; S.zaNeu = ""; S.bhFrei = ""; S.bhGrund = ""; S.umDruck = null; S.evNeu = null;
         { const n = sollstellungenErzeugen(S.entwurf); if (n) { await objektSichern(S.entwurf);
             toast(n === 1 ? "Eine Sollstellung nachgetragen" : n + " Sollstellungen nachgetragen"); } }
         render(); break; }
@@ -12328,6 +13394,13 @@ const Objekte = (() => {
         eigentumVon(o).eigene.push({ id: Objekte.neueId(), name: "", zu: "offen", notiz: "" });
         await objektSichern(o); render(true);
         app.querySelector("[data-se='eigen|" + (o.eigentum.eigene.length - 1) + "|name']")?.focus({ preventScroll: true }); break; }
+      case "se-modus": { const o = S.entwurf; if (!o) return;
+        const e = eigentumVon(o); e.modus = e.modus === "eigen" ? "" : "eigen";
+        render(true); break; }
+      case "se-vorlage": { const o = S.entwurf; if (!o) return;
+        const e = eigentumVon(o);
+        e.eigene = SE_KATALOG.map(k => ({ name: k[1], zu: seWert(o, k[0]), notiz: seNotiz(o, k[0]) }));
+        render(true); toast(e.eigene.length + " Punkte übernommen – jetzt einzeln änderbar"); break; }
       case "se-weg": { const o = S.entwurf; if (!o) return; const i = Number(b.dataset.i);
         if (S.loeschen !== "se" + i) { S.loeschen = "se" + i; render(true); return; }
         eigentumVon(o).eigene.splice(i, 1); S.loeschen = false; await objektSichern(o); render(true); break; }
@@ -12491,6 +13564,44 @@ const Objekte = (() => {
       case "abr-drucken": { const o = S.entwurf; if (!o) return;
         S.abrDruck = { jahr: abrJahrVon(), einheitId: b.dataset.id || "", personId: b.dataset.wer || "" }; render(); break; }
       case "abr-zurueck": { S.abrDruck = null; S.objTab = "abrechnung"; render(); break; }
+      /* Umstellung des Umlageschlüssels (§ 556a Abs. 2 BGB) */
+      /* Bestehende Sollstellungen an Wirtschaftsplan, Mietstufen und Minderungen anpassen. */
+      case "so-rechnen": { const o = S.entwurf; if (!o) return;
+        const n = sollNeuRechnen(o);
+        const neu = sollstellungenErzeugen(o);
+        if (n || neu) await objektSichern(o);
+        render(true);
+        toast(n || neu ? [n ? (n === 1 ? "eine Sollstellung geändert" : n + " Sollstellungen geändert") : "",
+          neu ? (neu === 1 ? "eine nachgetragen" : neu + " nachgetragen") : ""].filter(Boolean).join(", ")
+          : "Alle Sollstellungen stimmen bereits");
+        break; }
+      case "um-neu": { const o = S.entwurf; if (!o) return;
+        umstellungen(o).push(umstellungLeer(Number(abrJahrVon()) + 1));
+        await objektSichern(o); render(true); break; }
+      case "um-weg": { const o = S.entwurf; if (!o) return; const i = Number(b.dataset.i);
+        if (S.loeschen !== "um" + i) { S.loeschen = "um" + i; render(true); return; }
+        umstellungen(o).splice(i, 1); S.loeschen = false; await objektSichern(o); render(true); break; }
+      case "um-brief": { const o = S.entwurf; if (!o) return;
+        const u = umstellungen(o)[Number(b.dataset.i)];
+        if (!u || !u.kontoNr) { toast("Bitte zuerst die Kostenart wählen."); return; }
+        S.umDruck = Number(b.dataset.i); render(); break; }
+      case "um-brief-zu": { S.umDruck = null; S.objTab = "abrechnung"; render(); break; }
+      /* Voreigentümer einer Einheit */
+      case "ev-neu": { const o = S.entwurf; if (!o) return;
+        const e = (o.einheitenListe || [])[Number(b.dataset.u)]; if (!e) return;
+        eigVerlauf(e).push({ id: Objekte.neueId(), personId: "", von: "", bis: "", erfasst: new Date().toISOString() });
+        S.evNeu = e.id; await objektSichern(o); render(true); break; }
+      /* Hausgeld des Voreigentümers nachtragen und die Monate neu rechnen. */
+      case "ev-rechnen": { const o = S.entwurf; if (!o) return;
+        const ge = sollNeuRechnen(o); const nn = sollstellungenErzeugen(o);
+        if (ge || nn) await objektSichern(o);
+        render(true);
+        toast(ge || nn ? "Hausgeld der Eigentümer nachgetragen" : "Alle Sollstellungen stimmen bereits"); break; }
+      case "ev-weg": { const o = S.entwurf; if (!o) return;
+        const ui = Number(b.dataset.u), vi = Number(b.dataset.i);
+        const e = (o.einheitenListe || [])[ui]; if (!e) return;
+        if (S.loeschen !== "ev" + ui + "-" + vi) { S.loeschen = "ev" + ui + "-" + vi; render(true); return; }
+        eigVerlauf(e).splice(vi, 1); S.loeschen = false; await objektSichern(o); render(true); break; }
       /* ---------- Verwaltungsbeirat ---------- */
       case "br-frei": {
         const o = S.entwurf; if (!o) return;
@@ -13078,6 +14189,12 @@ const Objekte = (() => {
       case "bei-neu": S.entwurf.beirat = (S.entwurf.beirat || []).concat({ funktion: (S.entwurf.beirat || []).length ? "beisitz" : "vorsitz", personId: "", name: "", telefon: "", email: "" }); render(true); break;
       case "bei-weg": S.entwurf.beirat.splice(Number(b.dataset.i), 1); render(true); break;
       case "bearbeiten": S.bearbeiten = true; S.objTab = "stammdaten"; render(true); break;
+      case "obj-klapp": { const k = b.dataset.wert;
+        S.objAuf = objAuf(k) ? objAufListe().filter(x => x !== k) : objAufListe().concat(k);
+        render(true); break; }
+      case "obj-klapp-alle": {
+        S.objAuf = KLAPP_ALLE.every(k => objAuf(k)) ? [] : KLAPP_ALLE.slice();
+        render(true); break; }
       case "obj-tab": S.objTab = b.dataset.wert; render(true); break;
       case "u-auf": S.uOffen = S.uOffen === b.dataset.id ? null : b.dataset.id; S.eTab = "stamm"; render(true); break;
       case "u-person-neu": { const e = S.entwurf.einheitenListe[Number(b.dataset.u)]; personAnlegen(S.entwurf, e, b.dataset.rolle); render(true);
@@ -13185,6 +14302,7 @@ const Objekte = (() => {
     S.mvBausteine = Speicher.lokal("mietbausteine");
     S.lieferanten = Speicher.lokal("lieferanten");
     S.mahnEinst = (Speicher.lokal("mahnwesen") || [])[0] || null;
+    S.vpi = (Speicher.lokal("indizes") || [])[0] || null;
     S.rahmen = Speicher.lokal("kontenrahmen").filter(r => r && Array.isArray(r.konten));
     if (!S.rahmen.length) { rahmenListe(); rahmenAlleSichern(); }
     try { S.sitzung = localStorage.getItem("ov_sitzung") || sessionStorage.getItem("ov_sitzung") || ""; } catch (e) { S.sitzung = ""; }
@@ -13221,6 +14339,8 @@ const Objekte = (() => {
     Speicher.beobachten("bausteine", l => { S.bausteine = l || []; Speicher.lokalSetzen("bausteine", S.bausteine); });
     Speicher.beobachten("mietbausteine", l => { S.mvBausteine = l || []; Speicher.lokalSetzen("mietbausteine", S.mvBausteine); });
     Speicher.beobachten("mahnwesen", l => { S.mahnEinst = (l || [])[0] || null; Speicher.lokalSetzen("mahnwesen", l || []); });
+    Speicher.beobachten("indizes", l => { S.vpi = (l || [])[0] || null; Speicher.lokalSetzen("indizes", l || []);
+      if (S.tab === "einstellungen" || S.pEntwurf) render(true); });
     Speicher.beobachten("lieferanten", l => { S.lieferanten = l || []; Speicher.lokalSetzen("lieferanten", S.lieferanten); });
     Speicher.beobachten("kontenrahmen", l => { const gut = (l || []).filter(r => r && Array.isArray(r.konten));
       if (gut.length) { S.rahmen = gut; Speicher.lokalSetzen("kontenrahmen", gut); if (S.tab === "einstellungen") render(true); } });
