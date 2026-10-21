@@ -780,7 +780,10 @@ a.btn{text-decoration:none;display:inline-block}
 #vv .ergebnis{animation:auf .35s ease-out}
 @keyframes auf{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 #vv .papier{background:var(--paper);color:var(--paper-ink);font-family:Arial,"Helvetica Neue",Helvetica,sans-serif;font-size:14.5px;line-height:1.55;
-  padding:clamp(28px,6vw,72px) clamp(22px,6vw,80px);border-radius:6px;box-shadow:0 30px 60px -30px rgba(20,30,50,.35),0 1px 2px rgba(20,30,50,.06)}
+  padding:clamp(28px,6vw,72px) clamp(22px,6vw,80px);border-radius:6px;box-shadow:0 30px 60px -30px rgba(20,30,50,.35),0 1px 2px rgba(20,30,50,.06);
+  display:flex;flex-direction:column;min-height:min(1075px,142vw)}
+/* Die Fußzeile gehört an den Fuß des Blattes – auch wenn der Text kurz ist. */
+#vv .papier>.bk-fuss{margin-top:auto;padding-top:56px}
 #vv .papier h1{font-size:14.5px;line-height:1.4;text-align:left;margin:0 0 30px;padding-bottom:4px;font-weight:700;border-bottom:1px solid var(--paper-ink)}
 #vv .bk{margin-bottom:26px;font-size:14.5px}
 #vv .bk-logo{display:block;width:200px;max-width:45%;margin:0 0 6px auto}
@@ -863,7 +866,12 @@ a.btn{text-decoration:none;display:inline-block}
 #vv .toast.an{opacity:1}
 @media (max-width:600px){#vv .klausel{grid-template-columns:auto 1fr}#vv .k-aktionen{grid-column:1/-1;justify-content:flex-start}}
 @media (prefers-reduced-motion:reduce){#vv *{transition:none!important;animation:none!important}}
-@media print{#vv .kopf,#vv .ergebnis-kopf,#vv .meldungen,#vv .status,#vv .toast{display:none!important}#vv main{padding:0}#vv .papier{box-shadow:none;padding:0}#vv .luecke{background:none;border:0}}
+@media print{#vv .kopf,#vv .ergebnis-kopf,#vv .meldungen,#vv .status,#vv .toast{display:none!important}#vv main{padding:0}
+  /* Beim Drucken steht die Fußzeile am Seitenfuß, der Text hält Abstand dazu, und je Empfänger beginnt eine neue Seite. */
+  #vv .papier{box-shadow:none;padding:0 0 32mm;display:block;min-height:0;break-after:page}
+  #vv .papier:last-of-type{break-after:auto}
+  #vv .papier>.bk-fuss{position:fixed;bottom:8mm;left:0;right:0;margin:0;padding:0;font-size:7pt}
+  #vv .luecke{background:none;border:0}}
 #vv .seite{width:100%;max-width:none;margin:0}
 #vv .papier{max-width:900px;margin:0 auto}
 #vv .ergebnis-kopf,#vv .meldungen,#vv .ergebnis .leise{max-width:900px;margin-left:auto;margin-right:auto}
@@ -1419,7 +1427,7 @@ const Objekte = (() => {
   const S = { hwTab: "stamm", rgStapel: [], rgEntwurf: null, rgZu: {}, rahmen: [], rahmenOffen: "", kkAuf: {}, kkDetail: false, krProtAuf: false, krVorher: null, bank: null, lsMonat: "", lsDatum: "", sitzung: "", anFehler: "", anMail: "", pwWechsel: false, pwMeldung: "", pwMeldungOk: false, wpJahr: "", wpDatum: "", wpTop: "",
     sollOffen: "", zaNeu: "", zaEntwurf: null, bhFrei: "", bhGrund: "", infoAlle: false, vmtTab: "miete", vkOffen: null, vkWahl: false, vkSuche: "", bonOffen: null, bonHinweis: "", tObjSuche: "", anruferTreffer: null, tdTab: "vorgang", briefAnzeige: null, datFilter: { suche: "", quelle: "" }, eTab: "stamm", pTab: "stamm", pBearbeiten: false, eaHinweis: "", vermTab: "frei", vermOffen: null, vermFeedback: null, kiLaeuft: false, kiHinweis: "", kiStop: null, mails: [], mailTab: "eingang", mailFilter: { suche: "" }, mailImport: null, mailOffenId: null, mailRichtung: "ein",
     objTab: "stammdaten", bhTab: "konten", rundTab: "rund", ueEinheit: null, mvBausteine: [], mvOffen: "", mvDruck: null, mvbsEntwurf: null, ptAbr: null, rlDruck: null,
-    mahnEinst: null, vpi: null, ixDruck: null, pStaffel: { ab: "", anzahl: "3", schritt: "", art: "eur" }, mhDruck: null, mhVerzug: null, mhEinstAuf: false, rzEntwurf: null, rzOffen: "", rzDruck: null,
+    mahnEinst: null, vpi: null, ixDruck: null, zuNeu: null, objAuf: [], pStaffel: { ab: "", anzahl: "3", schritt: "", art: "eur" }, mhDruck: null, mhVerzug: null, mhEinstAuf: false, rzEntwurf: null, rzOffen: "", rzDruck: null,
     gbTab: "gewaehr", gwOffen: "", gwRuege: "", ihJahre: 15, brJahr: "", brBericht: null, tickets: [], tAnsicht: "liste", kalDatum: "", kalModus: "monat", kalWer: [], tEntwurfTicket: null, ticketOffen: null, ticketBearbeiten: false, ticketVorher: null, mailNeuFuer: null, mailOffen: null, mailVerschieben: null, mailRichtung: "ein", ichBin: "", einst: { ichBin: "", zeitraum: "woche", nurMeine: true, ansicht: "liste", kalModus: "monat" }, tFilter: { status: "", suche: "", nurMeine: true, zeitraum: "woche" }, bearbeiten: false, uOffen: null, anlageOffen: null, team: [], tEntwurf: null, eigNeuFuer: null, mieterNeuFuer: null, pObjekte: {}, pDirty: new Set(), tab: "vertraege", liste: [], handwerker: [], personen: [], pEntwurf: null, pFilter: { rolle: "", suche: "", ehemalige: false }, ansicht: "liste", entwurf: null, istNeu: false, hwEntwurf: null, hwNeuFuer: null,
     filter: { art: "", suche: "", beendete: false }, loeschen: false };
   const app = $("#app");
@@ -2770,9 +2778,70 @@ const Objekte = (() => {
       "Für die WEG gibt es keine solche Frist – dort beschließen die Eigentümer über Nachschüsse und Anpassungen (§ 28 Abs. 2 WEG), " +
       "und einen Monat nach dem Beschluss ist er bestandskräftig (§ 45 WEG).</li></ul>";
   }
+  /* ---------- Zustellung: wer noch Post bekommt ---------- */
+  function zustellUebersichtHtml() {
+    const alle = S.personen.filter(p => !Objekte.ehemalig(p) && p.objektId &&
+      (S.liste || []).some(o => o.id === p.objektId && !o.beendet));
+    const reihen = alle.map(p => {
+      const o = (S.liste || []).find(x => x.id === p.objektId) || null;
+      const letzte = (S.liste || []).flatMap(x => zustellZu(x, p.id))
+        .sort((a, b) => String(b.am).localeCompare(String(a.am)))[0] || null;
+      return { p, o, weg: zuWegVon(p), hind: zuHindernis(p), letzte };
+    });
+    const digital = reihen.filter(x => !x.hind);
+    const papier = reihen.filter(x => x.hind);
+    const offenAbruf = reihen.filter(x => x.letzte && x.letzte.weg === "portal" && !x.letzte.abgerufenAm);
+    let h = "<div class='kacheln'>" +
+      "<div class='kachel'><b>" + digital.length + "</b><span>bekommen alles elektronisch</span></div>" +
+      "<div class='kachel'><b class='" + (papier.length ? "z-minus" : "") + "'>" + papier.length + "</b><span>brauchen noch Post</span></div>" +
+      "<div class='kachel'><b>" + alle.length + "</b><span>Empfänger insgesamt</span></div>" +
+      "<div class='kachel'><b class='" + (offenAbruf.length ? "z-minus" : "") + "'>" + offenAbruf.length +
+        "</b><span>Schreiben im Portal noch nicht abgerufen</span></div></div>";
+    h += "<p class='unter' style='margin-top:16px'>Abrechnungen, Wirtschaftsplan, Mahnungen, Mieterhöhungen und die " +
+      "Einladung zur Eigentümerversammlung dürfen elektronisch zugehen – dafür genügt Textform. Nachweisen müssen Sie " +
+      "aber den Zugang. Das Portal protokolliert ihn selbst, bei E-Mail bleibt Ihr gesendeter Ordner der Beleg.</p>";
+    if (papier.length) {
+      h += "<h3 style='margin-top:18px'>Noch per Post <span class='fuer'>" + papier.length + "</span></h3>" +
+        "<div class='ue-tab'><div class='abe-kopf'><span>Empfänger</span><span>Objekt</span><span>Rolle</span>" +
+        "<span>Woran es hängt</span><span>E-Mail</span><span></span></div>" +
+        papier.sort((a, b) => Objekte.personName(a.p).localeCompare(Objekte.personName(b.p), "de")).map(x =>
+          "<div class='abe-row'><span><strong>" + esc(Objekte.personName(x.p)) + "</strong></span>" +
+          "<span class='fuer'>" + esc(x.o ? objName(x.o) : "–") + "</span>" +
+          "<span class='fuer'>" + esc(ROLLE[x.p.rolle] || "") + "</span>" +
+          "<span>" + esc(x.hind) + "</span>" +
+          "<span class='fuer'>" + esc(String(x.p.email || "").trim() || "fehlt") + "</span>" +
+          "<span><button class='btn klein' data-act='p-bearbeiten' data-id='" + esc(x.p.id) + "'>öffnen</button></span></div>").join("") +
+        "</div>";
+    } else {
+      h += "<ul class='meldungen'><li class='m-ok'>Alle Empfänger sind auf einen elektronischen Weg eingestellt. " +
+        "Papier brauchen Sie nur noch für die Fälle unten.</li></ul>";
+    }
+    if (offenAbruf.length) h += "<h3 style='margin-top:18px'>Im Portal bereitgestellt, aber noch nicht abgerufen</h3>" +
+      "<div class='ue-tab'>" + offenAbruf.map(x => "<div class='abe-row'>" +
+        "<span><strong>" + esc(Objekte.personName(x.p)) + "</strong></span>" +
+        "<span class='fuer'>" + esc(x.o ? objName(x.o) : "") + "</span>" +
+        "<span>" + esc(x.letzte.was) + "</span>" +
+        "<span class='fuer'>bereitgestellt am " + esc(Objekte.datum(x.letzte.am)) + "</span>" +
+        "<span class='fuer'>" + (x.p.letzteAnmeldung ? "zuletzt angemeldet " +
+          esc(Objekte.datum(String(x.p.letzteAnmeldung).slice(0, 10))) : "noch nie angemeldet") + "</span>" +
+        "<span></span></div>").join("") + "</div>" +
+      "<ul class='meldungen'><li class='m-hinweis'>Bei fristgebundenen Schreiben reicht das Bereitstellen allein nicht. " +
+        "Ruft die Person nichts ab, schicken Sie zusätzlich eine E-Mail mit Hinweis auf das Schreiben – oder " +
+        "ausnahmsweise doch einen Brief.</li></ul>";
+    h += "<h3 style='margin-top:20px'>Was auf Papier bleiben muss</h3>" +
+      "<div class='ue-tab'>" + PAPIER_PFLICHT.map(([was, warum]) => "<div class='abe-row'>" +
+        "<span><strong>" + esc(was) + "</strong></span><span class='fuer' style='grid-column:span 4'>" + esc(warum) + "</span>" +
+        "<span></span></div>").join("") + "</div>" +
+      "<ul class='meldungen'><li class='m-hinweis'>Alles andere – Abrechnung, Wirtschaftsplan, Vermögensbericht, Protokoll, " +
+      "Beschluss-Sammlung, Mahnung, Mieterhöhung nach § 558a, § 557b und § 559b BGB, Einladung und Aushänge – " +
+      "darf elektronisch gehen.</li>" +
+      "<li class='m-hinweis'>Den Zustellweg stellen Sie beim einzelnen Mieter oder Eigentümer unter „Portal“ ein; " +
+      "dort steht auch das Zustellprotokoll dieser Person.</li></ul>";
+    return h;
+  }
   function auswertungHtml() {
-    const tabs = [["leerstand", "Leerstand"], ["rueckstand", "Rückstände"], ["op", "Offene Posten"], ["zahllauf", "Zahlungslauf"], ["umsatz", "Umsatz"], ["abrechnung", "Abrechnungen"], ["team", "Auslastung"], ["org", "Organigramm"]];
-    const tab = ["leerstand", "rueckstand", "op", "zahllauf", "umsatz", "abrechnung", "team", "org"].includes(S.awTab) ? S.awTab : "leerstand";
+    const tabs = [["leerstand", "Leerstand"], ["rueckstand", "Rückstände"], ["op", "Offene Posten"], ["zahllauf", "Zahlungslauf"], ["umsatz", "Umsatz"], ["abrechnung", "Abrechnungen"], ["zustellung", "Zustellung"], ["team", "Auslastung"], ["org", "Organigramm"]];
+    const tab = ["leerstand", "rueckstand", "op", "zahllauf", "umsatz", "abrechnung", "zustellung", "team", "org"].includes(S.awTab) ? S.awTab : "leerstand";
     let h = "<div class='seite'><div class='hero'><h1>Auswertung</h1>" +
       "<p>Leerstand, Rückstände und die Auslastung Ihrer Mitarbeiter auf einen Blick.</p></div>" +
       "<nav class='reiter e-reiter'>" + tabs.map(([w, l]) => "<button data-act='aw-tab' data-wert='" + w + "'" +
@@ -2780,7 +2849,8 @@ const Objekte = (() => {
     if (tab === "org") return h + organigrammHtml() + "</div>";
     h += awWerHtml();
     h += "<section class='gruppe'>" + (tab === "leerstand" ? leerstandHtml() : tab === "rueckstand" ? awRueckstandHtml()
-      : tab === "op" ? opHtml() : tab === "zahllauf" ? sammelHtml() : tab === "umsatz" ? umsatzHtml() : tab === "abrechnung" ? abrechnungenHtml() : teamLastHtml()) + "</section>";
+      : tab === "op" ? opHtml() : tab === "zahllauf" ? sammelHtml() : tab === "umsatz" ? umsatzHtml() : tab === "abrechnung" ? abrechnungenHtml()
+      : tab === "zustellung" ? zustellUebersichtHtml() : teamLastHtml()) + "</section>";
     h += awOrgHtml(tab);
     return h + "</div>";
   }
@@ -4776,6 +4846,116 @@ const Objekte = (() => {
       "Bitte vergeben Sie beim ersten Anmelden ein eigenes Kennwort.\n\n" +
       "Mit freundlichen Grüßen\n";
   }
+  /* ================= Zustellung =================
+     Fast alles darf heute elektronisch zugehen: Abrechnungen, Wirtschaftsplan, Mahnungen,
+     Mieterhöhungen (§ 558a, § 557b, § 559b BGB) und die Einladung zur Eigentümerversammlung
+     (§ 24 Abs. 4 WEG) brauchen nur Textform – eine E-Mail oder die Ablage im Portal genügt.
+     Entscheidend ist nicht die Form, sondern der Nachweis des Zugangs: bei fristgebundenen
+     Erklärungen trägt die Verwaltung die Beweislast. Deshalb hält das Programm für jeden
+     Empfänger den Weg, sein Einverständnis und jede Zustellung mit Datum fest.
+     Schriftform mit eigenhändiger Unterschrift verlangen dagegen weiterhin: die Kündigung eines
+     Wohnraummietverhältnisses (§ 568 Abs. 1 BGB), ein auf mehr als ein Jahr befristeter
+     Mietvertrag (§ 550 BGB) und die Mietbürgschaft (§ 766 BGB). */
+  const ZU_WEG = [["", "noch nicht festgelegt"], ["portal", "Portal – Ablage mit Abrufprotokoll"],
+    ["email", "E-Mail"], ["post", "Brief per Post"]];
+  const zuWegVon = p => ZU_WEG.some(([w]) => w && w === (p && p.versandweg)) ? p.versandweg : "";
+  const zuWegText = w => (ZU_WEG.find(x => x[0] === w) || ZU_WEG[0])[1];
+  const zuDigital = p => ["portal", "email"].includes(zuWegVon(p));
+  /* Woran es noch hängt, dass diese Person Post bekommt. */
+  function zuHindernis(p) {
+    const w = zuWegVon(p);
+    if (!w) return "Zustellweg noch nicht festgelegt";
+    if (w === "post") return "auf Brief eingestellt";
+    if (!String(p.email || "").trim()) return "keine E-Mail-Adresse hinterlegt";
+    if (w === "portal" && !portalZugang(p)) return "kein Portalzugang eingerichtet";
+    if (!p.eZuAm) return "Einverständnis zur elektronischen Zustellung fehlt";
+    return "";
+  }
+  const PAPIER_PFLICHT = [
+    ["Kündigung eines Wohnraummietverhältnisses",
+     "§ 568 Abs. 1 BGB verlangt Schriftform. Theoretisch ließe sie sich durch eine qualifizierte elektronische " +
+     "Signatur ersetzen (§ 126 Abs. 3, § 126a BGB); gerichtlich geklärt ist das nicht. Nehmen Sie den Brief."],
+    ["Wohnraummietvertrag mit mehr als einem Jahr Befristung",
+     "§ 550 BGB – ohne Schriftform gilt er als unbefristet. Für Gewerberaum genügt seit dem 1. Januar 2025 " +
+     "die Textform, dort reicht also die E-Mail (§ 578 BGB)."],
+    ["Bürgschaft für die Miete", "§ 766 BGB – die elektronische Form ist dort ausdrücklich ausgeschlossen."],
+    ["Mahnbescheid und Klage", "Zustellen muss das Gericht. Den Mahnantrag selbst können Sie online stellen."]
+  ];
+  /* ---------- Zustellprotokoll am Objekt ---------- */
+  const zustellListe = o => Array.isArray(o.zustellungen) ? o.zustellungen : (o.zustellungen = []);
+  function zustellEintragen(o, d) {
+    const pn = d.personId ? personVon(d.personId) : null;
+    const eintrag = { id: Objekte.neueId(), personId: d.personId || "", einheitId: d.einheitId || "",
+      was: d.was || "Schreiben", bezug: d.bezug || "", weg: d.weg || zuWegVon(pn) || "post",
+      am: d.am || isoTag(new Date()), wer: d.wer || teamName(S.ichBin) || "", abgerufenAm: "",
+      hinweis: d.hinweis || "", erfasst: new Date().toISOString() };
+    zustellListe(o).push(eintrag);
+    return eintrag;
+  }
+  const zustellZu = (o, personId, was) => zustellListe(o)
+    .filter(x => x.personId === personId && (!was || x.was === was))
+    .sort((a, b) => String(b.am).localeCompare(String(a.am)));
+  /* Wird die Person im Portal aktiv, gilt das als Abruf der dort liegenden Schreiben. */
+  async function zustellAbrufVermerken(p) {
+    const heute = isoTag(new Date());
+    for (const o of (S.liste || [])) {
+      let geaendert = false;
+      zustellListe(o).forEach(x => {
+        if (x.personId === p.id && x.weg === "portal" && !x.abgerufenAm) { x.abgerufenAm = heute; geaendert = true; }
+      });
+      if (geaendert) { try { await Speicher.speichern("objekte", o, S.liste); } catch (e) {} }
+    }
+  }
+  /* ---------- Zustellweg je Empfänger ---------- */
+  function zustellwegHtml(p) {
+    const w = zuWegVon(p);
+    const hind = zuHindernis(p);
+    const treffer = [];
+    (S.liste || []).forEach(o => zustellZu(o, p.id).forEach(x => treffer.push({ o, x })));
+    treffer.sort((a, b) => String(b.x.am).localeCompare(String(a.x.am)));
+    let h = "<section class='gruppe'><h2>Zustellung</h2>" +
+      "<p class='unter'>Auf welchem Weg diese Person ihre Schreiben bekommt. Abrechnungen, Mahnungen, " +
+      "Mieterhöhungen und Einladungen dürfen elektronisch zugehen – nachweisen müssen Sie den Zugang.</p>" +
+      "<div class='felder'><div class='feld'><label for='zu-weg'>Weg</label><select id='zu-weg' data-p='versandweg'>" +
+      ZU_WEG.map(([x, l]) => "<option value='" + x + "'" + (w === x ? " selected" : "") + ">" + esc(l) + "</option>").join("") +
+      "</select></div>" +
+      "<div class='feld'><label for='zu-am'>Einverständnis vom</label>" +
+      "<input type='date' id='zu-am' data-p='eZuAm' value='" + esc(p.eZuAm || "") + "'>" +
+      "<small>Datum, an dem die Person der elektronischen Zustellung zugestimmt hat.</small></div>" +
+      "<div class='feld'><label for='zu-wie'>Erteilt durch</label>" +
+      "<input type='text' id='zu-wie' data-p='eZuWie' value='" + esc(p.eZuWie || "") + "' placeholder='z. B. § 21 Mietvertrag, Formular vom 03.02.2026'></div></div>";
+    h += "<ul class='meldungen'>" +
+      (hind ? "<li class='m-hinweis'>Diese Person bekommt vorerst Post: " + esc(hind) + ".</li>"
+            : "<li class='m-ok'>Alles bereit für die elektronische Zustellung über " + esc(zuWegText(w)) + ".</li>") +
+      (w === "email" ? "<li class='m-hinweis'>Bei E-Mail hängt der Nachweis an Ihrem gesendeten Ordner. Für fristgebundene " +
+        "Schreiben ist das Portal sicherer: dort protokolliert das Programm, wann die Person das Schreiben abgerufen hat.</li>" : "") +
+      "<li class='m-hinweis'>Ohne Einverständnis ist der elektronische Weg bei fristgebundenen Erklärungen riskant. " +
+        "Nehmen Sie die Zustimmung in den Mietvertrag auf oder holen Sie sie einmal schriftlich ein.</li></ul>";
+    h += "<h3 style='margin-top:20px'>Zustellprotokoll <span class='fuer'>" + treffer.length + "</span></h3>";
+    const nz = S.zuNeu || {};
+    h += "<div class='felder' style='margin-top:10px'>" +
+      "<div class='feld'><label>Was wurde zugestellt</label><input type='text' data-zun='was' value='" + esc(nz.was || "") +
+        "' placeholder='z. B. Mieterhöhung, Hausordnung'></div>" +
+      "<div class='feld'><label>Am</label><input type='date' data-zun='am' value='" + esc(nz.am || isoTag(new Date())) + "'></div>" +
+      "<div class='feld'><label>Weg</label><select data-zun='weg'>" +
+        ZU_WEG.filter(x => x[0]).map(([x, l]) => "<option value='" + x + "'" +
+          ((nz.weg || (zuWegVon(p) || "email")) === x ? " selected" : "") + ">" + esc(l) + "</option>").join("") + "</select></div>" +
+      "<div class='feld'><label>Bemerkung</label><input type='text' data-zun='hinweis' value='" + esc(nz.hinweis || "") +
+        "' placeholder='z. B. per E-Mail mit Lesebestätigung'></div></div>" +
+      "<div class='leiste'><div><button class='btn klein' data-act='zu-neu' data-id='" + esc(p.id) + "'>Zustellung vermerken</button></div>" +
+      "<span class='fuer'>Für alles, was Sie außerhalb des Programms versendet haben.</span></div>";
+    h += treffer.length
+      ? "<div class='ue-tab'>" + treffer.slice(0, 25).map(({ o, x }) => "<div class='abe-row'>" +
+          "<span>" + esc(Objekte.datum(x.am)) + "</span>" +
+          "<span><strong>" + esc(x.was) + "</strong>" + (x.bezug ? "<br><span class='fuer'>" + esc(x.bezug) + "</span>" : "") + "</span>" +
+          "<span class='fuer'>" + esc(objName(o)) + "</span>" +
+          "<span>" + esc(zuWegText(x.weg).split(" –")[0]) + "</span>" +
+          "<span class='fuer'>" + (x.abgerufenAm ? "abgerufen am " + esc(Objekte.datum(x.abgerufenAm))
+            : x.weg === "portal" ? "noch nicht abgerufen" : x.wer ? "durch " + esc(x.wer) : "") + "</span>" +
+          "<span></span></div>").join("") + "</div>"
+      : "<p class='unter'>Noch keine Zustellung vermerkt.</p>";
+    return h + "</section>";
+  }
   function portalBlockHtml(p) {
     const mail = String(p.email || "").trim();
     const an = portalZugang(p);
@@ -5205,7 +5385,7 @@ const Objekte = (() => {
            : ablageHtml("person:" + p.id, "Dateien", "Mietvertrag, Schriftverkehr, SEPA-Mandat, Nachweise.")) +
       "<div class='leiste'><div>" + (S.pBearbeiten || neu ? "<button class='btn haupt' data-act='p-speichern'>Speichern</button>" : "") +
       "<button class='btn' data-act='p-abbrechen'>Schließen</button></div></div></section>";
-    if (S.pTab === "portal" && !neu) return pTabs + portalBlockHtml(p);
+    if (S.pTab === "portal" && !neu) return pTabs + zustellwegHtml(p) + portalBlockHtml(p);
     if (S.pTab === "miete" && !neu && mieter) return pTabs + mietVerhaeltnisHtml(p);
     if (S.pTab === "mieter" && !neu && p.rolle === "eigentuemer") return pTabs + mieterZuEigentuemerHtml(p);
     if (S.pTab === "konto" && !neu && !S.pBearbeiten) {
@@ -11543,6 +11723,7 @@ const Objekte = (() => {
       render(true); return;
     }
     if (t.dataset.uf) { const [oid, idx, feld] = t.dataset.uf.split("|"); const o = objFuer(oid); if (o) o.einheitenListe[Number(idx)][feld] = t.value; return; }
+    if (t.dataset.zun !== undefined) { S.zuNeu = { ...(S.zuNeu || {}), [t.dataset.zun]: t.value }; return; }
     if (t.dataset.vpib !== undefined) { const d = vpiDaten(); d.basis = t.value; vpiSichern(d); return; }
     if (t.dataset.vpi !== undefined) {
       const [i, feld] = t.dataset.vpi.split("|"); const d = vpiDaten();
@@ -11582,6 +11763,13 @@ const Objekte = (() => {
     if (t.dataset.p && S.pEntwurf) {
       S.pEntwurf[t.dataset.p] = t.value;
       if (t.dataset.p === "bkArt" || t.dataset.p === "hkArt") { render(true); return; }
+      /* Im Portal-Reiter gibt es keinen Speichern-Knopf – diese Felder gehen sofort ins Konto. */
+      if (["versandweg", "eZuAm", "eZuWie"].includes(t.dataset.p)) {
+        personSichern(S.pEntwurf);
+        if (t.dataset.p === "versandweg") render(true);
+        else spaeterZeichnen("zuweg", 900);
+        return;
+      }
       if (t.dataset.p === "einheitId") { const o = objDraft(S.pEntwurf.objektId); const e = o && (o.einheitenListe || []).find(x => x.id === t.value); S.pEntwurf.einheit = e ? (e.nr || e.art) : ""; render(true); return; }
       if (t.dataset.p === "iban") ibanAuswerten(t);
       if (t.dataset.p === "objektId") { S.pEntwurf.einheitId = ""; S.pEntwurf.einheit = ""; render(true); }
@@ -12236,7 +12424,7 @@ const Objekte = (() => {
     if (!["loeschen", "hw-loeschen", "p-loeschen", "m-loeschen", "td-loeschen", "v-weg", "mail-weg", "dok-weg", "mail-loeschen", "abl-weg",
       "bh-fest", "za-weg", "kk-weg", "kr-weg", "kr-klasse-weg", "kr-leeren",
       "nf-weg", "au-weg", "dienst-weg", "lv-weg", "org-weg", "hon-weg", "bs-weg", "ko-weg", "zl-weg",
-      "mv-weg", "mvbs-weg", "mvst-weg", "mvs-weg", "abr-frei-alle-zu", "rl-weg", "mh-weg", "rz-weg", "gw-weg", "gw-m-weg", "ih-weg", "schl-weg", "lf-weg", "zl-zust", "se-weg", "kau-weg", "kau-abrechnen", "pmd-weg", "um-weg", "ev-weg", "pst-weg", "vpi-weg"].includes(act)) S.loeschen = false;
+      "mv-weg", "mvbs-weg", "mvst-weg", "mvs-weg", "abr-frei-alle-zu", "rl-weg", "mh-weg", "rz-weg", "gw-weg", "gw-m-weg", "ih-weg", "schl-weg", "lf-weg", "zl-zust", "se-weg", "kau-weg", "kau-abrechnen", "pmd-weg", "um-weg", "ev-weg", "pst-weg", "vpi-weg", "bon-weg", "vk-raus"].includes(act)) S.loeschen = false;
     switch (act) {
       case "tab": S.tab = b.dataset.tab; S.ansicht = "liste"; S.entwurf = null; S.hwEntwurf = null; S.pEntwurf = null; S.tEntwurf = null; S.tEntwurfTicket = null; S.ticketOffen = null;
         S.vermOffen = null; S.mailOffenId = null; S.mailImport = null; render(); break;
@@ -12476,7 +12664,9 @@ const Objekte = (() => {
         if (m.id === ADMIN_ID) { const d = adminGespeichert() || { salt: ADMIN_SALT, hash: ADMIN_START, geaendert: "" };
           d.letzteAnmeldung = new Date().toISOString(); adminSichern(d); }
         else if (istPortal) { m.letzteAnmeldung = new Date().toISOString();
-          try { await Speicher.speichern("personen", m, S.personen); } catch (e) {} }
+          try { await Speicher.speichern("personen", m, S.personen); } catch (e) {}
+          /* Wer sich im Portal anmeldet, hat die dort liegenden Schreiben zur Kenntnis nehmen können. */
+          try { await zustellAbrufVermerken(m); } catch (e) {} }
         else { m.letzteAnmeldung = new Date().toISOString(); await teamSichern(m); }
         S.ichBin = (m.id === ADMIN_ID || istPortal) ? "" : m.id;
         render(); if (!m.pwStart) toast("Angemeldet als " + Objekte.mitarbeiterName(m)); break;
@@ -12934,7 +13124,6 @@ const Objekte = (() => {
       }
       case "mail-neu": S.mailNeuFuer = b.dataset.id; S.mailRichtung = "ein"; render(true); app.querySelector("#mail-text")?.focus({ preventScroll: true }); break;
       case "mail-abbr": S.mailNeuFuer = null; render(true); break;
-      case "mail-richtung": S.mailRichtung = b.dataset.wert; render(true); break;
       case "mail-auf": S.mailOffen = S.mailOffen === b.dataset.id ? null : b.dataset.id; render(true); break;
       case "mail-schreiben": { const t = S.tickets.find(x => x.id === b.dataset.id); if (!t) return;
         const m = melderDaten(t);
@@ -13001,7 +13190,7 @@ const Objekte = (() => {
         Object.assign(S.pEntwurf, { strasse: o.strasse || "", plz: o.plz || "", ort: o.ort || "" }); render(true); break; }
       case "p-tab": S.pTab = b.dataset.wert; render(true); break;
       case "p-bearbeiten-an": S.pBearbeiten = true; render(true); break;
-      case "p-bearbeiten": { const pn = S.personen.find(x => x.id === id); if (!pn) return; S.tab = "personen"; S.ansicht = "liste"; S.entwurf = null; S.pObjekte = {}; S.pTab = "stamm"; S.pBearbeiten = false;
+      case "p-bearbeiten": { const pn = S.personen.find(x => x.id === id); if (!pn) return; S.tab = "personen"; S.ansicht = "liste"; S.entwurf = null; S.pObjekte = {}; S.pTab = "stamm"; S.pBearbeiten = false; S.zuNeu = null;
         S.pEntwurf = { ...leerePerson(), ...JSON.parse(JSON.stringify(pn)) }; render(); if (S.pEntwurf.iban) ibanAuswerten($("#p-iban")); break; }
       case "p-abbrechen": S.pEntwurf = null; S.pObjekte = {}; S.pDirty.clear(); S.mieterNeuFuer = null; S.pBearbeiten = false; render(); break;
       case "pz-neu": { const [oid, ui] = b.dataset.pz.split("|"); const o = objFuer(oid); const e = o.einheitenListe[Number(ui)];
@@ -13051,6 +13240,19 @@ const Objekte = (() => {
           }
         }
         S.pObjekte = {}; S.pEntwurf = null; render(); toast("Gespeichert"); break;
+      }
+      /* Eine Zustellung von Hand vermerken */
+      case "zu-neu": {
+        const pn = personVon(b.dataset.id); if (!pn) return;
+        const nz = S.zuNeu || {};
+        if (!String(nz.was || "").trim()) { toast("Bitte eintragen, was zugestellt wurde."); return; }
+        const o = (S.liste || []).find(x => x.id === pn.objektId);
+        if (!o) { toast("Diese Person ist keinem Objekt zugeordnet."); return; }
+        zustellEintragen(o, { personId: pn.id, einheitId: pn.einheitId || "", was: String(nz.was).trim(),
+          bezug: pn.einheit || "", weg: nz.weg || zuWegVon(pn) || "email", am: nz.am || isoTag(new Date()),
+          hinweis: String(nz.hinweis || "").trim() });
+        try { await Speicher.speichern("objekte", o, S.liste); } catch (e) {}
+        S.zuNeu = null; render(true); toast("Zustellung vermerkt"); break;
       }
       /* Verbraucherpreisindex pflegen */
       case "vpi-text": {
@@ -13730,6 +13932,8 @@ const Objekte = (() => {
         const f = forderungen(o).find(x => x.e.id === b.dataset.e); if (!f) return;
         const m = mahnungErzeugen(o, f, b.dataset.wert);
         mahnListe(o).push(m);
+        zustellEintragen(o, { personId: f.p.id, einheitId: f.e.id, was: mahnStufe(m.stufe).kurz,
+          bezug: f.e.nr || f.e.art, hinweis: "aus dem Mahnlauf" });
         await objektSichern(o);
         S.mhDruck = m.id; render();
         toast(mahnStufe(m.stufe).kurz + " erstellt – bitte prüfen und versenden"); break;
@@ -13813,6 +14017,11 @@ const Objekte = (() => {
           if (abrFreiVon(o, jahr, x.einheitId, x.personId)) return;
           abrFreigaben(o).push({ id: Objekte.neueId(), jahr: String(jahr), einheitId: x.einheitId, personId: x.personId,
             art: erg.weg ? "weg" : "miete", einheit: x.einheit, am: new Date().toISOString(), wer });
+          /* Die Freigabe ist die Zustellung – sie gehört ins Protokoll, damit der Zugang belegt ist. */
+          zustellEintragen(o, { personId: x.personId, einheitId: x.einheitId,
+            was: erg.weg ? "Jahresabrechnung " + jahr : "Betriebskostenabrechnung " + jahr,
+            bezug: x.einheit, weg: zuDigital(x.p) ? zuWegVon(x.p) : "post", wer,
+            hinweis: zuDigital(x.p) ? "" : "noch kein elektronischer Zustellweg – bitte als Brief versenden" });
           n++;
         });
         if (!n) { toast("Hier ist schon alles freigegeben."); return; }
