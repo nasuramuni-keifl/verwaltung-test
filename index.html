@@ -4204,7 +4204,17 @@ const Objekte = (() => {
     if (typeof o.eigentum.modus !== "string") o.eigentum.modus = "";
     return o.eigentum; };
   /* Wer die Vorschlagsliste nicht will, trägt alles selbst ein. */
-  const seEigenModus = o => eigentumVon(o).modus === "eigen";
+  /* Vorgegeben ist nichts: Wer noch nichts eingetragen hat, bekommt die freie Liste. Nur wer
+     die Vorschlagsliste schon benutzt hat oder sie ausdrücklich wählt, sieht sie weiter. */
+  function seEigenModus(o) {
+    const e = eigentumVon(o);
+    if (e.modus === "eigen") return true;
+    if (e.modus === "katalog") return false;
+    return Object.keys(e.teile || {}).length === 0;
+  }
+  /* Eigene Zuordnung: wer keinen der vier Begriffe will, schreibt seinen eigenen. */
+  const SE_ZU_FREI = SE_ZU.concat([["eigen", "eigene Angabe …"]]);
+  const seZuText = x => (x.zu === "eigen" ? (String(x.zuText || "").trim() || "eigene Angabe") : seLabel(x.zu || "offen"));
   /* Zwingendes Gemeinschaftseigentum bleibt Gemeinschaftseigentum – egal was eingetragen wird. */
   const seWert = (o, k) => { const kat = seKat(k); if (!kat) return "offen";
     if (kat[4]) return "gemein";
@@ -4251,23 +4261,29 @@ const Objekte = (() => {
     const liste = e.eigene || [];
     let h = "<section class='gruppe voll'><h2>Sondereigentum und Gemeinschaftseigentum <span class='fuer'>" +
       liste.length + "</span></h2>";
-    if (!liste.length && !e.te.datum && !e.te.notar && !e.te.urnr && !e.te.hinweis)
+    if (!liste.length && !e.te.datum && !e.te.notar && !e.te.urnr && !e.te.hinweis && !String(e.notizen || "").trim())
       return h + "<p class='unter'>Noch nichts eingetragen. Tragen Sie unter „Bearbeiten“ Punkt für Punkt ein, " +
-        "was Ihre Teilungserklärung regelt.</p>" +
+        "was Ihre Teilungserklärung regelt – vorgegeben ist nichts.</p>" +
         "<div class='leiste'><div><button class='btn klein' data-act='bearbeiten'>Eintragen</button></div></div></section>";
-    h += "<div class='se-zahlen'>" + SE_ZU.map(([w, l]) => "<div class='se-zahl" +
+    const gruppen = SE_ZU.concat(liste.some(x => x.zu === "eigen") ? [["eigen", "Eigene Zuordnung"]] : []);
+    h += "<div class='se-zahlen'>" + gruppen.map(([w, l]) => "<div class='se-zahl" +
       (w === "offen" && liste.some(x => (x.zu || "offen") === "offen") ? " se-rot" : "") + "'>" +
       "<strong>" + liste.filter(x => (x.zu || "offen") === w).length + "</strong><span>" + esc(l) + "</span></div>").join("") + "</div>";
     if (e.te.datum || e.te.notar || e.te.urnr) h += "<p class='unter' style='margin-top:12px'>Teilungserklärung: " +
       esc([e.te.datum ? Objekte.datum(e.te.datum) : "", e.te.notar, e.te.urnr].filter(Boolean).join(" · ")) + "</p>";
     if (e.te.hinweis) h += "<p class='unter' style='white-space:pre-line'>" + esc(e.te.hinweis) + "</p>";
-    if (liste.length) h += "<div class='ue-tab' style='margin-top:12px'>" + SE_ZU.map(([w, l]) => {
+    if (liste.length) h += "<div style='margin-top:12px'>" + gruppen.map(([w, l]) => {
       const teil = liste.filter(x => (x.zu || "offen") === w);
       if (!teil.length) return "";
       return "<h3 style='margin:14px 0 6px'>" + esc(l) + "</h3><ul class='ue-liste'>" +
         teil.map(x => "<li><strong>" + esc(x.name || "ohne Bezeichnung") + "</strong>" +
-          (x.notiz ? " <span class='fuer'>" + esc(x.notiz) + "</span>" : "") + "</li>").join("") + "</ul>";
+          (x.zu === "eigen" && String(x.zuText || "").trim() ? " · " + esc(x.zuText) : "") +
+          (x.notiz ? " <span class='fuer'>" + esc(x.notiz) + "</span>" : "") +
+          (String(x.bem || "").trim() ? "<br><span class='fuer' style='white-space:pre-line'>" + esc(x.bem) + "</span>" : "") +
+          "</li>").join("") + "</ul>";
     }).join("") + "</div>";
+    if (String(e.notizen || "").trim()) h += "<h3 style='margin:16px 0 6px'>Notizen</h3>" +
+      "<p class='t-text' style='white-space:pre-line'>" + esc(e.notizen) + "</p>";
     return h + "<div class='leiste'><div><button class='btn klein' data-act='bearbeiten'>Ändern</button></div></div></section>";
   }
   function eigentumHtml(o) {
@@ -4288,7 +4304,8 @@ const Objekte = (() => {
       "' aria-label='Alles selbst eintragen' data-act='se-modus'></button></div>";
     if (!eigenMod) h += "<div class='se-zahlen'>" + SE_ZU.map(([w, l]) => "<div class='se-zahl" + (w === "offen" && offen ? " se-rot" : "") + "'>" +
       "<strong>" + zaehl(w) + "</strong><span>" + esc(l) + "</span></div>").join("") + "</div>";
-    else h += "<div class='se-zahlen'>" + SE_ZU.map(([w, l]) => "<div class='se-zahl'>" +
+    else h += "<div class='se-zahlen'>" + SE_ZU.concat(e.eigene.some(x => x.zu === "eigen") ? [["eigen", "Eigene Zuordnung"]] : [])
+      .map(([w, l]) => "<div class='se-zahl'>" +
       "<strong>" + e.eigene.filter(x => (x.zu || "offen") === w).length + "</strong><span>" + esc(l) + "</span></div>").join("") + "</div>";
     h += "<h3 style='margin-top:18px'>Teilungserklärung</h3><div class='felder'>" +
       "<div class='feld'><label for='se-te-datum'>Datum</label><input type='date' id='se-te-datum' data-se='te|datum' value='" + esc(e.te.datum || "") + "'></div>" +
@@ -4313,14 +4330,28 @@ const Objekte = (() => {
     h += "<h3 style='margin-top:20px'>" + (eigenMod ? "Ihre Punkte" : "Eigene Punkte") +
       " <span class='fuer'>" + e.eigene.length + "</span></h3>" +
       "<p class='unter'>" + (eigenMod
-        ? "Je Zeile ein Punkt: Bezeichnung, Zuordnung und die Fundstelle in der Teilungserklärung."
+        ? "Nichts ist vorgegeben. Legen Sie Punkt für Punkt an, so wie Ihre Teilungserklärung ihn nennt – mit eigener " +
+          "Zuordnung, wenn keiner der vier Begriffe passt, und mit Ihren Notizen dazu."
         : "Was in Ihrer Teilungserklärung sonst noch geregelt ist und oben nicht vorkommt.") + "</p>";
-    h += e.eigene.length ? "<div class='se-tab'>" + e.eigene.map((x, i) => "<div class='se-row'>" +
-      "<span><input type='text' data-se='eigen|" + i + "|name' value='" + esc(x.name || "") + "' placeholder='z. B. Hobbyraum im Untergeschoss'></span>" +
-      "<span><select data-se='eigen|" + i + "|zu'>" + SE_ZU.map(([w, l]) =>
-        "<option value='" + w + "'" + ((x.zu || "offen") === w ? " selected" : "") + ">" + esc(l) + "</option>").join("") + "</select></span>" +
-      "<span style='display:flex;gap:6px'><input type='text' data-se='eigen|" + i + "|notiz' value='" + esc(x.notiz || "") + "' placeholder='Fundstelle'>" +
-      "<button class='btn klein gefahr' data-act='se-weg' data-i='" + i + "'>" + (S.loeschen === "se" + i ? "Wirklich?" : "×") + "</button></span></div>").join("") + "</div>" : "";
+    h += e.eigene.length ? e.eigene.map((x, i) => "<div class='abr-einheit'><div class='felder'>" +
+      "<div class='feld breit'><label>Bezeichnung</label><input type='text' data-se='eigen|" + i + "|name' value='" +
+        esc(x.name || "") + "' placeholder='z. B. Hobbyraum im Untergeschoss, Markise Wohnung 4, Gartentor'></div>" +
+      "<div class='feld'><label>Gehört zum</label><select data-se='eigen|" + i + "|zu'>" + SE_ZU_FREI.map(([w, l]) =>
+        "<option value='" + w + "'" + ((x.zu || "offen") === w ? " selected" : "") + ">" + esc(l) + "</option>").join("") + "</select></div>" +
+      (x.zu === "eigen"
+        ? "<div class='feld'><label>Eigene Angabe</label><input type='text' data-se='eigen|" + i + "|zuText' value='" +
+          esc(x.zuText || "") + "' placeholder='z. B. Sondereigentum, Erhaltung trägt die Gemeinschaft'></div>" : "") +
+      "<div class='feld'><label>Fundstelle in der Teilungserklärung</label><input type='text' data-se='eigen|" + i +
+        "|notiz' value='" + esc(x.notiz || "") + "' placeholder='z. B. § 7 Abs. 2'></div>" +
+      "<div class='feld breit'><label>Notizen</label><textarea rows='2' data-se='eigen|" + i + "|bem' placeholder='" +
+        "Was Sie sich dazu merken wollen – wer zahlt, wer beauftragt, Besonderheiten, Vereinbarungen'>" + esc(x.bem || "") + "</textarea></div>" +
+      "</div><div class='leiste'><div><span class='fuer'>Punkt " + (i + 1) + " von " + e.eigene.length + "</span></div>" +
+      "<button class='btn klein gefahr' data-act='se-weg' data-i='" + i + "'>" +
+      (S.loeschen === "se" + i ? "Wirklich entfernen?" : "Entfernen") + "</button></div></div>").join("") : "";
+    h += "<div class='feld' style='margin-top:16px'><label for='se-notizen'>Notizen zum Eigentum insgesamt</label>" +
+      "<textarea id='se-notizen' data-se='notizen' rows='3' placeholder='Allgemeines, das zu keinem einzelnen Punkt gehört – " +
+      "z. B. Absprachen mit dem Beirat, offene Fragen an den Notar, Hinweise für den nächsten Schaden'>" +
+      esc(e.notizen || "") + "</textarea></div>";
     h += "<div class='leiste'><div><button class='btn klein' data-act='se-neu'>+ " + (eigenMod ? "Punkt" : "Eigener Punkt") + "</button>" +
       (eigenMod && !e.eigene.length ? "<button class='btn klein' data-act='se-vorlage'>Vorschlagsliste als Punkte übernehmen</button>" : "") +
       "</div></div>";
@@ -12272,7 +12303,8 @@ const Objekte = (() => {
     if (t.dataset.se) {
       const o = S.entwurf; if (!o) return;
       const e = eigentumVon(o); const teil = String(t.dataset.se).split("|");
-      if (teil[0] === "te") e.te[teil[1]] = t.value;
+      if (teil[0] === "notizen") e.notizen = t.value;
+      else if (teil[0] === "te") e.te[teil[1]] = t.value;
       else if (teil[0] === "teil") { e.teile[teil[1]] = { ...(e.teile[teil[1]] || {}), [teil[2]]: t.value }; }
       else if (teil[0] === "eigen") { const x = e.eigene[Number(teil[1])]; if (x) x[teil[2]] = t.value; }
       if (teil[2] === "zu" || teil[0] === "teil" && teil[2] === "zu") { objektSichern(o); render(true); return; }
@@ -13960,7 +13992,7 @@ const Objekte = (() => {
         await objektSichern(o); render(true);
         app.querySelector("[data-se='eigen|" + (o.eigentum.eigene.length - 1) + "|name']")?.focus({ preventScroll: true }); break; }
       case "se-modus": { const o = S.entwurf; if (!o) return;
-        const e = eigentumVon(o); e.modus = e.modus === "eigen" ? "" : "eigen";
+        const o2 = eigentumVon(o); o2.modus = seEigenModus(o) ? "katalog" : "eigen";
         render(true); break; }
       case "se-vorlage": { const o = S.entwurf; if (!o) return;
         const e = eigentumVon(o);
