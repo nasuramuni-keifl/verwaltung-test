@@ -153,6 +153,10 @@ main{padding:8px clamp(16px,4vw,40px) 64px}
 .klapp-kopf h2{margin:0;font-size:17px}
 .klapp-pfeil{color:var(--muted);font-size:12px;line-height:1.6}
 .klapp-inhalt{padding:0 clamp(18px,4vw,32px) 24px}
+.ug-row{display:grid;grid-template-columns:38px 1.6fr 80px 130px 1.4fr;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.ug-haken{width:26px;height:26px;border-radius:8px;border:1.5px solid var(--line);background:var(--field);cursor:pointer;font-size:15px;line-height:1;color:var(--ok)}
+.ug-haken.an{border-color:var(--ok);background:var(--ok-soft)}
+@media(max-width:820px){.ug-row{grid-template-columns:38px 1fr;gap:6px}.ug-row>span:nth-child(n+3){grid-column:2}}
 .klapp.auf .klapp-kopf{padding-bottom:10px}
 .arten{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
 .arten button{text-align:left;border:2px solid transparent;background:var(--field);border-radius:16px;padding:16px 18px}
@@ -1427,7 +1431,7 @@ const Objekte = (() => {
   const S = { hwTab: "stamm", rgStapel: [], rgEntwurf: null, rgZu: {}, rahmen: [], rahmenOffen: "", kkAuf: {}, kkDetail: false, krProtAuf: false, krVorher: null, bank: null, lsMonat: "", lsDatum: "", sitzung: "", anFehler: "", anMail: "", pwWechsel: false, pwMeldung: "", pwMeldungOk: false, wpJahr: "", wpDatum: "", wpTop: "",
     sollOffen: "", zaNeu: "", zaEntwurf: null, bhFrei: "", bhGrund: "", infoAlle: false, vmtTab: "miete", vkOffen: null, vkWahl: false, vkSuche: "", bonOffen: null, bonHinweis: "", tObjSuche: "", anruferTreffer: null, tdTab: "vorgang", briefAnzeige: null, datFilter: { suche: "", quelle: "" }, eTab: "stamm", pTab: "stamm", pBearbeiten: false, eaHinweis: "", vermTab: "frei", vermOffen: null, vermFeedback: null, kiLaeuft: false, kiHinweis: "", kiStop: null, mails: [], mailTab: "eingang", mailFilter: { suche: "" }, mailImport: null, mailOffenId: null, mailRichtung: "ein",
     objTab: "stammdaten", bhTab: "konten", rundTab: "rund", ueEinheit: null, mvBausteine: [], mvOffen: "", mvDruck: null, mvbsEntwurf: null, ptAbr: null, rlDruck: null,
-    mahnEinst: null, vpi: null, ixDruck: null, zuNeu: null, objAuf: [], pStaffel: { ab: "", anzahl: "3", schritt: "", art: "eur" }, mhDruck: null, mhVerzug: null, mhEinstAuf: false, rzEntwurf: null, rzOffen: "", rzDruck: null,
+    mahnEinst: null, vpi: null, ixDruck: null, zuNeu: null, objAuf: [], ugDruck: false, pStaffel: { ab: "", anzahl: "3", schritt: "", art: "eur" }, mhDruck: null, mhVerzug: null, mhEinstAuf: false, rzEntwurf: null, rzOffen: "", rzDruck: null,
     gbTab: "gewaehr", gwOffen: "", gwRuege: "", ihJahre: 15, brJahr: "", brBericht: null, tickets: [], tAnsicht: "liste", kalDatum: "", kalModus: "monat", kalWer: [], tEntwurfTicket: null, ticketOffen: null, ticketBearbeiten: false, ticketVorher: null, mailNeuFuer: null, mailOffen: null, mailVerschieben: null, mailRichtung: "ein", ichBin: "", einst: { ichBin: "", zeitraum: "woche", nurMeine: true, ansicht: "liste", kalModus: "monat" }, tFilter: { status: "", suche: "", nurMeine: true, zeitraum: "woche" }, bearbeiten: false, uOffen: null, anlageOffen: null, team: [], tEntwurf: null, eigNeuFuer: null, mieterNeuFuer: null, pObjekte: {}, pDirty: new Set(), tab: "vertraege", liste: [], handwerker: [], personen: [], pEntwurf: null, pFilter: { rolle: "", suche: "", ehemalige: false }, ansicht: "liste", entwurf: null, istNeu: false, hwEntwurf: null, hwNeuFuer: null,
     filter: { art: "", suche: "", beendete: false }, loeschen: false };
   const app = $("#app");
@@ -4024,7 +4028,8 @@ const Objekte = (() => {
     const anlagen = (o.anlagen || []);
     const dok = (o.dokumente || []);
     const unter = [["stammdaten", "Stammdaten"], ["buchhaltung", "Buchhaltung"], ["gebaeude", "Gebäude"], ["dienste", "Dienstleister"], ["portal", "Portal"], ["rund", "Rundschreiben"]]
-      .concat(o.art === "weg" ? [["etv", "Eigentümerversammlung"]] : []);
+      .concat(o.art === "weg" ? [["etv", "Eigentümerversammlung"]] : [])
+      .concat([["uebergabe", "Übergabe"]]);
     let h = "<div class='seite'><div class='hero'><h1>" + (o.nummer ? "<span class='obj-nr'>" + esc(o.nummer) + "</span> " : "") + esc(objName(o)) + "</h1>" +
       "<p>" + esc(Objekte.ARTEN[o.art] ? Objekte.ARTEN[o.art].name : "") + " · " + esc([o.strasse, [o.plz, o.ort].filter(Boolean).join(" ")].filter(Boolean).join(", ")) +
       (o.beendet ? " · beendet" : "") + "</p></div>" +
@@ -4042,6 +4047,8 @@ const Objekte = (() => {
     if (S.objTab === "dienste") return h + objektDiensteHtml(o) +
       "<div class='leiste'><div><button class='btn' data-act='abbrechen'>Zurück zur Übersicht</button></div></div></div>";
     if (S.objTab === "portal") return h + objektPortalHtml(o) +
+      "<div class='leiste'><div><button class='btn' data-act='abbrechen'>Zurück zur Übersicht</button></div></div></div>";
+    if (S.objTab === "uebergabe") return h + uebergabeHtml(o) +
       "<div class='leiste'><div><button class='btn' data-act='abbrechen'>Zurück zur Übersicht</button></div></div></div>";
     if (S.objTab === "rund") {
       const rt = rundReiter();
@@ -4335,6 +4342,300 @@ const Objekte = (() => {
       "<li class='m-hinweis'>Diese Aufstellung ersetzt die Teilungserklärung nicht. Sie hält fest, was Sie dort gelesen haben, " +
       "damit es beim nächsten Schaden nicht wieder nachgeschlagen werden muss. Im Zweifel gilt die Urkunde.</li></ul>";
     return h + "</section>";
+  }
+  /* ================= Übergabeprotokoll =================
+     Endet die Verwaltung, muss alles herausgegeben werden, was bei der Geschäftsbesorgung
+     erlangt wurde (§ 667 BGB, bei der WEG über § 675 BGB). Das Protokoll hält fest, was wann
+     an wen übergeben wurde – es schützt beide Seiten und ist die Grundlage, wenn später etwas
+     fehlt. Die Aufbewahrungspflichten (§ 147 AO, § 257 HGB) treffen weiterhin die abgebende
+     Verwaltung, soweit sie eigene Geschäftsunterlagen betreffen; deshalb gehören Kopien dazu. */
+  const UG_ARTEN = [["verwalter", "an die neue Verwaltung"], ["eigentuemer", "an den Eigentümer"],
+    ["gemeinschaft", "an die Gemeinschaft in Eigenverwaltung"]];
+  const UG_FORM = [["", "–"], ["papier", "Papier"], ["digital", "digital"], ["beides", "Papier und digital"]];
+  const UG_GRUPPEN = [["recht", "Objekt und Rechtsgrundlagen"], ["weg", "Verwaltung und Beschlüsse"],
+    ["miete", "Mietverhältnisse"], ["geld", "Buchhaltung, Konten und Belege"],
+    ["technik", "Technik, Wartung und Prüfungen"], ["vertrag", "Versicherungen und Verträge"],
+    ["schluessel", "Schlüssel und Zugänge"], ["offen", "Offene Vorgänge"],
+    ["daten", "Datenschutz und Aufbewahrung"]];
+  /* [Schlüssel, Bezeichnung, Gruppe, für welche Verwaltungsart, Hinweis] */
+  const UG_PUNKTE = [
+    ["te", "Teilungserklärung mit Gemeinschaftsordnung", "recht", "weg", "Mit allen Nachträgen – sie entscheidet, wer welche Kosten trägt."],
+    ["plan", "Aufteilungsplan und Abgeschlossenheitsbescheinigung", "recht", "weg", ""],
+    ["grundbuch", "Grundbuchauszüge der Einheiten", "recht", "weg", "Soweit vorhanden; sie belegen die aktuellen Eigentümer."],
+    ["eigliste", "Eigentümerliste mit Anschriften und Miteigentumsanteilen", "recht", "weg", ""],
+    ["kaufvertrag", "Kaufvertrag und Grundbuchauszug", "recht", "miet", "Nur soweit der Verwaltung überlassen."],
+    ["beschluss", "Beschluss-Sammlung", "weg", "weg", "Fortlaufend und vollständig (§ 24 Abs. 7 WEG). Der Nachfolger führt sie weiter."],
+    ["protokolle", "Protokolle der Eigentümerversammlungen", "weg", "weg", "Mit Anwesenheitslisten und Vollmachten."],
+    ["vvertrag", "Verwaltervertrag und Bestellbeschlüsse", "weg", "weg", ""],
+    ["beirat", "Verwaltungsbeirat: Bestellung und Prüfberichte", "weg", "weg", "§ 29 WEG."],
+    ["hausordnung", "Hausordnung und sonstige Beschlüsse mit Dauerwirkung", "weg", "beide", ""],
+    ["mvertrag", "Mietverträge mit allen Nachträgen", "miete", "miet", ""],
+    ["wuebergabe", "Wohnungsübergabeprotokolle", "miete", "miet", "Bei Ein- und Auszug."],
+    ["mieterliste", "Mieterliste mit Sollmieten und Vorauszahlungen", "miete", "miet", ""],
+    ["kaution", "Kautionen mit Nachweis der getrennten Anlage", "miete", "miet", "§ 551 Abs. 3 BGB – getrennt vom Vermögen der Verwaltung, mit Zinsnachweis."],
+    ["bkabr", "Betriebskostenabrechnungen der letzten drei Jahre", "miete", "miet", "Mit den Belegen, solange Einwendungen noch möglich sind."],
+    ["erhoehung", "Mieterhöhungen, Staffeln und Indexvereinbarungen", "miete", "miet", ""],
+    ["mrueck", "Offene Mietforderungen mit Mahnstand", "miete", "miet", ""],
+    ["sepa", "SEPA-Mandate und Daueraufträge", "geld", "beide", "Für Hausgeld- und Mieteinzug; sie laufen auf die abgebende Verwaltung und sind umzustellen."],
+    ["konten", "Bankkonten mit Saldo zum Stichtag", "geld", "beide", "Mit Vollmachten; die Verfügungsberechtigung ist umzustellen."],
+    ["ruecklage", "Nachweis der Erhaltungsrücklage", "geld", "weg", "Kontoauszug und Entwicklung (§ 19 Abs. 2 Nr. 4 WEG)."],
+    ["hausgeld", "Hausgeldkonten je Einheit mit Saldo", "geld", "weg", "Einschließlich rückständiger Hausgelder."],
+    ["jahresabr", "Jahresabrechnungen und Wirtschaftspläne", "geld", "weg", "Mit den Beschlüssen über Nachschüsse und Vorschüsse (§ 28 WEG)."],
+    ["vermoegen", "Vermögensberichte", "geld", "weg", "§ 28 Abs. 4 WEG."],
+    ["eigabr", "Abrechnungen gegenüber dem Eigentümer", "geld", "miet", ""],
+    ["belege", "Belege und Kontoauszüge", "geld", "beide", "Aufzubewahren sind zehn Jahre (§ 147 AO, § 257 HGB)."],
+    ["buchhaltung", "Buchhaltungsdaten und Kontenrahmen", "geld", "beide", "Möglichst auch als Datei, damit nichts abgetippt werden muss."],
+    ["offeneRg", "Offene Eingangsrechnungen und Verbindlichkeiten", "geld", "beide", ""],
+    ["steuer", "Bescheinigungen nach § 35a EStG", "geld", "beide", ""],
+    ["pruefung", "Prüfberichte: Aufzug, Heizung, Elektro, Blitzschutz, Brandschutz", "technik", "beide", "Mit den nächsten Fälligkeiten."],
+    ["trinkwasser", "Trinkwasseruntersuchungen", "technik", "beide", "§ 14 TrinkwV – Legionellenprüfung alle drei Jahre."],
+    ["heizkosten", "Heizkostenabrechnungen und Vertrag mit dem Messdienst", "technik", "beide", ""],
+    ["energie", "Energieausweis", "technik", "beide", "§ 80 GEG."],
+    ["rwm", "Rauchwarnmelder: Nachweis von Einbau und Wartung", "technik", "beide", ""],
+    ["zaehler", "Zählerstände zum Stichtag", "technik", "beide", "Strom, Wasser, Heizung – am besten mit Fotos."],
+    ["bauunterlagen", "Baubeschreibung, Pläne, Statik, Revisionsunterlagen", "technik", "beide", ""],
+    ["versicherung", "Versicherungsscheine mit Beitragsnachweis", "vertrag", "beide", "Gebäude, Haftpflicht, Glas, Elementar."],
+    ["schaeden", "Laufende Versicherungsschäden", "vertrag", "beide", "Mit Schadennummern und Stand der Regulierung."],
+    ["dienste", "Dienstleistungs- und Wartungsverträge", "vertrag", "beide", "Hausmeister, Reinigung, Garten, Winterdienst, Aufzug, Heizung."],
+    ["versorger", "Verträge mit Versorgern und Entsorgern", "vertrag", "beide", "Strom, Gas, Wasser, Müll, Kabel."],
+    ["personal", "Angestelltes Personal: Verträge und Lohnunterlagen", "vertrag", "beide", "Nur wenn die Gemeinschaft oder der Eigentümer Arbeitgeber ist."],
+    ["schluessel", "Schlüssel und Schließanlage", "schluessel", "beide", "Mit Sicherungskarte und Nachweis, wer welchen Schlüssel hat."],
+    ["zugaenge", "Zugänge zu Portalen und Apps", "schluessel", "beide", "Messdienst, Versorger, Rauchmelder, Bank, Mieter- und Eigentümerportal."],
+    ["post", "Postumleitung und Weiterleitung von Telefon und E-Mail", "schluessel", "beide", "Damit nichts verloren geht, was noch an die alte Anschrift geht."],
+    ["auftraege", "Erteilte, noch nicht abgeschlossene Aufträge", "offen", "beide", ""],
+    ["gewaehr", "Gewährleistungsfristen und gerügte Mängel", "offen", "beide", "§ 634a BGB – mit den Fristen, damit nichts verjährt."],
+    ["rechtsstreit", "Laufende Rechtsstreitigkeiten", "offen", "beide", "Aktenzeichen, Gericht, Anwalt und Stand."],
+    ["behoerden", "Schriftverkehr mit Behörden und Nachbarn", "offen", "beide", ""],
+    ["dsgvo", "Verzeichnis der Verarbeitungstätigkeiten und Auftragsverarbeitungen", "daten", "beide", "Mit der Übergabe wechselt die Verantwortlichkeit nach der DSGVO."],
+    ["loeschung", "Löschkonzept und Umgang mit den Restdaten", "daten", "beide", "Die abgebende Verwaltung behält nur, was sie aufbewahren muss."],
+    ["kopien", "Kopien der Unterlagen für die eigene Aufbewahrung", "daten", "beide", "Herausgabe entbindet nicht von § 147 AO und § 257 HGB."]
+  ];
+  const ugFuer = (o, art) => art === "beide" || (istWeg(o) ? art === "weg" : art === "miet");
+  const ugPunkte = o => UG_PUNKTE.filter(x => ugFuer(o, x[3]));
+  function uebergabeVon(o) {
+    if (!o.uebergabe || typeof o.uebergabe !== "object") o.uebergabe = {};
+    const u = o.uebergabe;
+    if (!u.punkte || typeof u.punkte !== "object") u.punkte = {};
+    if (!Array.isArray(u.eigene)) u.eigene = [];
+    if (!u.an || typeof u.an !== "object") u.an = {};
+    return u;
+  }
+  const ugStand = (u, k) => (u.punkte[k] && typeof u.punkte[k] === "object") ? u.punkte[k] : {};
+  function ugZahlen(o, u) {
+    const stichtag = String(u.stichtag || "").slice(0, 10) || isoTag(new Date());
+    const jahr = stichtag.slice(0, 4);
+    const einheiten = (o.einheitenListe || []).length;
+    const schl = schlListe(o).reduce((n, x) => n + (Number(x.anzahl) || 1), 0);
+    const draussen = schlListe(o).filter(x => x.ausgabe && !x.rueckgabe).reduce((n, x) => n + (Number(x.anzahl) || 1), 0);
+    const offen = cent(forderungen(o).reduce((n, x) => n + x.offen, 0));
+    const v = vermoegenVon(o, jahr);
+    return { stichtag, jahr, einheiten, schl, draussen, offen,
+      dienste: diensteListe(o).filter(dienstAktiv).length,
+      beschluesse: (o.beschluesse || []).length,
+      anlagen: (o.anlagen || []).length,
+      ruecklage: betragZahl(v.rlAnfang) || 0,
+      bank: (o.bank && typeof o.bank === "object") ? o.bank : {}, bankRl: objektBankRl(o) };
+  }
+  /* Die Arbeitsansicht: abhaken, zählen, Bemerkungen festhalten. */
+  function uebergabeHtml(o) {
+    const u = uebergabeVon(o);
+    const z = ugZahlen(o, u);
+    const liste = ugPunkte(o);
+    const fertig = liste.filter(x => ugStand(u, x[0]).ok).length +
+      u.eigene.filter(x => x.ok).length;
+    const gesamt = liste.length + u.eigene.length;
+    const art = UG_ARTEN.some(([w]) => w === u.art) ? u.art : "verwalter";
+    const f = (n, l, typ, platz, hilfe) => "<div class='feld'><label for='ug-" + n + "'>" + l + "</label>" +
+      "<input type='" + (typ || "text") + "' id='ug-" + n + "' data-ug='" + n + "' value='" + esc(u[n] || "") + "'" +
+      (platz ? " placeholder='" + esc(platz) + "'" : "") + ">" + (hilfe ? "<small>" + hilfe + "</small>" : "") + "</div>";
+    const fa = (n, l, platz) => "<div class='feld'><label for='uga-" + n + "'>" + l + "</label>" +
+      "<input type='text' id='uga-" + n + "' data-uga='" + n + "' value='" + esc(u.an[n] || "") + "'" +
+      (platz ? " placeholder='" + esc(platz) + "'" : "") + "></div>";
+    let h = "<section class='gruppe voll'><h2>Übergabeprotokoll</h2>" +
+      "<p class='unter'>Endet die Verwaltung, ist alles herauszugeben, was bei der Verwaltung angefallen ist " +
+      "(§ 667 BGB). Dieses Protokoll hält fest, was wann an wen übergeben wurde – es schützt beide Seiten, " +
+      "wenn später etwas vermisst wird.</p>" +
+      "<div class='kacheln'><div class='kachel'><b>" + fertig + " / " + gesamt + "</b><span>Punkte übergeben</span></div>" +
+      "<div class='kachel'><b>" + z.einheiten + "</b><span>Einheiten</span></div>" +
+      "<div class='kachel'><b class='" + (z.offen > 0.005 ? "z-minus" : "") + "'>" + esc(eur2(z.offen)) +
+        " €</b><span>offene Forderungen</span></div>" +
+      "<div class='kachel'><b>" + z.schl + "</b><span>Schlüssel · " + z.draussen + " ausgegeben</span></div></div>";
+    h += "<div class='felder' style='margin-top:18px'>" +
+      "<div class='feld'><label for='ug-art'>Übergabe</label><select id='ug-art' data-ug='art'>" +
+      UG_ARTEN.map(([w, l]) => "<option value='" + w + "'" + (art === w ? " selected" : "") + ">" + esc(l) + "</option>").join("") +
+      "</select></div>" +
+      f("stichtag", "Stichtag der Übergabe", "date", "", "Bis zu diesem Tag verwaltet noch Ihr Haus.") +
+      f("datum", "Tag der Protokollaufnahme", "date") +
+      f("ort", "Ort", "text", "z. B. Geschäftsräume der Verwaltung") + "</div>";
+    h += "<h3 style='margin-top:22px'>Empfänger</h3><div class='felder'>" +
+      fa("firma", art === "eigentuemer" ? "Name des Eigentümers" : "Firma", art === "eigentuemer" ? "" : "z. B. Hausverwaltung Nord GmbH") +
+      fa("ansprech", "Ansprechpartner") + fa("strasse", "Straße und Nr.") + fa("plzOrt", "PLZ und Ort") +
+      fa("telefon", "Telefon") + fa("email", "E-Mail") + "</div>" +
+      "<div class='feld' style='margin-top:12px'><label for='ug-teilnehmer'>Anwesend bei der Übergabe</label>" +
+      "<input type='text' id='ug-teilnehmer' data-ug='teilnehmer' value='" + esc(u.teilnehmer || "") +
+      "' placeholder='Namen und Funktion, z. B. U. Keifl (abgebend), M. Nord (übernehmend), K. Weber (Beirat)'></div>";
+    /* Die Checkliste. */
+    h += "<div class='leiste' style='margin-top:20px'><div>" +
+      "<button class='btn klein' data-act='ug-alle'>" + (fertig >= gesamt ? "Alle Haken entfernen" : "Alles abhaken") + "</button>" +
+      "<button class='btn klein' data-act='ug-punkt-neu'>+ Eigener Punkt</button></div>" +
+      "<span class='fuer'>Was nicht übergeben wurde, bleibt ohne Haken und kommt unten unter „Nachzureichen“.</span></div>";
+    UG_GRUPPEN.forEach(([g, titel]) => {
+      const teil = liste.filter(x => x[2] === g);
+      if (!teil.length) return;
+      h += "<h3 style='margin-top:20px'>" + esc(titel) + "</h3><div class='ue-tab'>" +
+        teil.map(x => {
+          const st = ugStand(u, x[0]);
+          return "<div class='ug-row'>" +
+            "<span><button type='button' class='ug-haken" + (st.ok ? " an" : "") + "' data-act='ug-ok' data-k='" + esc(x[0]) +
+              "' aria-pressed='" + !!st.ok + "' aria-label='" + esc(x[1]) + " übergeben'>" + (st.ok ? "✓" : "") + "</button></span>" +
+            "<span><strong>" + esc(x[1]) + "</strong>" + (x[4] ? "<br><span class='fuer'>" + esc(x[4]) + "</span>" : "") + "</span>" +
+            "<span><input type='text' inputmode='numeric' aria-label='Anzahl' data-ugp='" + esc(x[0]) + "|anzahl' value='" +
+              esc(st.anzahl || "") + "' placeholder='Anzahl'></span>" +
+            "<span><select aria-label='Form' data-ugp='" + esc(x[0]) + "|form'>" + UG_FORM.map(([w, l]) =>
+              "<option value='" + w + "'" + ((st.form || "") === w ? " selected" : "") + ">" + esc(l) + "</option>").join("") + "</select></span>" +
+            "<span><input type='text' aria-label='Bemerkung' data-ugp='" + esc(x[0]) + "|bem' value='" + esc(st.bem || "") +
+              "' placeholder='Bemerkung'></span></div>";
+        }).join("") + "</div>";
+    });
+    if (u.eigene.length) h += "<h3 style='margin-top:20px'>Eigene Punkte</h3><div class='ue-tab'>" +
+      u.eigene.map((x, i) => "<div class='ug-row'>" +
+        "<span><button type='button' class='ug-haken" + (x.ok ? " an" : "") + "' data-act='ug-e-ok' data-i='" + i +
+          "' aria-pressed='" + !!x.ok + "' aria-label='übergeben'>" + (x.ok ? "✓" : "") + "</button></span>" +
+        "<span><input type='text' aria-label='Bezeichnung' data-uge='" + i + "|was' value='" + esc(x.was || "") +
+          "' placeholder='Was wurde übergeben?'></span>" +
+        "<span><input type='text' inputmode='numeric' aria-label='Anzahl' data-uge='" + i + "|anzahl' value='" + esc(x.anzahl || "") + "' placeholder='Anzahl'></span>" +
+        "<span><select aria-label='Form' data-uge='" + i + "|form'>" + UG_FORM.map(([w, l]) =>
+          "<option value='" + w + "'" + ((x.form || "") === w ? " selected" : "") + ">" + esc(l) + "</option>").join("") + "</select></span>" +
+        "<span style='display:flex;gap:6px'><input type='text' aria-label='Bemerkung' data-uge='" + i + "|bem' value='" + esc(x.bem || "") + "' placeholder='Bemerkung'>" +
+        "<button class='btn gefahr klein' data-act='ug-punkt-weg' data-i='" + i + "'>" +
+        (S.loeschen === "ug" + i ? "Wirklich?" : "×") + "</button></span></div>").join("") + "</div>";
+    /* Geld und Schlüssel zum Stichtag, aus den Daten des Objekts. */
+    const zeile = (l, w) => "<div class='ue-zeile'><span class='ue-l'>" + l + "</span><span class='ue-w'>" + w + "</span></div>";
+    h += "<h3 style='margin-top:22px'>Stand zum Stichtag</h3>" +
+      "<p class='unter'>Diese Angaben zieht das Programm aus dem Objekt. Prüfen Sie sie gegen Ihre Kontoauszüge, " +
+      "bevor Sie unterschreiben.</p><div class='ue-tab'>" +
+      zeile("Einheiten", String(z.einheiten)) +
+      (Objekte.ibanGueltig(z.bank.iban) ? zeile("Bankkonto", esc(Objekte.ibanFormat(z.bank.iban)) +
+        (z.bank.bank ? " · " + esc(z.bank.bank) : "")) : "") +
+      (Objekte.ibanGueltig(z.bankRl.iban) ? zeile("Rücklagenkonto", esc(Objekte.ibanFormat(z.bankRl.iban))) : "") +
+      (istWeg(o) ? zeile("Erhaltungsrücklage laut Vermögensbericht " + esc(z.jahr), esc(eur2(z.ruecklage)) + " €") : "") +
+      zeile("Offene Forderungen", esc(eur2(z.offen)) + " €") +
+      zeile("Schlüssel erfasst", z.schl + " · davon ausgegeben " + z.draussen) +
+      zeile("Laufende Dienstleistungsverträge", String(z.dienste)) +
+      zeile("Technische Anlagen", String(z.anlagen)) +
+      (istWeg(o) ? zeile("Beschlüsse in der Sammlung", String(z.beschluesse)) : "") + "</div>" +
+      "<div class='felder' style='margin-top:14px'>" +
+      f("saldo", "Kontostand zum Stichtag €", "text", "", "Wie er auf dem Auszug steht.") +
+      f("saldoRl", "Stand des Rücklagenkontos €", "text") + "</div>";
+    h += "<div class='feld' style='margin-top:16px'><label for='ug-rest'>Noch nachzureichen</label>" +
+      "<textarea id='ug-rest' data-ug='rest' rows='3' placeholder='Was heute nicht dabei war, mit Frist – z. B. Belege 2026 bis zum 30.11.2026'>" +
+      esc(u.rest || "") + "</textarea></div>" +
+      "<div class='feld'><label for='ug-notiz'>Bemerkungen</label>" +
+      "<textarea id='ug-notiz' data-ug='notiz' rows='3' placeholder='Besonderheiten, Vorbehalte, Abweichungen'>" + esc(u.notiz || "") + "</textarea></div>";
+    const meld = [];
+    if (!u.stichtag) meld.push(["m-fehler", "Ohne Stichtag ist nicht klar, bis wann Sie verantwortlich waren."]);
+    if (!String(u.an.firma || "").trim()) meld.push(["m-fehler", "Bitte tragen Sie ein, an wen übergeben wird."]);
+    if (z.offen > 0.005) meld.push(["m-hinweis", "Es sind noch " + eur2(z.offen) + " € offen. Übergeben Sie die " +
+      "Forderungsaufstellung und halten Sie fest, wer sie weiterverfolgt."]);
+    if (z.draussen) meld.push(["m-hinweis", z.draussen + " Schlüssel sind ausgegeben und nicht zurück. " +
+      "Die Liste gehört ins Protokoll, sonst fehlen sie dem Nachfolger."]);
+    meld.push(["m-hinweis", "Die Herausgabe entbindet nicht von Ihren eigenen Aufbewahrungspflichten. " +
+      "Behalten Sie Kopien, solange § 147 AO und § 257 HGB es verlangen – in der Regel zehn Jahre."]);
+    if (istWeg(o)) meld.push(["m-hinweis", "Ein Zurückbehaltungsrecht an den Unterlagen besteht nicht, auch wenn " +
+      "noch Honorar offen ist. Die Unterlagen gehören der Gemeinschaft."]);
+    h += "<ul class='meldungen'>" + meld.map(([k, t]) => "<li class='" + k + "'>" + esc(t) + "</li>").join("") + "</ul>";
+    h += "<div class='leiste'><div><button class='btn haupt' data-act='ug-drucken'>Protokoll erstellen</button>" +
+      "<button class='btn' data-act='ug-abschluss'>" + (u.abgeschlossen ? "Abschluss aufheben" : "Übergabe abschließen") + "</button></div>" +
+      (u.abgeschlossen ? "<span class='fuer'>abgeschlossen am " + esc(Objekte.datum(String(u.abgeschlossen).slice(0, 10))) + "</span>" : "") +
+      "</div></section>";
+    return h;
+  }
+  /* Das fertige Protokoll zum Ausdrucken und Unterschreiben. */
+  function uebergabeDruckHtml(o) {
+    const u = uebergabeVon(o);
+    const z = ugZahlen(o, u);
+    const vw = (() => { try { return window.Firmendaten ? window.Firmendaten.daten() : {}; } catch (x) { return {}; } })();
+    const art = UG_ARTEN.find(([w]) => w === u.art) || UG_ARTEN[0];
+    const liste = ugPunkte(o);
+    const zeile = (l, w) => "<tr><td>" + l + "</td><td>" + w + "</td></tr>";
+    const kreuz = ok => ok ? "☑" : "☐";
+    let h = "<div class='seite'><div class='md-werkzeug'><div>" +
+      "<button class='btn klein' data-act='ug-zurueck'>‹ Zurück</button>" +
+      "<button class='btn klein haupt' data-act='mandat-drucken'>Drucken / als PDF speichern</button></div>" +
+      "<span class='fuer'>" + esc(objName(o)) + "</span></div>";
+    h += "<div class='md-blatt'><header class='md-kopf'>" +
+      (vw.logo ? "<img class='md-logo' src='" + esc(vw.logo) + "' alt='" + esc(vw.name || "Logo") + "'>"
+        : "<div class='md-firma'>" + esc(vw.name || "Hausverwaltung") + "</div>") +
+      "<div class='fuer'>" + esc(Objekte.datum(String(u.datum || isoTag(new Date())).slice(0, 10))) + "</div></header>";
+    h += "<h1>Übergabeprotokoll</h1>" +
+      "<p class='md-art'>" + esc(objName(o)) + " · " + esc([o.strasse, [o.plz, o.ort].filter(Boolean).join(" ")].filter(Boolean).join(", ")) +
+      (o.nummer ? " · Objekt " + esc(o.nummer) : "") + "</p>";
+    h += "<table class='lv-tab abr-tab'><tbody>" +
+      zeile("Art der Übergabe", esc(art[1])) +
+      zeile("Verwaltungsart", esc(Objekte.ARTEN[o.art] ? Objekte.ARTEN[o.art].name : o.art)) +
+      zeile("Stichtag", esc(u.stichtag ? Objekte.datum(u.stichtag) : "offen")) +
+      zeile("Abgebende Verwaltung", esc(vw.name || "–")) +
+      zeile("Übernimmt", esc([u.an.firma, u.an.ansprech].filter(Boolean).join(", ") || "–") +
+        (u.an.strasse || u.an.plzOrt ? "<br>" + esc([u.an.strasse, u.an.plzOrt].filter(Boolean).join(", ")) : "") +
+        (u.an.telefon || u.an.email ? "<br>" + esc([u.an.telefon, u.an.email].filter(Boolean).join(" · ")) : "")) +
+      zeile("Ort der Übergabe", esc(u.ort || "–")) +
+      zeile("Anwesend", esc(u.teilnehmer || "–")) +
+      "</tbody></table>";
+    h += "<h2>Stand zum Stichtag</h2><table class='lv-tab abr-tab'><tbody>" +
+      zeile("Einheiten", String(z.einheiten)) +
+      (Objekte.ibanGueltig(z.bank.iban) ? zeile("Bankkonto", esc(Objekte.ibanFormat(z.bank.iban)) +
+        (z.bank.bank ? " · " + esc(z.bank.bank) : "")) : "") +
+      (betragZahl(u.saldo) ? zeile("Kontostand", esc(eur2(betragZahl(u.saldo))) + " €") : "") +
+      (Objekte.ibanGueltig(z.bankRl.iban) ? zeile("Rücklagenkonto", esc(Objekte.ibanFormat(z.bankRl.iban))) : "") +
+      (betragZahl(u.saldoRl) ? zeile("Stand der Erhaltungsrücklage", esc(eur2(betragZahl(u.saldoRl))) + " €") : "") +
+      zeile("Offene Forderungen", esc(eur2(z.offen)) + " €") +
+      zeile("Schlüssel", z.schl + " erfasst, davon " + z.draussen + " ausgegeben") +
+      zeile("Laufende Dienstleistungsverträge", String(z.dienste)) +
+      (istWeg(o) ? zeile("Beschlüsse in der Sammlung", String(z.beschluesse)) : "") +
+      "</tbody></table>";
+    h += "<h2>Übergebene Unterlagen</h2>";
+    UG_GRUPPEN.forEach(([g, titel]) => {
+      const teil = liste.filter(x => x[2] === g);
+      if (!teil.length) return;
+      h += "<h3>" + esc(titel) + "</h3><table class='lv-tab abr-tab'><thead><tr><th style='width:34px'></th>" +
+        "<th>Unterlage</th><th style='width:70px'>Anzahl</th><th style='width:110px'>Form</th><th>Bemerkung</th></tr></thead><tbody>" +
+        teil.map(x => { const st = ugStand(u, x[0]);
+          return "<tr><td>" + kreuz(st.ok) + "</td><td>" + esc(x[1]) + "</td><td>" + esc(st.anzahl || "") + "</td><td>" +
+            esc((UG_FORM.find(y => y[0] === (st.form || "")) || UG_FORM[0])[1]) + "</td><td>" + esc(st.bem || "") + "</td></tr>";
+        }).join("") + "</tbody></table>";
+    });
+    if (u.eigene.length) h += "<h3>Weitere Unterlagen</h3><table class='lv-tab abr-tab'><tbody>" +
+      u.eigene.map(x => "<tr><td style='width:34px'>" + kreuz(x.ok) + "</td><td>" + esc(x.was || "") + "</td><td style='width:70px'>" +
+        esc(x.anzahl || "") + "</td><td style='width:110px'>" + esc((UG_FORM.find(y => y[0] === (x.form || "")) || UG_FORM[0])[1]) +
+        "</td><td>" + esc(x.bem || "") + "</td></tr>").join("") + "</tbody></table>";
+    const ohne = liste.filter(x => !ugStand(u, x[0]).ok).map(x => x[1])
+      .concat(u.eigene.filter(x => !x.ok).map(x => x.was || "ohne Bezeichnung"));
+    if (ohne.length) h += "<h2>Heute nicht übergeben</h2><p class='md-text'>" + esc(ohne.join("; ")) + ".</p>";
+    if (String(u.rest || "").trim()) h += "<p class='md-text'><strong>Nachzureichen:</strong> " +
+      esc(u.rest).replace(/\n/g, "<br>") + "</p>";
+    if (String(u.notiz || "").trim()) h += "<h2>Bemerkungen</h2><p class='md-text'>" +
+      esc(u.notiz).replace(/\n/g, "<br>") + "</p>";
+    h += "<h2>Erklärungen</h2>" +
+      "<p class='md-text'>Die abgebende Verwaltung gibt hiermit alles heraus, was sie bei der Verwaltung dieses Objekts " +
+      "erlangt hat (§ 667 BGB" + (istWeg(o) ? " in Verbindung mit § 675 BGB" : "") + "). Ein Zurückbehaltungsrecht wegen " +
+      "offener Forderungen wird nicht geltend gemacht.</p>" +
+      "<p class='md-text'>Die übernehmende Seite bestätigt den Empfang der oben angekreuzten Unterlagen. Die Übergabe " +
+      "erfolgt unter dem Vorbehalt, dass die Vollständigkeit erst nach Durchsicht beurteilt werden kann; " +
+      "fehlende Unterlagen sind unverzüglich schriftlich anzuzeigen.</p>" +
+      "<p class='md-text'>Mit dem Stichtag geht die Verantwortlichkeit für die Verarbeitung der personenbezogenen Daten " +
+      "auf die übernehmende Seite über. Die abgebende Verwaltung behält nur die Unterlagen, die sie nach § 147 AO und " +
+      "§ 257 HGB aufbewahren muss, und löscht die übrigen Daten.</p>" +
+      (istWeg(o) ? "<p class='md-text'>Die Beschluss-Sammlung nach § 24 Abs. 7 WEG wird in dem hier festgehaltenen Stand " +
+        "übergeben und von der übernehmenden Verwaltung fortgeführt.</p>" : "");
+    h += "<div class='unterschriften' style='display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:40px'>" +
+      "<div style='border-top:1px solid #000;padding-top:6px'>Ort, Datum · abgebende Verwaltung<br><span class='fuer'>" +
+      esc(vw.name || "") + "</span></div>" +
+      "<div style='border-top:1px solid #000;padding-top:6px'>Ort, Datum · übernehmend<br><span class='fuer'>" +
+      esc(u.an.firma || "") + "</span></div></div>";
+    h += "<p class='md-fuss'>Erstellt am " + esc(Objekte.datum(isoTag(new Date()))) +
+      ". Dieses Protokoll ersetzt keine rechtliche Beratung; bei Streit über den Umfang der Herausgabe lassen Sie sich " +
+      "beraten.</p></div></div>";
+    return h;
   }
   /* ---------- Notfallnummernplan ----------
      Die selbst eingetragenen Nummern und die Dienstleister mit laufendem Vertrag ergeben
@@ -11539,6 +11840,15 @@ const Objekte = (() => {
     }
     const mdP = S.mandatFuer ? mandatPerson() : null;
     const dvD = (!mdP && S.dienstDruck && S.entwurf) ? diensteListe(S.entwurf).find(x => x.id === S.dienstDruck) : null;
+    const ugD = (!mdP && !dvD && S.ugDruck && S.entwurf) ? S.entwurf : null;
+    if (ugD) {
+      $("#neu-knopf").hidden = true; $("#status").hidden = true; $("#lese-hinweis").hidden = true;
+      $("#ze").hidden = true; $("#vv").hidden = true; app.hidden = false;
+      document.body.classList.add("mandat-an");
+      app.innerHTML = uebergabeDruckHtml(ugD);
+      window.scrollTo({ top: behalteScroll ? y : 0 });
+      return;
+    }
     const umD = (!mdP && !dvD && S.umDruck !== null && S.umDruck !== undefined && S.entwurf) ? S.umDruck : null;
     const abrD = (!mdP && !dvD && umD === null && S.abrDruck && S.entwurf) ? S.abrDruck : null;
     const mvD = (!mdP && !dvD && !abrD && S.mvDruck && S.entwurf) ? mvListe(S.entwurf).find(x => x.id === S.mvDruck) : null;
@@ -11723,6 +12033,27 @@ const Objekte = (() => {
       render(true); return;
     }
     if (t.dataset.uf) { const [oid, idx, feld] = t.dataset.uf.split("|"); const o = objFuer(oid); if (o) o.einheitenListe[Number(idx)][feld] = t.value; return; }
+    if (t.dataset.ug !== undefined && S.entwurf) {
+      const u = uebergabeVon(S.entwurf); u[t.dataset.ug] = t.value; objektSichern(S.entwurf);
+      if (t.dataset.ug === "art") render(true); else spaeterZeichnen("ug", 900);
+      return;
+    }
+    if (t.dataset.uga !== undefined && S.entwurf) {
+      const u = uebergabeVon(S.entwurf); u.an[t.dataset.uga] = t.value; objektSichern(S.entwurf);
+      spaeterZeichnen("ug", 900); return;
+    }
+    if (t.dataset.ugp !== undefined && S.entwurf) {
+      const [k, feld] = t.dataset.ugp.split("|");
+      const u = uebergabeVon(S.entwurf);
+      u.punkte[k] = { ...ugStand(u, k), [feld]: t.value };
+      objektSichern(S.entwurf); spaeterZeichnen("ug", 900); return;
+    }
+    if (t.dataset.uge !== undefined && S.entwurf) {
+      const [i, feld] = t.dataset.uge.split("|");
+      const u = uebergabeVon(S.entwurf);
+      if (u.eigene[Number(i)]) { u.eigene[Number(i)][feld] = t.value; objektSichern(S.entwurf); spaeterZeichnen("ug", 900); }
+      return;
+    }
     if (t.dataset.zun !== undefined) { S.zuNeu = { ...(S.zuNeu || {}), [t.dataset.zun]: t.value }; return; }
     if (t.dataset.vpib !== undefined) { const d = vpiDaten(); d.basis = t.value; vpiSichern(d); return; }
     if (t.dataset.vpi !== undefined) {
@@ -12424,7 +12755,7 @@ const Objekte = (() => {
     if (!["loeschen", "hw-loeschen", "p-loeschen", "m-loeschen", "td-loeschen", "v-weg", "mail-weg", "dok-weg", "mail-loeschen", "abl-weg",
       "bh-fest", "za-weg", "kk-weg", "kr-weg", "kr-klasse-weg", "kr-leeren",
       "nf-weg", "au-weg", "dienst-weg", "lv-weg", "org-weg", "hon-weg", "bs-weg", "ko-weg", "zl-weg",
-      "mv-weg", "mvbs-weg", "mvst-weg", "mvs-weg", "abr-frei-alle-zu", "rl-weg", "mh-weg", "rz-weg", "gw-weg", "gw-m-weg", "ih-weg", "schl-weg", "lf-weg", "zl-zust", "se-weg", "kau-weg", "kau-abrechnen", "pmd-weg", "um-weg", "ev-weg", "pst-weg", "vpi-weg", "bon-weg", "vk-raus"].includes(act)) S.loeschen = false;
+      "mv-weg", "mvbs-weg", "mvst-weg", "mvs-weg", "abr-frei-alle-zu", "rl-weg", "mh-weg", "rz-weg", "gw-weg", "gw-m-weg", "ih-weg", "schl-weg", "lf-weg", "zl-zust", "se-weg", "kau-weg", "kau-abrechnen", "pmd-weg", "um-weg", "ev-weg", "pst-weg", "vpi-weg", "bon-weg", "vk-raus", "ug-punkt-weg"].includes(act)) S.loeschen = false;
     switch (act) {
       case "tab": S.tab = b.dataset.tab; S.ansicht = "liste"; S.entwurf = null; S.hwEntwurf = null; S.pEntwurf = null; S.tEntwurf = null; S.tEntwurfTicket = null; S.ticketOffen = null;
         S.vermOffen = null; S.mailOffenId = null; S.mailImport = null; render(); break;
@@ -13241,6 +13572,38 @@ const Objekte = (() => {
         }
         S.pObjekte = {}; S.pEntwurf = null; render(); toast("Gespeichert"); break;
       }
+      /* ---------- Übergabeprotokoll ---------- */
+      case "ug-ok": { const o = S.entwurf; if (!o) return;
+        const u = uebergabeVon(o); const k = b.dataset.k;
+        const st = ugStand(u, k);
+        u.punkte[k] = { ...st, ok: !st.ok, am: !st.ok ? isoTag(new Date()) : "" };
+        await objektSichern(o); render(true); break; }
+      case "ug-e-ok": { const o = S.entwurf; if (!o) return;
+        const u = uebergabeVon(o); const x = u.eigene[Number(b.dataset.i)]; if (!x) return;
+        x.ok = !x.ok; await objektSichern(o); render(true); break; }
+      case "ug-alle": { const o = S.entwurf; if (!o) return;
+        const u = uebergabeVon(o); const liste = ugPunkte(o);
+        const alleAn = liste.every(x => ugStand(u, x[0]).ok) && u.eigene.every(x => x.ok);
+        liste.forEach(x => { u.punkte[x[0]] = { ...ugStand(u, x[0]), ok: !alleAn, am: alleAn ? "" : isoTag(new Date()) }; });
+        u.eigene.forEach(x => { x.ok = !alleAn; });
+        await objektSichern(o); render(true); break; }
+      case "ug-punkt-neu": { const o = S.entwurf; if (!o) return;
+        uebergabeVon(o).eigene.push({ was: "", anzahl: "", form: "", bem: "", ok: false });
+        await objektSichern(o); render(true); break; }
+      case "ug-punkt-weg": { const o = S.entwurf; if (!o) return; const i = Number(b.dataset.i);
+        if (S.loeschen !== "ug" + i) { S.loeschen = "ug" + i; render(true); return; }
+        uebergabeVon(o).eigene.splice(i, 1); S.loeschen = false;
+        await objektSichern(o); render(true); break; }
+      case "ug-abschluss": { const o = S.entwurf; if (!o) return;
+        const u = uebergabeVon(o);
+        if (u.abgeschlossen) { u.abgeschlossen = ""; await objektSichern(o); render(true); toast("Abschluss aufgehoben"); return; }
+        if (!u.stichtag) { toast("Bitte zuerst den Stichtag eintragen."); return; }
+        if (!String(u.an.firma || "").trim()) { toast("Bitte eintragen, an wen übergeben wird."); return; }
+        u.abgeschlossen = new Date().toISOString();
+        await objektSichern(o); render(true); toast("Übergabe abgeschlossen"); break; }
+      case "ug-drucken": { const o = S.entwurf; if (!o) return;
+        S.ugDruck = true; render(); break; }
+      case "ug-zurueck": { S.ugDruck = false; S.objTab = "uebergabe"; render(); break; }
       /* Eine Zustellung von Hand vermerken */
       case "zu-neu": {
         const pn = personVon(b.dataset.id); if (!pn) return;
@@ -13384,7 +13747,7 @@ const Objekte = (() => {
       case "oeffnen": { const o = S.liste.find(x => x.id === id); if (!o) return;
         S.entwurf = Objekte.betreuungSicherstellen(Objekte.listeSicherstellen(JSON.parse(JSON.stringify(o)))); S.entwurf.beirat = S.entwurf.beirat || []; S.bearbeiten = false; S.objTab = "stammdaten"; S.ueEinheit = null; S.eigNeuFuer = null; S.uOffen = null;
         S.entwurf.anlagen = S.entwurf.anlagen || []; S.tab = "objekte"; S.istNeu = false; S.ansicht = "formular";
-        S.sollOffen = ""; S.zaNeu = ""; S.bhFrei = ""; S.bhGrund = ""; S.umDruck = null; S.evNeu = null;
+        S.sollOffen = ""; S.zaNeu = ""; S.bhFrei = ""; S.bhGrund = ""; S.umDruck = null; S.evNeu = null; S.ugDruck = false;
         { const n = sollstellungenErzeugen(S.entwurf); if (n) { await objektSichern(S.entwurf);
             toast(n === 1 ? "Eine Sollstellung nachgetragen" : n + " Sollstellungen nachgetragen"); } }
         render(); break; }
