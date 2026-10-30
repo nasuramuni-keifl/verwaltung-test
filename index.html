@@ -157,36 +157,32 @@ main{padding:8px clamp(16px,4vw,40px) 64px}
 .m3-buehne{position:relative;height:clamp(380px,56vh,620px);border-radius:18px;overflow:hidden;cursor:grab;
   background:linear-gradient(180deg,var(--field) 0%,var(--surface) 70%);touch-action:none;user-select:none}
 .m3-buehne.zieht{cursor:grabbing}
-.m3-welt{position:absolute;left:50%;top:58%;width:0;height:0;transform-style:preserve-3d;transition:transform .25s ease-out}
+.m3-welt{position:absolute;left:50%;top:50%;width:0;height:0;transform-style:preserve-3d;transition:transform .25s ease-out;--m3s:1}
 .m3-welt.sofort{transition:none}
 .m3-box{position:absolute;left:0;top:0;width:0;height:0;transform-style:preserve-3d}
-.m3-f{position:absolute;left:0;top:0;border:1px solid rgba(15,23,42,.14);box-sizing:border-box;
-  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;
+.m3-f{position:absolute;left:0;top:0;box-sizing:border-box;backface-visibility:hidden;
+  display:flex;align-items:center;justify-content:center;font-size:calc(12px*var(--m3s));font-weight:600;color:#fff;
   text-shadow:0 1px 2px rgba(0,0,0,.35);overflow:hidden}
-.m3-fenster{position:absolute;border-radius:2px;background:linear-gradient(158deg,#e4f0f8 0%,#a8c7de 46%,#6f8fae 100%);
-  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.8),0 1px 2px rgba(15,23,42,.3)}
-.m3-fenster::after{content:"";position:absolute;inset:2px;
-  background:linear-gradient(to right,transparent calc(50% - 1px),rgba(255,255,255,.78) calc(50% - 1px),rgba(255,255,255,.78) calc(50% + 1px),transparent calc(50% + 1px)),
-             linear-gradient(to bottom,transparent calc(50% - 1px),rgba(255,255,255,.78) calc(50% - 1px),rgba(255,255,255,.78) calc(50% + 1px),transparent calc(50% + 1px))}
-.m3-bank{position:absolute;border-radius:1px;background:rgba(255,255,255,.72);box-shadow:0 1px 1px rgba(15,23,42,.22)}
-.m3-tuer{position:absolute;border-radius:3px 3px 0 0;background:linear-gradient(168deg,#7a5543 0%,#4e3527 100%);
-  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.3),0 1px 2px rgba(15,23,42,.3)}
-.m3-schild{position:absolute;left:4px;bottom:3px;font-size:8.5px;font-weight:700;letter-spacing:.02em;
-  color:#2b3440;background:rgba(255,255,255,.7);border-radius:5px;padding:0 4px;text-shadow:none;line-height:1.5}
-.m3-ziegel{background-image:repeating-linear-gradient(to right,rgba(0,0,0,.14) 0 1px,transparent 1px 13px),
-  repeating-linear-gradient(to bottom,rgba(0,0,0,.1) 0 1px,transparent 1px 9px)}
-.m3-rasen{background:linear-gradient(170deg,#8fbf7a 0%,#6fa45e 100%)}
-.m3-schatten{position:absolute;border-radius:50%;background:radial-gradient(ellipse at center,rgba(15,23,42,.3),transparent 70%);
-  filter:blur(5px)}
+.m3-kante{box-shadow:inset 0 0 0 1px rgba(15,23,42,.13)}
+.m3-boden-schatten{background:radial-gradient(ellipse at center,rgba(15,23,42,.34) 0%,rgba(15,23,42,.16) 48%,transparent 72%);
+  box-shadow:none;border:0;pointer-events:none}
+.m3-fenster{position:absolute;border-radius:calc(2px*var(--m3s));background:linear-gradient(158deg,#eef6fb 0%,#aecbe0 48%,#6c8dad 100%);
+  box-shadow:inset 0 0 0 calc(1.5px*var(--m3s)) rgba(255,255,255,.85),0 calc(1px*var(--m3s)) calc(2px*var(--m3s)) rgba(15,23,42,.28)}
+.m3-fenster::after{content:"";position:absolute;inset:calc(2px*var(--m3s));
+  background:linear-gradient(to right,transparent calc(50% - .5px*var(--m3s)),rgba(255,255,255,.8) calc(50% - .5px*var(--m3s)),rgba(255,255,255,.8) calc(50% + .5px*var(--m3s)),transparent calc(50% + .5px*var(--m3s))),
+             linear-gradient(to bottom,transparent calc(50% - .5px*var(--m3s)),rgba(255,255,255,.8) calc(50% - .5px*var(--m3s)),rgba(255,255,255,.8) calc(50% + .5px*var(--m3s)),transparent calc(50% + .5px*var(--m3s)))}
+.m3-bank{position:absolute;border-radius:1px;background:rgba(255,255,255,.8);box-shadow:0 calc(1px*var(--m3s)) calc(1px*var(--m3s)) rgba(15,23,42,.22)}
+.m3-tuer{position:absolute;border-radius:calc(3px*var(--m3s)) calc(3px*var(--m3s)) 0 0;background:linear-gradient(168deg,#86604c 0%,#4e3527 100%);
+  box-shadow:inset 0 0 0 calc(1.5px*var(--m3s)) rgba(255,255,255,.3),0 calc(1px*var(--m3s)) calc(2px*var(--m3s)) rgba(15,23,42,.3)}
+.m3-schild{position:absolute;left:calc(5px*var(--m3s));bottom:calc(4px*var(--m3s));font-size:calc(8.5px*var(--m3s));font-weight:700;letter-spacing:.02em;
+  color:#2b3440;background:rgba(255,255,255,.78);border-radius:calc(5px*var(--m3s));padding:0 calc(4px*var(--m3s));text-shadow:none;line-height:1.55}
+.m3-ziegel{background-image:repeating-linear-gradient(to right,rgba(0,0,0,.13) 0 1px,transparent 1px calc(13px*var(--m3s))),
+  repeating-linear-gradient(to bottom,rgba(0,0,0,.09) 0 1px,transparent 1px calc(9px*var(--m3s)))}
 .m3-klick{cursor:pointer}
-.m3-klick:hover .m3-f{filter:brightness(1.18)}
-.m3-an .m3-f{box-shadow:inset 0 0 0 3px var(--accent),0 0 16px rgba(79,70,229,.45);filter:brightness(1.12)}
+.m3-klick:hover .m3-f{box-shadow:inset 0 0 0 calc(2px*var(--m3s)) rgba(255,255,255,.92)}
+.m3-an .m3-f{box-shadow:inset 0 0 0 calc(3px*var(--m3s)) var(--accent)}
 .m3-an .m3-schild{background:var(--accent);color:#fff}
-.m3-blass{opacity:.14;pointer-events:none}
-.m3-etikett{position:absolute;left:0;top:0;transform-style:preserve-3d;white-space:nowrap;font-size:12px;
-  font-weight:700;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:999px;
-  padding:3px 10px;cursor:pointer}
-.m3-etikett:hover{border-color:var(--accent);color:var(--accent)}
+.m3-blass{opacity:.16;pointer-events:none}
 .m3-leiste{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:12px 0}
 .m3-leiste .pille{padding:6px 12px;font-size:13px}
 .m3-legende{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:13px;color:var(--muted)}
@@ -355,11 +351,12 @@ select:focus{outline:none;border-color:var(--accent)}
 .pt-aushang p{margin:0}
 .pt-datei{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;background:var(--field);border:none;border-radius:10px;padding:12px 14px;text-decoration:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
 .pt-datei:hover{background:var(--accent-soft)}
-.pt-nav{position:sticky;top:0;z-index:6;display:flex;gap:7px;overflow-x:auto;padding:10px 2px 12px;margin:0 0 16px;max-width:820px;
+.pt-nav{position:sticky;top:0;z-index:6;display:flex;flex-wrap:wrap;gap:7px;padding:10px 2px 12px;margin:0 0 16px;max-width:820px;
   background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(10px);scrollbar-width:none}
+@media (max-width:760px){.pt-nav{flex-wrap:nowrap;overflow-x:auto}}
 .pt-nav::-webkit-scrollbar{display:none}
 .pt-nav button{flex:none;display:flex;align-items:center;gap:7px;border:0;background:var(--surface);color:var(--ink);
-  border-radius:14px;padding:11px 17px;font:inherit;font-weight:600;font-size:15px;white-space:nowrap;box-shadow:inset 0 0 0 1.5px var(--line)}
+  border-radius:14px;padding:10px 15px;font:inherit;font-weight:600;font-size:14.5px;white-space:nowrap;box-shadow:inset 0 0 0 1.5px var(--line)}
 .pt-nav button.an{background:var(--accent);color:var(--accent-ink);box-shadow:none}
 .pt-nav .zahl{background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:1px 8px;font-size:12.5px;font-weight:700}
 .pt-nav button.an .zahl{background:color-mix(in srgb,var(--accent-ink) 26%,transparent);color:var(--accent-ink)}
@@ -369,15 +366,17 @@ select:focus{outline:none;border-color:var(--accent)}
 .pt-not a,.pt-not button{display:inline-flex;align-items:center;gap:7px;background:var(--surface);color:var(--ink);border:0;
   border-radius:12px;padding:8px 14px;text-decoration:none;font:inherit;font-weight:600;font-size:14px}
 .pt-not a b{color:var(--accent);font-variant-numeric:tabular-nums}
-.pt-tun{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:16px;max-width:820px}
+.pt-tun{display:grid;grid-template-columns:repeat(auto-fit,minmax(236px,1fr));gap:12px;margin-bottom:16px;max-width:820px}
 @media (max-width:620px){.pt-tun{grid-template-columns:1fr}}
-.pt-tun button{display:block;width:100%;height:100%;text-align:left;border:0;background:var(--surface);border-radius:18px;padding:18px 20px;font:inherit;
+.pt-tun button{display:block;width:100%;height:100%;text-align:left;border:0;background:var(--surface);border-radius:18px;padding:17px 19px;font:inherit;
   color:var(--ink);box-shadow:inset 0 0 0 2px transparent;transition:box-shadow .15s}
 .pt-tun button:hover{box-shadow:inset 0 0 0 2px var(--accent)}
-.pt-tun b{display:block;font-size:16.5px;margin-bottom:3px;letter-spacing:-.01em}
-.pt-tun span{display:block;color:var(--muted);font-size:14px;line-height:1.42}
+.pt-tun b{display:block;font-size:16px;margin-bottom:3px;letter-spacing:-.01em}
+.pt-tun b .zahl{display:inline-block;background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:1px 8px;font-size:12.5px;margin-left:6px;vertical-align:2px}
+.pt-tun span{display:block;color:var(--muted);font-size:13.8px;line-height:1.42}
 .pt-leer{color:var(--muted);font-size:14.5px;margin:0}
 .pt-mehr{margin-top:12px}
+.pt-wo{color:var(--muted);font-size:14.5px;padding:16px 2px 0;max-width:820px}
 .portal .hero{padding:18px 0 14px}
 .portal .hero h1{font-size:clamp(25px,3.6vw,33px)}
 .nf-kopf,.nf-zeile{display:grid;grid-template-columns:1fr 180px 1fr 32px;gap:10px;align-items:center}
@@ -1736,7 +1735,7 @@ const Objekte = (() => {
      Reihe von Kästen, jeder Kasten eine Einheit. Welche Einheit in welcher Etage liegt, errät
      das Programm aus der Lage („2. OG links“) und lässt sich von Hand korrigieren.
      Gezeichnet wird mit den 3D-Mitteln des Browsers – ohne Zusatzprogramm und ohne Internet. */
-  const M3_BREITE = 118, M3_HOEHE = 54, M3_TIEFE = 92, M3_LUECKE = 2;
+  const M3_BREITE = 118, M3_HOEHE = 54, M3_TIEFE = 112, M3_LUECKE = 2;
   const M3_FARBEN = {
     frei:   { f: "#e8833a", t: "frei / in Vermarktung" },
     miet:   { f: "#3f8f5f", t: "vermietet" },
@@ -1816,29 +1815,39 @@ const Objekte = (() => {
     if (istWeg(o) || e.eigentuemerId) return M3_FARBEN.selbst.f;
     return M3_FARBEN.leer.f;
   }
+  /* Licht als fertige Farbe statt als Filter: ein Filter zwingt den Browser, die Fläche
+     erst als Bild zu rendern und dann zu kippen – genau das macht die Kanten grisselig. */
+  function m3Ton(farbe, hell) {
+    if (hell > 1.001) return "color-mix(in srgb, " + farbe + " " + cent(100 / hell) + "%, #ffffff)";
+    if (hell < 0.999) return "color-mix(in srgb, " + farbe + " " + cent(hell * 100) + "%, #0b1220)";
+    return farbe;
+  }
   /* Einen Quader aus sechs Flächen bauen. Jede Seite bekommt ihr eigenes Licht –
      vorne hell, hinten dunkel – sonst sieht der Kasten flach aus. */
   function m3Quader(x, y, z, w, hh, d, farbe, text, extra) {
     const o = extra || {};
-    const f = (fw, fh, tr, hell, inhalt, klasse) => "<div class='m3-f" + (klasse ? " " + klasse : "") +
-      "' style='width:" + fw + "px;height:" + fh + "px;margin-left:" + (-fw / 2) + "px;margin-top:" + (-fh / 2) +
-      "px;background:" + farbe + ";filter:brightness(" + hell + ");transform:" + tr + "'>" + (inhalt || "") + "</div>";
+    const r = Math.round;
+    const f = (fw, fh, tr, hell, inhalt, klasse) => "<div class='m3-f m3-kante" + (klasse ? " " + klasse : "") +
+      "' style='width:" + r(fw) + "px;height:" + r(fh) + "px;margin-left:" + r(-fw / 2) + "px;margin-top:" + r(-fh / 2) +
+      "px;background:" + m3Ton(farbe, hell) + ";transform:" + tr + "'>" + (inhalt || "") + "</div>";
     return "<div class='m3-box" + (o.klasse ? " " + o.klasse : "") + "'" + (o.attr ? " " + o.attr : "") +
-      " style='transform:translate3d(" + x + "px," + y + "px," + z + "px)'>" +
-      f(w, hh, "translateZ(" + (d / 2) + "px)", 1.03, o.vorn !== undefined ? o.vorn :
+      " style='transform:translate3d(" + r(x) + "px," + r(y) + "px," + r(z) + "px)'>" +
+      f(w, hh, "translateZ(" + r(d / 2) + "px)", 1.04, o.vorn !== undefined ? o.vorn :
         (text ? "<span class='m3-schild'>" + esc(text) + "</span>" : ""), o.ziegel) +
-      f(w, hh, "rotateY(180deg) translateZ(" + (d / 2) + "px)", 0.72, "", o.ziegel) +
-      f(d, hh, "rotateY(-90deg) translateZ(" + (w / 2) + "px)", 0.84, "", o.ziegel) +
-      f(d, hh, "rotateY(90deg) translateZ(" + (w / 2) + "px)", 0.92, "", o.ziegel) +
-      f(w, d, "rotateX(90deg) translateZ(" + (hh / 2) + "px)", 1.16, "", o.ziegel) +
-      f(w, d, "rotateX(-90deg) translateZ(" + (hh / 2) + "px)", 0.66) + "</div>";
+      f(w, hh, "rotateY(180deg) translateZ(" + r(d / 2) + "px)", 0.74, o.hinten || "", o.ziegel) +
+      f(d, hh, "rotateY(-90deg) translateZ(" + r(w / 2) + "px)", 0.85, o.links || "", o.ziegel) +
+      f(d, hh, "rotateY(90deg) translateZ(" + r(w / 2) + "px)", 0.93, o.rechts || "", o.ziegel) +
+      f(w, d, "rotateX(90deg) translateZ(" + r(hh / 2) + "px)", 1.18, "", o.ziegel) +
+      f(w, d, "rotateX(-90deg) translateZ(" + r(hh / 2) + "px)", 0.68) + "</div>";
   }
   /* Fenster, Fensterbank und bei Bedarf eine Haustür auf die Vorderseite setzen. */
-  function m3Fassade(w, hh, text, tuer) {
-    const anzahl = w < 85 ? 1 : w < 170 ? 2 : 3;
-    const fb = Math.min(30, Math.round(w / (anzahl * 2.1)));
-    const fh = Math.max(16, Math.round(hh * 0.44));
+  function m3Fassade(w, hh, text, tuer, sk) {
+    const s = sk || 1;
+    const anzahl = w < 85 * s ? 1 : w < 170 * s ? 2 : 3;
+    const fb = Math.min(Math.round(30 * s), Math.round(w / (anzahl * 2.1)));
+    const fh = Math.max(Math.round(16 * s), Math.round(hh * 0.44));
     const oben = Math.round(hh * 0.22);
+    const bk = Math.max(2, Math.round(2 * s));
     let h = "";
     for (let i = 0; i < anzahl; i++) {
       const links = Math.round((w / (anzahl + 1)) * (i + 1) - fb / 2);
@@ -1848,14 +1857,16 @@ const Objekte = (() => {
         continue;
       }
       h += "<div class='m3-fenster' style='left:" + links + "px;top:" + oben + "px;width:" + fb + "px;height:" + fh + "px'></div>" +
-        "<div class='m3-bank' style='left:" + (links - 2) + "px;top:" + (oben + fh) + "px;width:" + (fb + 4) + "px;height:2px'></div>";
+        "<div class='m3-bank' style='left:" + (links - bk) + "px;top:" + (oben + fh) + "px;width:" + (fb + 2 * bk) +
+        "px;height:" + bk + "px'></div>";
     }
     return h + (text ? "<span class='m3-schild'>" + esc(text) + "</span>" : "");
   }
   /* Aus der Statusfarbe einen Putzton machen – das Haus soll nicht knallbunt sein. */
   const m3Putz = farbe => "color-mix(in srgb, " + farbe + " 34%, #f0e8da)";
   const m3Stand = () => { if (!S.m3 || typeof S.m3 !== "object") S.m3 = { drehen: 32, neigen: 16, zoom: 1,
-    etage: null, einheit: "", auf: false, farbe: "status", bearbeiten: false }; return S.m3; };
+    etage: null, einheit: "", auf: false, farbe: "status", bearbeiten: false, vorschau: 1, gezeichnet: 1 };
+    return S.m3; };
   /* Das Modell selbst. */
   function modellHtml(o) {
     const m = m3Stand();
@@ -1867,62 +1878,92 @@ const Objekte = (() => {
       "<p class='unter'>Für dieses Objekt sind noch keine Einheiten angelegt. Sobald Wohnungen erfasst sind, " +
       "baut das Programm daraus das Modell.</p></section>";
     const spalt = m.auf ? 46 : 0;
-    /* Damit immer das ganze Haus zu sehen ist, wird es passend verkleinert. */
-    m.fit = 1;
     /* Jede Etage ist gleich breit – die Wohnungen teilen sich die Breite. So entsteht ein
        sauberes Haus statt einer Treppe, auch wenn oben weniger Wohnungen liegen. */
-    const gesamtBreite = Math.max(2, bau.breiteste) * M3_BREITE;
-    const hoehe = bau.etagen.length * (M3_HOEHE + spalt);
-    m.fit = Math.min(1, 430 / (hoehe + 130), 1000 / (gesamtBreite + 180));
-    const dachBasis = -hoehe - ((md.stil || "haus") === "haus" ? 12 : 0);
+    const rohBreite = Math.max(2, bau.breiteste) * M3_BREITE;
+    const rohHoehe = bau.etagen.length * (M3_HOEHE + spalt);
+    /* Damit immer das ganze Haus zu sehen ist, wird es passend verkleinert. */
+    m.fit = Math.min(1, 430 / (rohHoehe + 130), 1000 / (rohBreite + 180));
+    /* Gezeichnet wird gleich in der Größe, in der man es sieht. Würde das Haus
+       stattdessen nachträglich vergrößert, käme es verpixelt heraus. */
+    const sk = Math.max(0.2, cent(m.fit * (m.zoom || 1)));
+    m.gezeichnet = m.zoom || 1;
+    m.vorschau = 1;
+    const q = v => Math.round(v * sk);
+    const gesamtBreite = q(rohBreite), hoehe = q(rohHoehe);
+    const tiefe = q(M3_TIEFE), etHoehe = q(M3_HOEHE), luecke = Math.max(1, q(M3_LUECKE)), spaltQ = q(spalt);
     const haus = (md.stil || "haus") === "haus";
-    let welt = "";
-    /* Grundstück mit Schatten */
-    welt += m3Quader(0, 5, 0, gesamtBreite + 104, 8, M3_TIEFE + 104, haus ? "#7fae6b" : "#cbd3de", "", {});
-    /* Sockel unter dem Haus */
-    if (haus) welt += m3Quader(0, -5, 0, gesamtBreite + 14, 14, M3_TIEFE + 14, "#9a9387", "", {});
+    const fuss = haus ? q(12) : 0;
+    const dachBasis = -hoehe - fuss;
+    let welt = "", boden = "";
+    /* Grundstück. Die Oberkante liegt genau dort, wo Sockel und Haus aufsetzen –
+       überlappende Körper würden sich je nach Blickwinkel gegenseitig durchstechen.
+       Der Boden liegt in einer eigenen Ebene hinter dem Haus. Sonst entscheidet der
+       Browser beim Kippen falsch, was vorne liegt, und die Wiese deckt das Haus zu. */
+    const bodenOben = q(1), bodenDicke = q(8);
+    /* Gedreht wird um die Mitte des Hauses. Läge der Drehpunkt am Boden, würde das
+       Haus beim Kippen nach hinten umfallen statt sich zu drehen. */
+    const dachHoehe = (md.dach || "sattel") === "sattel" ? q(66) : q(14);
+    const yOff = -Math.round(((dachBasis - dachHoehe) + bodenOben + bodenDicke) / 2);
+    const gb = gesamtBreite + q(104), gt = tiefe + q(104);
+    boden += m3Quader(0, yOff + bodenOben + bodenDicke / 2, 0, gb, bodenDicke, gt, haus ? "#7fae6b" : "#cbd3de", "", {});
+    /* Weicher Schlagschatten auf der Wiese, damit das Haus nicht schwebt. */
+    boden += "<div class='m3-box' style='transform:translate3d(0," + Math.round(yOff + bodenOben - q(1)) + "px,0)'>" +
+      "<div class='m3-f m3-boden-schatten' style='width:" + Math.round(gesamtBreite + q(70)) + "px;height:" +
+      Math.round(tiefe + q(70)) + "px;margin-left:" + Math.round(-(gesamtBreite + q(70)) / 2) + "px;margin-top:" +
+      Math.round(-(tiefe + q(70)) / 2) + "px;transform:rotateX(90deg)'></div></div>";
+    /* Sockel unter dem Haus: steht auf dem Boden, trägt das Erdgeschoss. */
+    if (haus) boden += m3Quader(0, yOff + bodenOben - fuss / 2 - q(1) / 2, 0, gesamtBreite + q(14), fuss + q(1), tiefe + q(14), "#9a9387", "", {});
     /* Etagen und Einheiten */
     bau.etagen.forEach((et, idx) => {
       const n = et.teile.length;
-      const bw = gesamtBreite / n;
-      const y = -(M3_HOEHE / 2) - idx * (M3_HOEHE + spalt) - (haus ? 12 : 0);
+      const bw = Math.round(gesamtBreite / n);
+      const y = yOff - (etHoehe / 2) - idx * (etHoehe + spaltQ) - fuss;
       const blass = m.etage !== null && m.etage !== et.nr;
-      const unten = idx === 0 || (et.nr === 0 && !bau.etagen.some(z2 => z2.nr === 0 && z2 !== et));
       et.teile.forEach((x, j) => {
-        const bx = (j - (n - 1) / 2) * bw;
+        const bx = Math.round((j - (n - 1) / 2) * bw);
         const roh = m3Farbe(o, x.e, m.farbe, rueck);
         const farbe = haus ? m3Putz(roh) : roh;
         const an = m.einheit === x.e.id;
-        const bb = bw - M3_LUECKE, bh = M3_HOEHE - 2;
+        const bb = bw - luecke, bh = etHoehe - Math.max(1, q(2));
         const schild = x.e.nr || x.e.art || "";
-        welt += m3Quader(bx, y, 0, bb, bh, M3_TIEFE, farbe, schild,
+        /* Fenster auch hinten und an den Seiten – sonst wirkt das Haus von schräg hinten wie ein Klotz. */
+        const seite = haus ? m3Fassade(tiefe, bh, "", false, sk) : "";
+        welt += m3Quader(bx, y, 0, bb, bh, tiefe, farbe, schild,
           { klasse: "m3-klick" + (blass ? " m3-blass" : "") + (an ? " m3-an" : ""),
-            vorn: haus ? m3Fassade(bb, bh, schild, et.nr === 0 && j === 0) : undefined,
+            vorn: haus ? m3Fassade(bb, bh, schild, et.nr === 0 && j === 0, sk) : undefined,
+            hinten: haus ? m3Fassade(bb, bh, "", false, sk) : "",
+            links: j === 0 ? seite : "", rechts: j === n - 1 ? seite : "",
             attr: "data-act='m3-einheit' data-e='" + esc(x.e.id) + "' title='" +
               esc([x.e.nr || x.e.art, x.e.lage, x.e.flaeche ? x.e.flaeche + " m²" : ""].filter(Boolean).join(" · ")) + "'" });
       });
     });
-    /* Dach */
+    /* Dach – wieder eine eigene Ebene. Es liegt immer über dem Haus; ohne eigene Ebene
+       entscheidet der Browser beim Kippen falsch und das Dach verschwindet hinter der
+       obersten Decke. */
+    let dach = "";
     if ((md.dach || "sattel") === "sattel") {
-      const rh = 66, halb = M3_TIEFE / 2;
-      const ht = (M3_TIEFE + 16) / 2;
+      const rh = q(66);
+      const db = gesamtBreite + q(16), dt = tiefe + q(16);
+      const ht = dt / 2;
       const win = Math.round(Math.atan2(rh, ht) * 180 / Math.PI);
       const lang = Math.round(Math.sqrt(ht * ht + rh * rh));
-      const yc = dachBasis - rh / 2;
+      const yc = Math.round(yOff + dachBasis - rh / 2);
       /* Vorne heller, hinten dunkler – dadurch liest sich das Dach räumlich. */
-      const dachF = (tr, w2, h2, hell, clip, ziegel) => "<div class='m3-f" + (ziegel ? " m3-ziegel" : "") +
-        "' style='width:" + w2 + "px;height:" + h2 + "px;margin-left:" +
-        (-w2 / 2) + "px;margin-top:" + (-h2 / 2) + "px;background:#9c5f49;filter:brightness(" + hell + ");transform:" + tr + ";" +
-        (clip ? "clip-path:polygon(0 100%,50% 0,100% 100%);border:0;" : "") + "'></div>";
-      const db = gesamtBreite + 16, dt = M3_TIEFE + 16;
-      welt += "<div class='m3-box' style='transform:translate3d(0," + yc + "px,0)'>" +
-        dachF("translateZ(" + (dt / 4) + "px) rotateX(" + (90 - win) + "deg)", db, lang, 1.12, false, haus) +
-        dachF("translateZ(" + (-dt / 4) + "px) rotateX(" + (90 + win) + "deg)", db, lang, 0.74, false, haus) +
-        dachF("rotateY(-90deg) translateZ(" + (db / 2) + "px)", dt, rh, 0.9, true) +
-        dachF("rotateY(90deg) translateZ(" + (db / 2) + "px)", dt, rh, 0.9, true) +
+      const dachF = (tr, w2, h2, hell, clip, ziegel) => "<div class='m3-f" + (clip ? "" : " m3-kante") +
+        (ziegel ? " m3-ziegel" : "") + "' style='width:" + Math.round(w2) + "px;height:" + Math.round(h2) +
+        "px;margin-left:" + Math.round(-w2 / 2) + "px;margin-top:" + Math.round(-h2 / 2) +
+        "px;background:" + m3Ton("#9c5f49", hell) + ";transform:" + tr + ";" +
+        (clip ? "clip-path:polygon(0 100%,50% 0,100% 100%);" : "") + "'></div>";
+      dach += "<div class='m3-box' style='transform:translate3d(0," + yc + "px,0)'>" +
+        dachF("translateZ(" + Math.round(dt / 4) + "px) rotateX(" + (90 - win) + "deg)", db, lang, 1.12, false, haus) +
+        dachF("translateZ(" + Math.round(-dt / 4) + "px) rotateX(" + (90 + win) + "deg)", db, lang, 0.74, false, haus) +
+        dachF("rotateY(-90deg) translateZ(" + Math.round(db / 2) + "px)", dt, rh, 0.9, true) +
+        dachF("rotateY(90deg) translateZ(" + Math.round(db / 2) + "px)", dt, rh, 0.9, true) +
         "</div>";
     } else {
-      welt += m3Quader(0, dachBasis - 7, 0, gesamtBreite + 16, 14, M3_TIEFE + 16, haus ? "#6d7380" : "#8d5a4a", "", {});
+      dach += m3Quader(0, yOff + dachBasis - q(7), 0, gesamtBreite + q(16), q(14), tiefe + q(16),
+        haus ? "#6d7380" : "#8d5a4a", "", {});
     }
     /* Bedienung */
     const pille = (act, wert, text, an) => "<button type='button' class='pille" + (an ? " an" : "") +
@@ -1950,10 +1991,12 @@ const Objekte = (() => {
       pille("m3-farbe", "art", "Art", m.farbe === "art") +
       pille("m3-farbe", "flaeche", "Fläche", m.farbe === "flaeche") +
       "</div>";
+    /* Minus, damit ein größerer Wert heißt: weiter von oben draufschauen. */
+    const dreh = "rotateX(" + (-m.neigen) + "deg) rotateY(" + m.drehen + "deg)";
+    const ebene = (id, inhalt) => "<div class='m3-welt sofort' data-m3welt='1'" + (id ? " id='" + id + "'" : "") +
+      " style='--m3s:" + sk + ";transform:" + dreh + "'>" + inhalt + "</div>";
     h += "<div class='m3-buehne' id='m3-buehne' style='perspective:1500px'>" +
-      "<div class='m3-welt' id='m3-welt' style='transform:rotateX(" + m.neigen + "deg) rotateY(" + m.drehen +
-      "deg) scale(" + cent(m.zoom * m.fit) + ")'><div class='m3-box' style='transform:translate3d(0," +
-      Math.round(hoehe / 2 + 20) + "px,0)'>" + welt + "</div></div>" +
+      ebene("", boden) + ebene("m3-welt", welt) + ebene("", dach) +
       "<div class='m3-hinweis'>Ziehen zum Drehen · Mausrad zum Zoomen</div></div>";
     if (m.farbe === "status") h += "<div class='m3-legende'>" + Object.keys(M3_FARBEN).map(k =>
       "<span><i class='m3-punkt' style='background:" + M3_FARBEN[k].f + "'></i>" + esc(M3_FARBEN[k].t) + "</span>").join("") + "</div>";
@@ -1995,11 +2038,22 @@ const Objekte = (() => {
   /* Die Drehung wird direkt am Element gesetzt – ein Neuzeichnen bei jeder Mausbewegung
      wäre zu langsam und würde die Auswahl stören. */
   function m3Anwenden(sofort) {
-    const el = document.getElementById("m3-welt"); if (!el) return;
+    const ebenen = document.querySelectorAll("[data-m3welt]"); if (!ebenen.length) return;
     const m = m3Stand();
-    el.classList.toggle("sofort", !!sofort);
-    el.style.transform = "rotateX(" + m.neigen + "deg) rotateY(" + m.drehen + "deg) scale(" +
-      cent(m.zoom * (m.fit || 1)) + ")";
+    const v = cent(m.vorschau || 1);
+    const tr = "rotateX(" + (-m.neigen) + "deg) rotateY(" + m.drehen + "deg)" + (v !== 1 ? " scale(" + v + ")" : "");
+    ebenen.forEach(el => { el.classList.toggle("sofort", !!sofort); el.style.transform = tr; });
+  }
+  /* Beim Zoomen wird zuerst nur gestreckt, damit es sofort reagiert – gleich danach
+     zeichnet das Programm das Haus in der neuen Größe sauber neu. */
+  let m3ZoomUhr = null;
+  function m3Zoomen(neu) {
+    const m = m3Stand();
+    m.zoom = Math.max(0.35, Math.min(2.4, neu));
+    m.vorschau = m.zoom / (m.gezeichnet || 1);
+    m3Anwenden(true);
+    clearTimeout(m3ZoomUhr);
+    m3ZoomUhr = setTimeout(() => { m.vorschau = 1; render(true); }, 180);
   }
   (() => {
     let zieht = null;
@@ -2015,7 +2069,7 @@ const Objekte = (() => {
       zieht.bewegt = Math.max(zieht.bewegt, Math.abs(dx) + Math.abs(dy));
       const m = m3Stand();
       m.drehen = zieht.d + dx * 0.45;
-      m.neigen = Math.max(-12, Math.min(72, zieht.n + dy * 0.3));
+      m.neigen = Math.max(-12, Math.min(58, zieht.n + dy * 0.3));
       m3Anwenden(true);
     });
     document.addEventListener("pointerup", e => {
@@ -2030,8 +2084,7 @@ const Objekte = (() => {
       const b = e.target.closest("#m3-buehne"); if (!b) return;
       e.preventDefault();
       const m = m3Stand();
-      m.zoom = Math.max(0.35, Math.min(2.4, m.zoom * (e.deltaY < 0 ? 1.08 : 1 / 1.08)));
-      m3Anwenden(true);
+      m3Zoomen(m.zoom * (e.deltaY < 0 ? 1.08 : 1 / 1.08));
     }, { passive: false });
   })();
   /* ================= Sanierungsfahrplan =================
@@ -6983,10 +7036,11 @@ const Objekte = (() => {
   function portalMeldungHtml(p, vorschau) {
     const o = portalObjekt(p);
     const gesperrt = vorschau ? " disabled" : "";
-    const meine = S.tickets.filter(t => t.melderWert === "p:" + p.id)
+    const meine = S.tickets.filter(t => t.melderWert === "p:" + p.id && t.kategorie !== "unterlagen")
       .sort((a, b) => String(b.erstellt || "").localeCompare(String(a.erstellt || ""))).slice(0, 8);
     let h = "<section class='gruppe'><h2>Schaden oder Mangel melden</h2>" +
-      "<p class='unter'>Ihre Meldung geht sofort an die Verwaltung. Bei Gefahr für Menschen rufen Sie bitte zuerst 112 oder die Notfallnummern oben an.</p>";
+      "<p class='unter'>Ihre Meldung geht sofort an die Verwaltung. Bei Gefahr für Menschen rufen Sie bitte zuerst 112 an – " +
+      "die Nummern fürs Haus stehen unter „Notfallnummern“.</p>";
     if (!o) return h + "<p class='unter'>Sie sind noch keinem Objekt zugeordnet. Bitte wenden Sie sich an die Verwaltung.</p></section>";
     if (S.ptmNr) h += "<ul class='meldungen'><li class='m-ok'>Ihre Meldung ist eingegangen – Vorgangsnummer <strong>" + esc(S.ptmNr) +
       "</strong>. Wir kümmern uns ab dem nächsten Werktag darum und melden uns bei Ihnen.</li></ul>";
@@ -7134,37 +7188,17 @@ const Objekte = (() => {
       const x = sanVon(o); return !!(x.frei && x.schritte.length); })();
     const vorgaenge = S.tickets.filter(t => t.melderWert === "p:" + p.id)
       .slice().sort((a, b) => String(b.erstellt || "").localeCompare(String(a.erstellt || "")));
-    const offen = vorgaenge.filter(t => Objekte.ticketStatus(t) !== "erledigt");
-
-    /* Eine Leiste statt einer langen Seite: jeder Bereich für sich, mit Zahl dahinter. */
-    const reiter = [["start", "Start", 0], ["post", "Post", dateien.length + abr.length],
-      ["melden", "Melden", offen.length], ["haus", "Mein Haus", au.length]];
-    if (beirat) reiter.push(["pruefung", "Rechnungsprüfung", 0]);
-    reiter.push(["ich", "Meine Daten", 0]);
-    const tab = reiter.some(r => r[0] === S.ptTab) ? S.ptTab : "start";
+    const meldungen = vorgaenge.filter(t => t.kategorie !== "unterlagen");
+    const nachweise = vorgaenge.filter(t => t.kategorie === "unterlagen");
+    const offen = meldungen.filter(t => Objekte.ticketStatus(t) !== "erledigt");
     const objZeile = esc(o ? objName(o) : "Ihr Objekt") + (p.einheit ? " · " + esc(p.einheit) : "");
-    const KOEPFE = {
-      start: ["Willkommen, " + Objekte.personName(p), ""],
-      post: ["Ihre Post", "Alles, was wir für Sie bereitgestellt haben: Schreiben und Abrechnungen."],
-      melden: ["Melden und einreichen", "Einen Schaden melden oder einen Nachweis an uns schicken."],
-      haus: ["Mein Haus", ""],
-      pruefung: ["Rechnungsprüfung", "Ihre Aufgabe als Verwaltungsbeirat."],
-      ich: ["Meine Daten", "Ihre Kontaktdaten und Ihr Zugang."]
-    };
 
+    const zahlSpan = n => n ? " <span class='fuer'>" + n + "</span>" : "";
     const notKurz = "<div class='pt-not'><strong>Im Notfall</strong>" +
       "<a href='tel:112'>Feuer, Unfall <b>112</b></a><a href='tel:110'>Polizei <b>110</b></a>" +
-      (nf.length ? "<button type='button' data-act='pt-tab' data-wert='haus'>" + nf.length +
+      (nf.length ? "<button type='button' data-act='pt-tab' data-wert='notfall'>" + nf.length +
         (nf.length === 1 ? " Nummer fürs Haus" : " Nummern fürs Haus") + " ›</button>"
         : "<em>Weitere Nummern fürs Haus sind noch nicht hinterlegt.</em>") + "</div>";
-    const notVoll = "<section class='gruppe'><h2>Im Notfall</h2>" +
-      "<p class='unter'>Bei Gefahr für Leib und Leben immer zuerst 112 oder 110. Für alles andere gelten diese Nummern.</p>" +
-      (nf.length ? "<div class='pt-nf'>" +
-        nf.map(x => "<a class='pt-nf-karte' href='tel:" + esc(tel(x.nummer)) + "'>" +
-          "<strong>" + esc(x.was || "Notruf") + "</strong><span class='pt-nr'>" + esc(x.nummer) + "</span>" +
-          (x.hinweis ? "<span class='fuer'>" + esc(x.hinweis) + "</span>" : "") + "</a>").join("") + "</div>"
-        : "<p class='pt-leer'>Für dieses Objekt sind noch keine Nummern hinterlegt. Bitte wenden Sie sich an die Verwaltung.</p>") + "</section>";
-
     const aushangKarte = x => "<article class='pt-aushang'><h3>" + esc(x.titel || "Mitteilung") + "</h3>" +
       "<p class='fuer'>" + esc(Objekte.datum(String(x.erstellt || "").slice(0, 10))) + "</p>" +
       "<p>" + esc(x.text || "").replace(/\n/g, "<br>") + "</p></article>";
@@ -7178,62 +7212,73 @@ const Objekte = (() => {
     const mehr = (wohin, text) => "<div class='pt-mehr'><button class='btn klein' type='button' data-act='pt-tab' data-wert='" +
       wohin + "'>" + esc(text) + " ›</button></div>";
 
+    /* Ein Thema = ein Reiter = eine Kachel auf der Startseite. Nur was es gibt, wird gezeigt. */
+    const bereiche = [];
+    const B = (id, name, kurz, n, inhalt) => bereiche.push({ id, name, kurz, zahl: n, inhalt });
+    B("schriftverkehr", "Schriftverkehr", "Briefe und Mitteilungen, die wir Ihnen zugestellt haben.", dateien.length, () =>
+      "<section class='gruppe'><h2>Schriftverkehr" + zahlSpan(dateien.length) + "</h2>" +
+      "<p class='unter'>Alles, was wir für Sie freigegeben haben. Zum Aufheben einfach herunterladen.</p>" +
+      (dateien.length ? "<div class='abl-liste'>" + dateien.map(dateiZeile).join("") + "</div>"
+        : "<p class='pt-leer'>Hier erscheinen Schreiben, sobald wir welche für Sie freigeben.</p>") + "</section>");
+    B("abrechnungen", "Abrechnungen", "Ihre Abrechnungen ansehen, drucken oder als PDF speichern.", abr.length,
+      () => portalAbrechnungHtml(p));
+    B("melden", "Schaden melden", "Heizung kalt, Wasser läuft, etwas ist kaputt – in zwei Minuten gemeldet.", offen.length,
+      () => portalMeldungHtml(p, vorschau));
+    B("unterlagen", "Unterlagen", "Nachweise an uns schicken: Versicherung, Wartung, Schornsteinfeger.", nachweise.length,
+      () => portalUnterlagenHtml(p, vorschau));
+    B("aushaenge", "Aushänge", "Mitteilungen, die auch im Treppenhaus hängen.", au.length, () =>
+      "<section class='gruppe'><h2>Aushänge" + zahlSpan(au.length) + "</h2>" +
+      "<p class='unter'>Mitteilungen der Verwaltung, die auch im Treppenhaus hängen – neueste zuerst.</p>" +
+      (au.length ? au.map(aushangKarte).join("") : "<p class='pt-leer'>Zurzeit gibt es keine Mitteilungen.</p>") + "</section>");
+    B("notfall", "Notfallnummern", "Wen Sie außerhalb unserer Bürozeiten erreichen.", nf.length, () =>
+      "<section class='gruppe'><h2>Im Notfall</h2>" +
+      "<p class='unter'>Bei Gefahr für Leib und Leben immer zuerst 112 oder 110. Für alles andere gelten diese Nummern.</p>" +
+      (nf.length ? "<div class='pt-nf'>" +
+        nf.map(x => "<a class='pt-nf-karte' href='tel:" + esc(tel(x.nummer)) + "'>" +
+          "<strong>" + esc(x.was || "Notruf") + "</strong><span class='pt-nr'>" + esc(x.nummer) + "</span>" +
+          (x.hinweis ? "<span class='fuer'>" + esc(x.hinweis) + "</span>" : "") + "</a>").join("") + "</div>"
+        : "<p class='pt-leer'>Für dieses Objekt sind noch keine Nummern hinterlegt. Bitte wenden Sie sich an die Verwaltung.</p>") +
+      "</section>");
+    if (sanFrei) B("sanierung", "Sanierungsfahrplan", "Welche Arbeiten wann anstehen, was sie kosten und was sie sparen.", 0,
+      () => portalSanierungHtml(p, o));
+    if (beirat) B("pruefung", "Rechnungsprüfung", "Ihre Aufgabe als Verwaltungsbeirat: Belege prüfen und nachfragen.", beirat,
+      () => portalBeiratHtml(p, vorschau));
+    B("verwaltung", "Ihre Verwaltung", "Telefon, E-Mail und Anschrift – für alles, was nicht eilt.", 0, () =>
+      portalVerwaltungHtml() || "<section class='gruppe'><h2>Ihre Verwaltung</h2>" +
+      "<p class='pt-leer'>Die Kontaktdaten sind noch nicht hinterlegt.</p></section>");
+    B("ich", "Meine Daten", "Telefon, E-Mail, Anschrift und Kennwort ändern.", 0, null);
+
+    const tab = bereiche.some(x => x.id === S.ptTab) ? S.ptTab : "start";
+    const akt = bereiche.find(x => x.id === tab);
+
     let h = vorschau
       ? "<div class='vorschau-band'><div><strong>Ansicht von " + esc(Objekte.personName(p)) + "</strong>" +
         "<small>So sieht diese Person ihr Portal. Hier lässt sich nichts ändern.</small></div>" +
         "<button class='btn klein' data-act='pt-vorschau-zurueck'>Zurück zur Verwaltung</button></div>" : "";
-    h += "<div class='seite portal'><div class='hero'><h1>" + esc(KOEPFE[tab][0]) + "</h1>" +
-      "<p>" + (tab === "start" || tab === "haus" ? objZeile : esc(KOEPFE[tab][1])) + "</p></div>";
-    h += "<nav class='pt-nav' aria-label='Bereiche'>" + reiter.map(([w, l, n]) =>
-      "<button type='button' class='" + (w === tab ? "an" : "") + "' data-act='pt-tab' data-wert='" + w + "'" +
-      (w === tab ? " aria-current='page'" : "") + ">" + esc(l) +
-      (n ? "<span class='zahl'>" + n + "</span>" : "") + "</button>").join("") + "</nav>";
+    h += "<div class='seite portal'>" + (akt
+      ? "<div class='pt-wo'>" + objZeile + "</div>"
+      : "<div class='hero'><h1>Willkommen, " + esc(Objekte.personName(p)) + "</h1><p>" + objZeile + "</p></div>");
+    h += "<nav class='pt-nav' aria-label='Bereiche'>" +
+      [{ id: "start", name: "Start", zahl: 0 }].concat(bereiche).map(x =>
+        "<button type='button' class='" + (x.id === tab ? "an" : "") + "' data-act='pt-tab' data-wert='" + x.id + "'" +
+        (x.id === tab ? " aria-current='page'" : "") + ">" + esc(x.name) +
+        (x.zahl ? "<span class='zahl'>" + x.zahl + "</span>" : "") + "</button>").join("") + "</nav>";
 
     if (tab === "start") {
       h += notKurz;
-      h += "<div class='pt-tun'>" +
-        "<button type='button' data-act='pt-tab' data-wert='melden'><b>Schaden melden</b>" +
-        "<span>Heizung kalt, Wasser läuft, etwas ist kaputt – in zwei Minuten gemeldet.</span></button>" +
-        "<button type='button' data-act='pt-tab' data-wert='post'><b>Meine Post</b><span>" +
-        (dateien.length + abr.length ? "Schreiben und Abrechnungen – zurzeit " + (dateien.length + abr.length) +
-          (dateien.length + abr.length === 1 ? " Eintrag." : " Einträge.")
-          : "Hier liegen künftig Ihre Schreiben und Abrechnungen.") + "</span></button>" +
-        "<button type='button' data-act='pt-tab' data-wert='haus'><b>Mein Haus</b><span>Notfallnummern, Aushänge" +
-        (sanFrei ? " und der Sanierungsfahrplan" : "") + ".</span></button>" +
-        "<button type='button' data-act='pt-tab' data-wert='ich'><b>Meine Daten</b>" +
-        "<span>Telefon, E-Mail, Anschrift und Kennwort ändern.</span></button>" + "</div>";
+      h += "<div class='pt-tun'>" + bereiche.map(x =>
+        "<button type='button' data-act='pt-tab' data-wert='" + x.id + "'><b>" + esc(x.name) +
+        (x.zahl ? "<span class='zahl'>" + x.zahl + "</span>" : "") + "</b><span>" + esc(x.kurz) + "</span></button>").join("") + "</div>";
       h += "<section class='gruppe'><h2>Aktuelles</h2>";
-      if (!au.length && !offen.length) h += "<p class='pt-leer'>Zurzeit gibt es nichts Neues. Alles, was wir Ihnen schicken, finden Sie unter „Post“.</p>";
+      if (!au.length && !offen.length) h += "<p class='pt-leer'>Zurzeit gibt es nichts Neues. " +
+        "Alles, was wir Ihnen zuschicken, finden Sie unter „Schriftverkehr“.</p>";
       if (au.length) h += "<h3 style='margin:0 0 10px'>Neuester Aushang</h3>" + aushangKarte(au[0]) +
-        (au.length > 1 ? mehr("haus", "Alle " + au.length + " Aushänge") : "");
+        (au.length > 1 ? mehr("aushaenge", "Alle " + au.length + " Aushänge") : "");
       if (offen.length) h += "<h3 style='margin:22px 0 4px'>Ihre offenen Vorgänge <span class='fuer'>" + offen.length + "</span></h3>" +
         offen.slice(0, 3).map(vorgangZeile).join("") + mehr("melden", "Alle Vorgänge");
       h += "</section>";
     }
-
-    if (tab === "post") {
-      h += "<section class='gruppe'><h2>Ihre Schreiben" + (dateien.length ? " <span class='fuer'>" + dateien.length + "</span>" : "") + "</h2>" +
-        "<p class='unter'>Schreiben, die wir für Sie freigegeben haben. Zum Aufheben einfach herunterladen.</p>" +
-        (dateien.length ? "<div class='abl-liste'>" + dateien.map(dateiZeile).join("") + "</div>"
-          : "<p class='pt-leer'>Hier erscheinen Schreiben, die wir für Sie freigeben.</p>") + "</section>";
-      h += portalAbrechnungHtml(p);
-    }
-
-    if (tab === "melden") {
-      h += portalMeldungHtml(p, vorschau);
-      h += portalUnterlagenHtml(p, vorschau);
-    }
-
-    if (tab === "haus") {
-      h += notVoll;
-      h += "<section class='gruppe'><h2>Aushänge" + (au.length ? " <span class='fuer'>" + au.length + "</span>" : "") + "</h2>" +
-        (au.length ? au.map(aushangKarte).join("")
-          : "<p class='pt-leer'>Zurzeit gibt es keine Mitteilungen.</p>") + "</section>";
-      h += portalSanierungHtml(p, o);
-      h += portalVerwaltungHtml();
-    }
-
-    if (tab === "pruefung") h += portalBeiratHtml(p, vorschau);
+    if (akt && akt.inhalt) h += akt.inhalt();
 
     const kf = (n, l, typ, hilfe) => "<div class='feld'><label for='ptk-" + n + "'>" + l + "</label>" +
       "<input type='" + (typ || "text") + "' id='ptk-" + n + "' data-ptk='" + n + "' value='" + esc(p[n] || "") + "'" + (vorschau ? " disabled" : "") + ">" +
@@ -14475,10 +14520,11 @@ const Objekte = (() => {
       case "m3-etage": { const m = m3Stand();
         m.etage = b.dataset.wert === "" ? null : Number(b.dataset.wert); render(true); break; }
       case "m3-sicht": { const m = m3Stand();
-        m.drehen = Number(b.dataset.wert); m.neigen = 16; render(true); break; }
+        m.drehen = Number(b.dataset.wert); m.neigen = 16;
+        /* Erst sanft drehen, dann die Knöpfe nachziehen. */
+        m3Anwenden(false); setTimeout(() => render(true), 300); break; }
       case "m3-zoom": { const m = m3Stand();
-        m.zoom = Math.max(0.35, Math.min(2.4, m.zoom * (b.dataset.wert === "+" ? 1.2 : 1 / 1.2)));
-        m3Anwenden(); break; }
+        m3Zoomen(m.zoom * (b.dataset.wert === "+" ? 1.2 : 1 / 1.2)); break; }
       case "m3-auf": { const m = m3Stand(); m.auf = !m.auf; render(true); break; }
       case "m3-farbe": { const m = m3Stand(); m.farbe = b.dataset.wert; render(true); break; }
       case "m3-bearbeiten": { const m = m3Stand(); m.bearbeiten = !m.bearbeiten; render(true); break; }
