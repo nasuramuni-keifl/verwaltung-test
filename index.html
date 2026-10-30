@@ -196,6 +196,16 @@ main{padding:8px clamp(16px,4vw,40px) 64px}
   border-radius:10px;padding:6px 10px;opacity:.9;pointer-events:none}
 .m3-gitter{display:grid;grid-template-columns:1.2fr 90px 90px 1fr;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
 @media(max-width:820px){.m3-gitter{grid-template-columns:1fr 1fr}}
+.pt-san{display:grid;gap:10px;margin-top:14px}
+.pt-san-schritt{display:grid;grid-template-columns:74px 1fr;gap:14px;align-items:start;padding:14px 16px;
+  border-radius:14px;background:var(--field);border-left:4px solid var(--line)}
+.pt-san-schritt.bald{border-left-color:var(--accent);background:var(--accent-soft)}
+.pt-san-jahr{font-weight:700;font-size:19px;letter-spacing:-.01em}
+@media(max-width:620px){.pt-san-schritt{grid-template-columns:1fr;gap:4px}}
+.san-kopf,.san-row{display:grid;grid-template-columns:1.6fr 1fr 110px 110px;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+.sanp-kopf,.sanp-row{display:grid;grid-template-columns:90px 2fr 110px 110px 110px 90px 70px;gap:9px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.san-kopf,.sanp-kopf{font-size:12px;color:var(--muted)}
+@media(max-width:900px){.san-kopf,.sanp-kopf{display:none}.san-row,.sanp-row{grid-template-columns:1fr 1fr;gap:6px}}
 .ug-row{display:grid;grid-template-columns:38px 1.6fr 80px 130px 1.4fr;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
 .ug-haken{width:26px;height:26px;border-radius:8px;border:1.5px solid var(--line);background:var(--field);cursor:pointer;font-size:15px;line-height:1;color:var(--ok)}
 .ug-haken.an{border-color:var(--ok);background:var(--ok-soft)}
@@ -345,6 +355,31 @@ select:focus{outline:none;border-color:var(--accent)}
 .pt-aushang p{margin:0}
 .pt-datei{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;background:var(--field);border:none;border-radius:10px;padding:12px 14px;text-decoration:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
 .pt-datei:hover{background:var(--accent-soft)}
+.pt-nav{position:sticky;top:0;z-index:6;display:flex;gap:7px;overflow-x:auto;padding:10px 2px 12px;margin:0 0 16px;max-width:820px;
+  background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(10px);scrollbar-width:none}
+.pt-nav::-webkit-scrollbar{display:none}
+.pt-nav button{flex:none;display:flex;align-items:center;gap:7px;border:0;background:var(--surface);color:var(--ink);
+  border-radius:14px;padding:11px 17px;font:inherit;font-weight:600;font-size:15px;white-space:nowrap;box-shadow:inset 0 0 0 1.5px var(--line)}
+.pt-nav button.an{background:var(--accent);color:var(--accent-ink);box-shadow:none}
+.pt-nav .zahl{background:var(--accent-soft);color:var(--accent);border-radius:999px;padding:1px 8px;font-size:12.5px;font-weight:700}
+.pt-nav button.an .zahl{background:color-mix(in srgb,var(--accent-ink) 26%,transparent);color:var(--accent-ink)}
+.pt-not{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--warn-soft);border-radius:18px;padding:14px 18px;margin-bottom:16px;max-width:820px}
+.pt-not strong{color:var(--warn);font-size:15px}
+.pt-not em{color:var(--muted);font-size:14px;font-style:normal}
+.pt-not a,.pt-not button{display:inline-flex;align-items:center;gap:7px;background:var(--surface);color:var(--ink);border:0;
+  border-radius:12px;padding:8px 14px;text-decoration:none;font:inherit;font-weight:600;font-size:14px}
+.pt-not a b{color:var(--accent);font-variant-numeric:tabular-nums}
+.pt-tun{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:16px;max-width:820px}
+@media (max-width:620px){.pt-tun{grid-template-columns:1fr}}
+.pt-tun button{display:block;width:100%;height:100%;text-align:left;border:0;background:var(--surface);border-radius:18px;padding:18px 20px;font:inherit;
+  color:var(--ink);box-shadow:inset 0 0 0 2px transparent;transition:box-shadow .15s}
+.pt-tun button:hover{box-shadow:inset 0 0 0 2px var(--accent)}
+.pt-tun b{display:block;font-size:16.5px;margin-bottom:3px;letter-spacing:-.01em}
+.pt-tun span{display:block;color:var(--muted);font-size:14px;line-height:1.42}
+.pt-leer{color:var(--muted);font-size:14.5px;margin:0}
+.pt-mehr{margin-top:12px}
+.portal .hero{padding:18px 0 14px}
+.portal .hero h1{font-size:clamp(25px,3.6vw,33px)}
 .nf-kopf,.nf-zeile{display:grid;grid-template-columns:1fr 180px 1fr 32px;gap:10px;align-items:center}
 .nf-kopf{font-size:12px;color:var(--muted);padding:10px 2px 6px;border-bottom:1px solid var(--line)}
 .nf-zeile{padding:6px 0;border-bottom:1px solid var(--line)}
@@ -1473,8 +1508,8 @@ const Objekte = (() => {
   const tel = t => String(t || "").replace(/[^\d+]/g, "");
   const S = { hwTab: "stamm", rgStapel: [], rgEntwurf: null, rgZu: {}, rahmen: [], rahmenOffen: "", kkAuf: {}, kkDetail: false, krProtAuf: false, krVorher: null, bank: null, lsMonat: "", lsDatum: "", sitzung: "", anFehler: "", anMail: "", pwWechsel: false, pwMeldung: "", pwMeldungOk: false, wpJahr: "", wpDatum: "", wpTop: "",
     sollOffen: "", zaNeu: "", zaEntwurf: null, bhFrei: "", bhGrund: "", infoAlle: false, vmtTab: "miete", vkOffen: null, vkWahl: false, vkSuche: "", bonOffen: null, bonHinweis: "", tObjSuche: "", anruferTreffer: null, tdTab: "vorgang", briefAnzeige: null, datFilter: { suche: "", quelle: "" }, eTab: "stamm", pTab: "stamm", pBearbeiten: false, eaHinweis: "", vermTab: "frei", vermOffen: null, vermFeedback: null, kiLaeuft: false, kiHinweis: "", kiStop: null, mails: [], mailTab: "eingang", mailFilter: { suche: "" }, mailImport: null, mailOffenId: null, mailRichtung: "ein",
-    objTab: "stammdaten", bhTab: "konten", rundTab: "rund", ueEinheit: null, mvBausteine: [], mvOffen: "", mvDruck: null, mvbsEntwurf: null, ptAbr: null, rlDruck: null,
-    mahnEinst: null, vpi: null, ixDruck: null, zuNeu: null, objAuf: [], ugDruck: false,
+    objTab: "stammdaten", bhTab: "konten", rundTab: "rund", ueEinheit: null, mvBausteine: [], mvOffen: "", mvDruck: null, mvbsEntwurf: null, ptAbr: null, ptTab: "start", rlDruck: null,
+    mahnEinst: null, vpi: null, foerd: null, ixDruck: null, zuNeu: null, objAuf: [], ugDruck: false,
     m3: { drehen: 32, neigen: 16, zoom: 1, etage: null, einheit: "", auf: false, farbe: "status", bearbeiten: false }, pStaffel: { ab: "", anzahl: "3", schritt: "", art: "eur" }, mhDruck: null, mhVerzug: null, mhEinstAuf: false, rzEntwurf: null, rzOffen: "", rzDruck: null,
     gbTab: "modell", gwOffen: "", gwRuege: "", ihJahre: 15, brJahr: "", brBericht: null, tickets: [], tAnsicht: "liste", kalDatum: "", kalModus: "monat", kalWer: [], tEntwurfTicket: null, ticketOffen: null, ticketBearbeiten: false, ticketVorher: null, mailNeuFuer: null, mailOffen: null, mailVerschieben: null, mailRichtung: "ein", ichBin: "", einst: { ichBin: "", zeitraum: "woche", nurMeine: true, ansicht: "liste", kalModus: "monat" }, tFilter: { status: "", suche: "", nurMeine: true, zeitraum: "woche" }, bearbeiten: false, uOffen: null, anlageOffen: null, team: [], tEntwurf: null, eigNeuFuer: null, mieterNeuFuer: null, pObjekte: {}, pDirty: new Set(), tab: "vertraege", liste: [], handwerker: [], personen: [], pEntwurf: null, pFilter: { rolle: "", suche: "", ehemalige: false }, ansicht: "liste", entwurf: null, istNeu: false, hwEntwurf: null, hwNeuFuer: null,
     filter: { art: "", suche: "", beendete: false }, loeschen: false };
@@ -1999,6 +2034,250 @@ const Objekte = (() => {
       m3Anwenden(true);
     }, { passive: false });
   })();
+  /* ================= Sanierungsfahrplan =================
+     Eine Orientierung, kein individueller Sanierungsfahrplan (iSFP): den darf nur eine
+     Energieberatung erstellen, und nur mit ihm gibt es den Förderbonus. Hier entsteht aus den
+     Daten des Hauses eine Reihenfolge: welches Bauteil wann dran ist, was es ungefähr kostet
+     und was es spart. Die Beträge sind Spannen aus Erfahrungswerten – verbindlich ist das
+     Angebot des Handwerks.
+     Rechtsstand: Das Gebäudeenergiegesetz wurde zum 29. Juli 2026 durch das
+     Gebäudemodernisierungsgesetz abgelöst; die pauschale 65-Prozent-Vorgabe beim Heizungstausch
+     ist entfallen. Weil sich so etwas wieder ändern kann, stehen Fördersätze und Pflichten in
+     den Einstellungen und lassen sich dort pflegen. */
+  const SAN_ZUSTAND = [["", "unbekannt"], ["original", "Originalzustand"], ["teil", "teilweise erneuert"], ["saniert", "saniert"]];
+  const SAN_TRAEGER = ["Erdgas", "Heizöl", "Fernwärme", "Wärmepumpe", "Pellets", "Strom", "Nachtspeicher"];
+  /* [Schlüssel, Name, Gruppe, Lebensdauer, Fläche je m² Wohnfläche, Kosten je m² von–bis,
+      Einsparung % von–bis, Reihenfolge, Hinweis] */
+  const SAN_MASSNAHMEN = [
+    { k: "ogdecke", name: "Oberste Geschossdecke dämmen", gruppe: "huelle", dauer: 45,
+      flaeche: (w, g) => w / Math.max(1, g), von: 45, bis: 90, sparVon: 6, sparBis: 12, rang: 1,
+      hinweis: "Die günstigste Maßnahme überhaupt – wenig Geld, sofort spürbar. Lohnt fast immer zuerst." },
+    { k: "kellerdecke", name: "Kellerdecke dämmen", gruppe: "huelle", dauer: 45,
+      flaeche: (w, g) => w / Math.max(1, g), von: 50, bis: 100, sparVon: 4, sparBis: 10, rang: 2,
+      hinweis: "Kalte Füße im Erdgeschoss sind das deutlichste Zeichen. Arbeiten von unten, Wohnungen bleiben bewohnt." },
+    { k: "rohre", name: "Heizungsrohre im Keller dämmen", gruppe: "technik", dauer: 30,
+      pauschal: [1500, 4000], sparVon: 2, sparBis: 5, rang: 3,
+      hinweis: "Kleine Maßnahme, schnelle Amortisation. Gehört zu jeder Heizungswartung dazu." },
+    { k: "abgleich", name: "Hydraulischer Abgleich und neue Pumpen", gruppe: "technik", dauer: 20,
+      jeWe: [180, 350], sparVon: 5, sparBis: 10, rang: 4,
+      hinweis: "Ohne Abgleich heizen die einen zu viel und die anderen zu wenig. Voraussetzung für jede Förderung der Heizung." },
+    { k: "fenster", name: "Fenster erneuern", gruppe: "huelle", dauer: 35,
+      flaeche: w => w * 0.16, von: 700, bis: 1000, sparVon: 8, sparBis: 15, rang: 5,
+      hinweis: "Nach den Fenstern muss richtig gelüftet werden, sonst droht Schimmel. Am besten zusammen mit der Fassade." },
+    { k: "fassade", name: "Fassade dämmen", gruppe: "huelle", dauer: 40,
+      flaeche: w => w * 0.85, von: 160, bis: 260, sparVon: 15, sparBis: 25, rang: 6,
+      hinweis: "Der größte Hebel, aber auch der teuerste Schritt. Nur sinnvoll, wenn das Gerüst ohnehin steht." },
+    { k: "dach", name: "Dach dämmen und neu eindecken", gruppe: "huelle", dauer: 45,
+      flaeche: (w, g) => (w / Math.max(1, g)) * 1.35, von: 260, bis: 420, sparVon: 10, sparBis: 20, rang: 7,
+      hinweis: "Nur nötig, wenn der Dachraum ausgebaut ist oder die Eindeckung ohnehin ansteht." },
+    { k: "heizung", name: "Heizung erneuern", gruppe: "technik", dauer: 22,
+      pauschal: [30000, 60000], jeWe: [1200, 2500], sparVon: 20, sparBis: 35, rang: 8,
+      hinweis: "Erst die Hülle, dann die Heizung – sonst wird die Anlage zu groß gekauft und zu teuer." },
+    { k: "lueftung", name: "Lüftung mit Wärmerückgewinnung", gruppe: "technik", dauer: 25,
+      jeWe: [4500, 9000], sparVon: 8, sparBis: 15, rang: 9,
+      hinweis: "Sinnvoll nach einer dichten Hülle. Beugt Schimmel vor und holt Wärme aus der Abluft zurück." },
+    { k: "pv", name: "Photovoltaik auf dem Dach", gruppe: "strom", dauer: 25,
+      kwp: w => Math.max(5, Math.round(w / 110)), kwpVon: 1300, kwpBis: 1800, sparVon: 0, sparBis: 0, rang: 10,
+      hinweis: "Spart keine Heizenergie, aber Stromkosten – besonders zusammen mit einer Wärmepumpe. In der WEG über Mieterstrom oder Allgemeinstrom." }
+  ];
+  const sanVon = o => { if (!o.sanierung || typeof o.sanierung !== "object") o.sanierung = {};
+    const x = o.sanierung;
+    if (!x.zustand || typeof x.zustand !== "object") x.zustand = {};
+    if (!Array.isArray(x.schritte)) x.schritte = [];
+    return x; };
+  /* Beheizte Fläche und Geschosszahl aus dem Objekt, wenn nichts eingetragen ist. */
+  function sanBasis(o) {
+    const x = sanVon(o);
+    const liste = o.einheitenListe || [];
+    const flaeche = betragZahl(x.flaeche) || cent(liste.reduce((n, e) => n + betragZahl(e.flaeche), 0));
+    const geschosse = Number(x.geschosse) || (() => { try { return Math.max(1, m3Bau(o).etagen.length); } catch (e) { return 3; } })();
+    return { flaeche, geschosse, wohnungen: Math.max(1, liste.length),
+      baujahr: Number(x.baujahr) || Number(o.baujahr) || 0,
+      kennwert: betragZahl(x.kennwert) || betragZahl(o.energiewert),
+      traeger: x.traeger || o.energietraeger || "",
+      klasse: x.klasse || o.effizienz || "",
+      heizungBj: Number(x.heizungBj) || 0 };
+  }
+  /* Grobe Kostenspanne einer Maßnahme. */
+  function sanKosten(mm, b) {
+    let von = 0, bis = 0;
+    if (mm.flaeche) { const f = mm.flaeche(b.flaeche, b.geschosse); von += f * mm.von; bis += f * mm.bis; }
+    if (mm.pauschal) { von += mm.pauschal[0]; bis += mm.pauschal[1]; }
+    if (mm.jeWe) { von += mm.jeWe[0] * b.wohnungen; bis += mm.jeWe[1] * b.wohnungen; }
+    if (mm.kwp) { const kw = mm.kwp(b.flaeche); von += kw * mm.kwpVon; bis += kw * mm.kwpBis; }
+    const runden = n => Math.round(n / 500) * 500;
+    return { von: runden(von), bis: runden(bis) };
+  }
+  /* Wann ist ein Bauteil fällig? Aus Zustand, Jahr der letzten Erneuerung und Lebensdauer. */
+  function sanFaellig(mm, z, b, jetzt) {
+    const jahr = Number(z && z.jahr) || 0;
+    const stand = (z && z.stand) || "";
+    if (stand === "saniert") return (jahr || b.baujahr || jetzt) + mm.dauer;
+    if (stand === "teil") return (jahr || b.baujahr || jetzt) + Math.round(mm.dauer * 0.6);
+    if (stand === "original") return (b.baujahr || jetzt) + mm.dauer;
+    /* Zustand unbekannt: nicht als überfällig ausweisen, nur einreihen. */
+    return jetzt + 1;
+  }
+  /* Den Fahrplan vorschlagen: Reihenfolge, Jahre, Kosten, Einsparung. */
+  function sanVorschlag(o) {
+    const b = sanBasis(o);
+    const x = sanVon(o);
+    const jetzt = new Date().getFullYear();
+    const roh = SAN_MASSNAHMEN.map(mm => {
+      const z = x.zustand[mm.k] || {};
+      if (z.stand === "saniert" && Number(z.jahr) && jetzt - Number(z.jahr) < mm.dauer * 0.7) return null;
+      if (z.weg) return null;
+      const faellig = sanFaellig(mm, z, b, jetzt);
+      const dringend = (z.stand === "original" || z.stand === "teil") && faellig <= jetzt;
+      return { mm, dringend, faellig: dringend ? jetzt : faellig,
+        rang: mm.rang + (dringend ? 0 : 40), kosten: sanKosten(mm, b) };
+    }).filter(Boolean).sort((a, c) => a.rang - c.rang || a.faellig - c.faellig);
+    /* Höchstens eine große Maßnahme alle zwei Jahre, damit die Rücklage mitkommt. */
+    let jahr = jetzt;
+    return roh.map(r => {
+      const gross = r.kosten.bis > 40000;
+      const j = Math.max(jahr, r.faellig);
+      jahr = j + (gross ? 2 : 1);
+      return { ...r, jahr: j };
+    });
+  }
+  /* ---------- Fördersätze ----------
+     Sie ändern sich regelmäßig – zuletzt zum 21. Juli 2026. Deshalb stehen sie nicht im
+     Programm fest, sondern werden in den Einstellungen gepflegt. Verbindlich sind allein
+     die Richtlinien von BAFA und KfW. */
+  const foerdWerte = () => {
+    const g = (S.foerd && typeof S.foerd === "object") ? S.foerd : {};
+    return { id: "standard", stand: g.stand || "2026-10-30",
+      huelle: g.huelle || "15", isfp: g.isfp || "20", isfpAb: g.isfpAb || "30000",
+      heizGrund: g.heizGrund || "30", heizTempo: g.heizTempo || "16", heizMax: g.heizMax || "28000",
+      maxWe1: g.maxWe1 || "30000", maxWe2: g.maxWe2 || "15000", maxWe7: g.maxWe7 || "8000",
+      hinweis: g.hinweis !== undefined ? g.hinweis : "Seit dem 29. Juli 2026 gilt das Gebäudemodernisierungsgesetz " +
+        "anstelle des Gebäudeenergiegesetzes. Die pauschale Vorgabe von 65 Prozent erneuerbarer Energie beim " +
+        "Heizungstausch ist entfallen; ab 2029 steigt stattdessen schrittweise der Anteil klimaneutraler Brennstoffe." };
+  };
+  async function foerdSichern(d) {
+    S.foerd = { ...d, geaendert: new Date().toISOString() };
+    try { await Speicher.speichern("foerderung", S.foerd, [S.foerd]); } catch (e) {}
+  }
+  /* Grobe Förderung einer Maßnahme. */
+  function sanFoerderung(r, b) {
+    const f = foerdWerte();
+    const mitte = cent((r.kosten.von + r.kosten.bis) / 2);
+    if (r.mm.k === "heizung") {
+      const satz = (betragZahl(f.heizGrund) + betragZahl(f.heizTempo)) / 100;
+      const deckel = betragZahl(f.heizMax) * b.wohnungen;
+      return Math.round(Math.min(mitte * satz, deckel) / 100) * 100;
+    }
+    if (r.mm.k === "pv") return 0;
+    const grund = betragZahl(f.huelle) / 100;
+    const ab = betragZahl(f.isfpAb);
+    const bonus = mitte > ab ? (mitte - ab) * (betragZahl(f.isfp) / 100) : 0;
+    const deckel = betragZahl(f.maxWe1) + betragZahl(f.maxWe2) * Math.min(5, Math.max(0, b.wohnungen - 1)) +
+      betragZahl(f.maxWe7) * Math.max(0, b.wohnungen - 6);
+    return Math.round(Math.min(mitte * grund + bonus, deckel) / 100) * 100;
+  }
+  /* Der fertige Plan: gespeicherte Schritte, sonst der Vorschlag. */
+  function sanPlan(o) {
+    const b = sanBasis(o);
+    const x = sanVon(o);
+    if (x.schritte.length) return { b, schritte: x.schritte.slice().sort((p, q) => Number(p.jahr) - Number(q.jahr)), eigen: true };
+    return { b, schritte: sanVorschlag(o).map(r => ({ id: r.mm.k, was: r.mm.name, jahr: String(r.jahr),
+      von: String(r.kosten.von), bis: String(r.kosten.bis), sparVon: String(r.mm.sparVon), sparBis: String(r.mm.sparBis),
+      foerder: String(sanFoerderung(r, b)), hinweis: r.mm.hinweis, dringend: r.dringend, status: "offen" })), eigen: false };
+  }
+  const sanSumme = (liste, feld) => cent(liste.reduce((n, x) => n + betragZahl(x[feld]), 0));
+  /* Die Arbeitsansicht für die Verwaltung. */
+  function sanierungHtml(o) {
+    const x = sanVon(o);
+    const b = sanBasis(o);
+    const plan = sanPlan(o);
+    const jetzt = new Date().getFullYear();
+    const f = (n, l, typ, platz, hilfe) => "<div class='feld'><label for='san-" + n + "'>" + l + "</label>" +
+      "<input type='" + (typ || "text") + "' id='san-" + n + "' data-san='" + n + "' value='" + esc(x[n] || "") + "'" +
+      (platz ? " placeholder='" + esc(platz) + "'" : "") + ">" + (hilfe ? "<small>" + hilfe + "</small>" : "") + "</div>";
+    let h = "<section class='gruppe voll'><h2>Sanierungsfahrplan</h2>" +
+      "<p class='unter'>Eine Orientierung für die Eigentümer: welches Bauteil wann dran ist, was es ungefähr kostet " +
+      "und was es spart. Den offiziellen individuellen Sanierungsfahrplan erstellt eine Energieberatung – nur mit ihm " +
+      "gibt es den Förderbonus.</p>";
+    h += "<h3>Das Gebäude</h3><div class='felder'>" +
+      f("baujahr", "Baujahr", "text", String(o.baujahr || ""), o.baujahr ? "Aus den Stammdaten: " + esc(o.baujahr) : "") +
+      f("flaeche", "Beheizte Wohnfläche m²", "text", String(b.flaeche || ""), "Leer lassen: Summe der Einheiten.") +
+      f("geschosse", "Geschosse", "text", String(b.geschosse)) +
+      f("kennwert", "Energiekennwert kWh/(m²·a)", "text", String(o.energiewert || ""), "Steht im Energieausweis.") +
+      "<div class='feld'><label for='san-traeger'>Womit wird geheizt</label><input type='text' id='san-traeger' " +
+      "list='san-traeger-liste' data-san='traeger' value='" + esc(x.traeger || o.energietraeger || "") + "'>" +
+      "<datalist id='san-traeger-liste'>" + SAN_TRAEGER.map(t => "<option value='" + esc(t) + "'>").join("") + "</datalist></div>" +
+      f("heizungBj", "Heizung von Baujahr", "text", "", "Jahr des Einbaus.") + "</div>";
+    /* Zustand der Bauteile */
+    h += "<h3 style='margin-top:22px'>Zustand der Bauteile</h3>" +
+      "<p class='unter'>Je besser das hier steht, desto brauchbarer der Fahrplan. „Originalzustand“ heißt: " +
+      "seit dem Bau nicht angefasst.</p><div class='ue-tab'>" +
+      "<div class='san-kopf'><span>Bauteil</span><span>Zustand</span><span>zuletzt erneuert</span><span>nicht vorhanden</span></div>" +
+      SAN_MASSNAHMEN.map(mm => { const z = x.zustand[mm.k] || {};
+        return "<div class='san-row'><span><strong>" + esc(mm.name) + "</strong></span>" +
+          "<span><select data-sanz='" + esc(mm.k) + "|stand'>" + SAN_ZUSTAND.map(([w, l]) =>
+            "<option value='" + w + "'" + ((z.stand || "") === w ? " selected" : "") + ">" + esc(l) + "</option>").join("") + "</select></span>" +
+          "<span><input type='text' inputmode='numeric' aria-label='Jahr' data-sanz='" + esc(mm.k) + "|jahr' value='" +
+            esc(z.jahr || "") + "' placeholder='Jahr'></span>" +
+          "<span><button type='button' class='ug-haken" + (z.weg ? " an" : "") + "' data-act='san-weg' data-k='" +
+            esc(mm.k) + "' aria-pressed='" + !!z.weg + "' aria-label='nicht vorhanden'>" + (z.weg ? "✓" : "") + "</button></span></div>";
+      }).join("") + "</div>";
+    /* Der Plan */
+    const ges = { von: sanSumme(plan.schritte, "von"), bis: sanSumme(plan.schritte, "bis"), foerder: sanSumme(plan.schritte, "foerder") };
+    const sparVon = plan.schritte.reduce((n, z2) => n + betragZahl(z2.sparVon), 0);
+    h += "<h3 style='margin-top:24px'>Der Fahrplan</h3>" +
+      "<div class='kacheln'><div class='kachel'><b>" + esc(eur2(ges.von)) + " – " + esc(eur2(ges.bis)) +
+        " €</b><span>Kosten insgesamt</span></div>" +
+      "<div class='kachel'><b>" + esc(eur2(ges.foerder)) + " €</b><span>mögliche Förderung</span></div>" +
+      "<div class='kachel'><b>" + Math.min(70, Math.round(sparVon)) + " – " +
+        Math.min(85, Math.round(plan.schritte.reduce((n, z2) => n + betragZahl(z2.sparBis), 0))) +
+        " %</b><span>weniger Heizenergie</span></div>" +
+      "<div class='kachel'><b>" + plan.schritte.length + "</b><span>Schritte</span></div></div>";
+    h += "<div class='leiste'><div>" +
+      "<button class='btn klein haupt' data-act='san-vorschlag'>" + (plan.eigen ? "Neu vorschlagen" : "Vorschlag übernehmen") + "</button>" +
+      (plan.eigen ? "<button class='btn klein' data-act='san-schritt-neu'>+ Eigener Schritt</button>" : "") +
+      "</div><span class='fuer'>" + (plan.eigen ? "Sie bearbeiten einen eigenen Fahrplan." : "Noch nicht übernommen – das ist der Vorschlag aus den Daten.") + "</span></div>";
+    h += "<div class='ue-tab'><div class='sanp-kopf'><span>Jahr</span><span>Maßnahme</span><span>Kosten von</span>" +
+      "<span>bis</span><span>Förderung</span><span>spart</span><span></span></div>" +
+      plan.schritte.map((z2, i) => "<div class='sanp-row" + (z2.dringend ? " aw-warn" : "") + "'>" +
+        (plan.eigen
+          ? "<span><input type='text' inputmode='numeric' aria-label='Jahr' data-sans='" + i + "|jahr' value='" + esc(z2.jahr) + "'></span>" +
+            "<span><input type='text' aria-label='Maßnahme' data-sans='" + i + "|was' value='" + esc(z2.was) + "'></span>" +
+            "<span><input type='text' inputmode='decimal' aria-label='Kosten von' data-sans='" + i + "|von' value='" + esc(z2.von) + "'></span>" +
+            "<span><input type='text' inputmode='decimal' aria-label='Kosten bis' data-sans='" + i + "|bis' value='" + esc(z2.bis) + "'></span>" +
+            "<span><input type='text' inputmode='decimal' aria-label='Förderung' data-sans='" + i + "|foerder' value='" + esc(z2.foerder) + "'></span>" +
+            "<span><input type='text' inputmode='numeric' aria-label='Einsparung' data-sans='" + i + "|sparVon' value='" + esc(z2.sparVon) + "'></span>" +
+            "<span><button class='btn klein gefahr' data-act='san-schritt-weg' data-i='" + i + "'>" +
+              (S.loeschen === "san" + i ? "Wirklich?" : "×") + "</button></span>"
+          : "<span><strong>" + esc(z2.jahr) + "</strong>" + (z2.dringend ? "<br><span class='fuer'>überfällig</span>" : "") + "</span>" +
+            "<span><strong>" + esc(z2.was) + "</strong><br><span class='fuer'>" + esc(z2.hinweis || "") + "</span></span>" +
+            "<span>" + esc(eur2(betragZahl(z2.von))) + " €</span>" +
+            "<span>" + esc(eur2(betragZahl(z2.bis))) + " €</span>" +
+            "<span>" + esc(eur2(betragZahl(z2.foerder))) + " €</span>" +
+            "<span>" + esc(z2.sparVon) + "–" + esc(z2.sparBis) + " %</span><span></span>") +
+        "</div>").join("") + "</div>";
+    const fw = foerdWerte();
+    h += "<ul class='meldungen' style='margin-top:14px'>" +
+      (b.flaeche ? "" : "<li class='m-fehler'>Ohne Wohnfläche kann das Programm nichts rechnen. Tragen Sie sie oben ein " +
+        "oder erfassen Sie die Flächen bei den Einheiten.</li>") +
+      (b.baujahr ? "" : "<li class='m-hinweis'>Ohne Baujahr schätzt das Programm die Fälligkeiten nur grob.</li>") +
+      (istWeg(o) ? "<li class='m-hinweis'>In der WEG beschließt die Versammlung über bauliche Veränderungen " +
+        "(§ 20 WEG); die Kosten trägt, wer nach § 21 WEG dafür aufkommen muss. Finanziert wird aus der Erhaltungsrücklage " +
+        "oder über eine Sonderumlage.</li>"
+        : "<li class='m-hinweis'>Modernisierungen kündigen Sie den Mietern drei Monate vorher an (§ 555c BGB). " +
+          "Acht Prozent der Kosten dürfen Sie auf die Jahresmiete umlegen (§ 559 BGB), begrenzt auf 3 € je m² in sechs " +
+          "Jahren – bei Mieten unter 7 € je m² auf 2 €.</li>") +
+      "<li class='m-hinweis'>Fördersätze Stand " + esc(Objekte.datum(fw.stand)) + ": " + esc(fw.huelle) +
+        " % für die Gebäudehülle, " + esc(fw.heizGrund) + " % für die Heizung plus " + esc(fw.heizTempo) +
+        " % Klimageschwindigkeit. Gepflegt werden sie in den Einstellungen.</li>" +
+      "<li class='m-hinweis'>Alle Beträge sind Erfahrungswerte und keine Angebote. Verbindlich wird es erst mit " +
+        "Angeboten des Handwerks und der Bestätigung von BAFA oder KfW.</li></ul>";
+    h += "<div class='schalter-zeile' style='margin-top:16px'><div>Für die Eigentümer im Portal sichtbar" +
+      "<small>Dann sehen die Eigentümer dieses Objekts den Fahrplan in ihrem Portal.</small></div>" +
+      "<button type='button' class='schalter' role='switch' aria-checked='" + !!x.frei +
+      "' aria-label='im Portal sichtbar' data-act='san-frei'></button></div>";
+    return h + "</section>";
+  }
   /* ---------- Portal: was Mieter und Eigentümer dieses Objekts sehen ---------- */
   const notfallListe = o => Array.isArray(o.notfall) ? o.notfall : (o.notfall = []);
   const aushangListe = o => Array.isArray(o.aushaenge) ? o.aushaenge : (o.aushaenge = []);
@@ -4386,9 +4665,10 @@ const Objekte = (() => {
     if (S.objTab === "gebaeude") {
       const gt = gbReiter();
       return h + "<nav class='reiter e-reiter' style='margin-top:14px'>" +
-        [["modell", "Gebäudemodell"], ["gewaehr", "Gewährleistung"], ["instand", "Instandhaltung"], ["schluessel", "Schlüssel"]].map(([w, l]) =>
+        [["modell", "Gebäudemodell"], ["sanierung", "Sanierungsfahrplan"], ["gewaehr", "Gewährleistung"],
+         ["instand", "Instandhaltung"], ["schluessel", "Schlüssel"]].map(([w, l]) =>
           "<button data-act='gb-tab' data-wert='" + w + "'" + (gt === w ? " aria-current='page'" : "") + ">" + l + "</button>").join("") + "</nav>" +
-        (gt === "modell" ? modellHtml(o) : gt === "gewaehr" ? gewaehrleistungHtml(o)
+        (gt === "modell" ? modellHtml(o) : gt === "sanierung" ? sanierungHtml(o) : gt === "gewaehr" ? gewaehrleistungHtml(o)
           : gt === "instand" ? instandhaltungHtml(o) : schluesselHtml(o)) +
         "<div class='leiste'><div><button class='btn' data-act='abbrechen'>Zurück zur Übersicht</button></div></div></div>";
     }
@@ -6759,6 +7039,74 @@ const Objekte = (() => {
         " · Entwicklung der Erhaltungsrücklage</span></span><span class='fuer'>ansehen</span></button>" : "")).join("") + "</div>";
     return h + "<p class='unter' style='margin-top:10px'>Mit „Drucken“ speichern Sie die Abrechnung als PDF auf Ihrem Gerät.</p></section>";
   }
+  /* Was der Eigentümer sieht: der Weg in Etappen, ohne Fachsprache. */
+  function portalSanierungHtml(p, o) {
+    if (!o || p.rolle !== "eigentuemer") return "";
+    const x = sanVon(o);
+    if (!x.frei || !x.schritte.length) return "";
+    const plan = sanPlan(o);
+    const b = plan.b;
+    const jetzt = new Date().getFullYear();
+    const ges = { von: sanSumme(plan.schritte, "von"), bis: sanSumme(plan.schritte, "bis"), foerder: sanSumme(plan.schritte, "foerder") };
+    const meins = (o.einheitenListe || []).filter(e => e.eigentuemerId === p.id);
+    const mea = meins.reduce((n, e) => n + betragZahl(e.mea), 0);
+    const meaGes = Objekte.meaSumme(o.einheitenListe || []) || 0;
+    const anteil = meaGes > 0 && mea > 0 ? mea / meaGes : 0;
+    let h = "<section class='gruppe'><h2>Sanierungsfahrplan</h2>" +
+      "<p class='unter'>So sieht der Weg für " + esc(objName(o)) + " aus heutiger Sicht aus: welche Arbeiten wann " +
+      "anstehen, was sie ungefähr kosten und was sie an Heizkosten sparen. Es ist eine Orientierung, kein Angebot.</p>";
+    h += "<div class='kacheln'>" +
+      (b.kennwert ? "<div class='kachel'><b>" + esc(String(b.kennwert).replace(".", ",")) +
+        "</b><span>kWh je m² und Jahr" + (b.klasse ? " · Klasse " + esc(b.klasse) : "") + "</span></div>" : "") +
+      "<div class='kachel'><b>" + esc(eur2(ges.von)) + " – " + esc(eur2(ges.bis)) + " €</b><span>Kosten für das ganze Haus</span></div>" +
+      (ges.foerder ? "<div class='kachel'><b>" + esc(eur2(ges.foerder)) + " €</b><span>mögliche Förderung</span></div>" : "") +
+      (anteil ? "<div class='kachel'><b>" + esc(eur2(cent(ges.bis * anteil))) + " €</b><span>davon Ihr Anteil (" +
+        esc((Math.round(anteil * 1000) / 10).toLocaleString("de-DE")) + " %)</span></div>" : "") + "</div>";
+    h += "<div class='pt-san'>" + plan.schritte.map(z => {
+      const jahr = Number(z.jahr) || jetzt;
+      const bald = jahr <= jetzt + 1;
+      return "<div class='pt-san-schritt" + (bald ? " bald" : "") + "'>" +
+        "<div class='pt-san-jahr'>" + esc(z.jahr) + "</div>" +
+        "<div><strong>" + esc(z.was) + "</strong>" +
+        (z.hinweis ? "<br><span class='fuer'>" + esc(z.hinweis) + "</span>" : "") +
+        "<div class='fuer' style='margin-top:4px'>" +
+        esc(eur2(betragZahl(z.von))) + " – " + esc(eur2(betragZahl(z.bis))) + " € für das Haus" +
+        (anteil ? " · Ihr Anteil etwa " + esc(eur2(cent(betragZahl(z.bis) * anteil))) + " €" : "") +
+        (betragZahl(z.foerder) ? " · bis zu " + esc(eur2(betragZahl(z.foerder))) + " € Förderung" : "") +
+        (betragZahl(z.sparVon) ? " · spart " + esc(z.sparVon) + "–" + esc(z.sparBis) + " % Heizenergie" : "") +
+        "</div></div></div>";
+    }).join("") + "</div>";
+    h += "<ul class='meldungen' style='margin-top:16px'>" +
+      "<li class='m-hinweis'>Die Reihenfolge hat einen Grund: zuerst das Dach und die Kellerdecke, weil sie am " +
+      "wenigsten kosten und am schnellsten wirken, dann Fenster und Fassade, zuletzt die Heizung. Wer zuerst die " +
+      "Heizung tauscht, kauft sie zu groß.</li>" +
+      (istWeg(o)
+        ? "<li class='m-hinweis'>Entschieden wird nichts davon allein: Über bauliche Veränderungen beschließt die " +
+          "Eigentümerversammlung (§ 20 WEG). Dieser Fahrplan ist die Grundlage für die Beratung dort.</li>"
+        : "<li class='m-hinweis'>Dieser Fahrplan ist Ihre Entscheidungsgrundlage als Eigentümer – wir setzen nichts " +
+          "ohne Ihren Auftrag um.</li>") +
+      "<li class='m-hinweis'>Für die Förderung brauchen Sie einen individuellen Sanierungsfahrplan einer " +
+      "Energieberatung. Diese Übersicht ersetzt ihn nicht, hilft aber beim ersten Gespräch. Sprechen Sie uns an, " +
+      "wenn wir eine Beratung beauftragen sollen.</li></ul></section>";
+    return h;
+  }
+  /* Wer sich um das Haus kümmert – damit niemand die Nummer suchen muss. */
+  function portalVerwaltungHtml() {
+    const vw = (() => { try { return window.Firmendaten ? window.Firmendaten.daten() : {}; } catch (x) { return {}; } })();
+    const infos = [["Verwaltung", vw.name || ""], ["Anschrift", String(vw.anschrift || "").replace(/\s*,\s*/g, ", ")],
+      ["Ansprechpartner", vw.ansprechpartner || ""]].filter(z => z[1]);
+    if (!infos.length && !vw.telefon && !vw.email) return "";
+    let h = "<section class='gruppe'><h2>Ihre Verwaltung</h2>" +
+      "<p class='unter'>So erreichen Sie uns außerhalb von Notfällen. Schriftliches geht am schnellsten über „Melden“.</p>";
+    if (vw.telefon || vw.email) h += "<div class='pt-nf'>" +
+      (vw.telefon ? "<a class='pt-nf-karte' href='tel:" + esc(tel(vw.telefon)) + "'><strong>Telefon</strong>" +
+        "<span class='pt-nr'>" + esc(vw.telefon) + "</span></a>" : "") +
+      (vw.email ? "<a class='pt-nf-karte' href='mailto:" + esc(vw.email) + "'><strong>E-Mail</strong>" +
+        "<span class='pt-nr' style='font-size:15px;word-break:break-all'>" + esc(vw.email) + "</span></a>" : "") + "</div>";
+    if (infos.length) h += "<div style='margin-top:14px'>" + infos.map(z => "<div class='pt-vorgang'>" +
+      "<span class='fuer'>" + esc(z[0]) + "</span><span>" + esc(z[1]) + "</span></div>").join("") + "</div>";
+    return h + "</section>";
+  }
   function portalSeiteHtml(p, vorschau) {
     if (S.ptAbr) {
       const oA = S.liste.find(x => x.id === S.ptAbr.objektId);
@@ -6776,43 +7124,121 @@ const Objekte = (() => {
     const o = portalObjekt(p);
     const heute = new Date().toISOString().slice(0, 10);
     const nf = o ? notfallPlan(o) : [];
-    const au = o ? aushangListe(o).filter(x => (!x.bis || x.bis >= heute) && (x.titel || x.text)) : [];
+    const au = o ? aushangListe(o).filter(x => (!x.bis || x.bis >= heute) && (x.titel || x.text))
+      .slice().sort((a, b) => String(b.erstellt || "").localeCompare(String(a.erstellt || ""))) : [];
     const dateien = portalDateien(p);
+    const abr = portalAbrechnungen(p);
+    /* Nur prüfen, ob es den Bereich gibt – gebaut wird er erst, wenn er dran ist. */
+    const beirat = brFuerPerson(p).length;
+    const sanFrei = (() => { if (!o || p.rolle !== "eigentuemer") return false;
+      const x = sanVon(o); return !!(x.frei && x.schritte.length); })();
+    const vorgaenge = S.tickets.filter(t => t.melderWert === "p:" + p.id)
+      .slice().sort((a, b) => String(b.erstellt || "").localeCompare(String(a.erstellt || "")));
+    const offen = vorgaenge.filter(t => Objekte.ticketStatus(t) !== "erledigt");
+
+    /* Eine Leiste statt einer langen Seite: jeder Bereich für sich, mit Zahl dahinter. */
+    const reiter = [["start", "Start", 0], ["post", "Post", dateien.length + abr.length],
+      ["melden", "Melden", offen.length], ["haus", "Mein Haus", au.length]];
+    if (beirat) reiter.push(["pruefung", "Rechnungsprüfung", 0]);
+    reiter.push(["ich", "Meine Daten", 0]);
+    const tab = reiter.some(r => r[0] === S.ptTab) ? S.ptTab : "start";
+    const objZeile = esc(o ? objName(o) : "Ihr Objekt") + (p.einheit ? " · " + esc(p.einheit) : "");
+    const KOEPFE = {
+      start: ["Willkommen, " + Objekte.personName(p), ""],
+      post: ["Ihre Post", "Alles, was wir für Sie bereitgestellt haben: Schreiben und Abrechnungen."],
+      melden: ["Melden und einreichen", "Einen Schaden melden oder einen Nachweis an uns schicken."],
+      haus: ["Mein Haus", ""],
+      pruefung: ["Rechnungsprüfung", "Ihre Aufgabe als Verwaltungsbeirat."],
+      ich: ["Meine Daten", "Ihre Kontaktdaten und Ihr Zugang."]
+    };
+
+    const notKurz = "<div class='pt-not'><strong>Im Notfall</strong>" +
+      "<a href='tel:112'>Feuer, Unfall <b>112</b></a><a href='tel:110'>Polizei <b>110</b></a>" +
+      (nf.length ? "<button type='button' data-act='pt-tab' data-wert='haus'>" + nf.length +
+        (nf.length === 1 ? " Nummer fürs Haus" : " Nummern fürs Haus") + " ›</button>"
+        : "<em>Weitere Nummern fürs Haus sind noch nicht hinterlegt.</em>") + "</div>";
+    const notVoll = "<section class='gruppe'><h2>Im Notfall</h2>" +
+      "<p class='unter'>Bei Gefahr für Leib und Leben immer zuerst 112 oder 110. Für alles andere gelten diese Nummern.</p>" +
+      (nf.length ? "<div class='pt-nf'>" +
+        nf.map(x => "<a class='pt-nf-karte' href='tel:" + esc(tel(x.nummer)) + "'>" +
+          "<strong>" + esc(x.was || "Notruf") + "</strong><span class='pt-nr'>" + esc(x.nummer) + "</span>" +
+          (x.hinweis ? "<span class='fuer'>" + esc(x.hinweis) + "</span>" : "") + "</a>").join("") + "</div>"
+        : "<p class='pt-leer'>Für dieses Objekt sind noch keine Nummern hinterlegt. Bitte wenden Sie sich an die Verwaltung.</p>") + "</section>";
+
+    const aushangKarte = x => "<article class='pt-aushang'><h3>" + esc(x.titel || "Mitteilung") + "</h3>" +
+      "<p class='fuer'>" + esc(Objekte.datum(String(x.erstellt || "").slice(0, 10))) + "</p>" +
+      "<p>" + esc(x.text || "").replace(/\n/g, "<br>") + "</p></article>";
+    const dateiZeile = d => "<a class='pt-datei' href='/_blob/" + esc(d.id) + "' target='_blank' rel='noopener'>" +
+      "<span><strong>" + esc(d.name || "Schreiben") + "</strong><br><span class='fuer'>" +
+      esc([d.art, zeitstempel(d.hochgeladen)].filter(Boolean).join(" · ")) + "</span></span><span class='fuer'>öffnen</span></a>";
+    const vorgangZeile = t => "<div class='pt-vorgang'><span><strong>" + esc(t.titel || "Meldung") + "</strong><br>" +
+      "<span class='fuer'>Nr. " + esc(t.nr) + " · " + esc(Objekte.datum(String(t.erstellt || "").slice(0, 10))) + "</span></span>" +
+      "<span class='marke s-" + (Objekte.ticketStatus(t) === "erledigt" ? "erledigt" : "neu") + "'>" +
+      esc(Objekte.label(Objekte.STATUS, Objekte.ticketStatus(t))) + "</span></div>";
+    const mehr = (wohin, text) => "<div class='pt-mehr'><button class='btn klein' type='button' data-act='pt-tab' data-wert='" +
+      wohin + "'>" + esc(text) + " ›</button></div>";
+
     let h = vorschau
       ? "<div class='vorschau-band'><div><strong>Ansicht von " + esc(Objekte.personName(p)) + "</strong>" +
         "<small>So sieht diese Person ihr Portal. Hier lässt sich nichts ändern.</small></div>" +
         "<button class='btn klein' data-act='pt-vorschau-zurueck'>Zurück zur Verwaltung</button></div>" : "";
-    h += "<div class='seite portal'><div class='hero'><h1>Willkommen, " + esc(Objekte.personName(p)) + "</h1>" +
-      "<p>" + esc(o ? objName(o) : "Ihr Objekt") + (p.einheit ? " · " + esc(p.einheit) : "") + "</p></div>";
+    h += "<div class='seite portal'><div class='hero'><h1>" + esc(KOEPFE[tab][0]) + "</h1>" +
+      "<p>" + (tab === "start" || tab === "haus" ? objZeile : esc(KOEPFE[tab][1])) + "</p></div>";
+    h += "<nav class='pt-nav' aria-label='Bereiche'>" + reiter.map(([w, l, n]) =>
+      "<button type='button' class='" + (w === tab ? "an" : "") + "' data-act='pt-tab' data-wert='" + w + "'" +
+      (w === tab ? " aria-current='page'" : "") + ">" + esc(l) +
+      (n ? "<span class='zahl'>" + n + "</span>" : "") + "</button>").join("") + "</nav>";
 
-    h += "<section class='gruppe'><h2>Im Notfall</h2>" +
-      (nf.length ? "<p class='unter'>Bei Gefahr für Leib und Leben immer zuerst 112 oder 110.</p><div class='pt-nf'>" +
-        nf.map(x => "<a class='pt-nf-karte' href='tel:" + esc(tel(x.nummer)) + "'>" +
-          "<strong>" + esc(x.was || "Notruf") + "</strong><span class='pt-nr'>" + esc(x.nummer) + "</span>" +
-          (x.hinweis ? "<span class='fuer'>" + esc(x.hinweis) + "</span>" : "") + "</a>").join("") + "</div>"
-        : "<p class='unter'>Für dieses Objekt sind noch keine Nummern hinterlegt. Wenden Sie sich bitte an die Verwaltung.</p>") + "</section>";
+    if (tab === "start") {
+      h += notKurz;
+      h += "<div class='pt-tun'>" +
+        "<button type='button' data-act='pt-tab' data-wert='melden'><b>Schaden melden</b>" +
+        "<span>Heizung kalt, Wasser läuft, etwas ist kaputt – in zwei Minuten gemeldet.</span></button>" +
+        "<button type='button' data-act='pt-tab' data-wert='post'><b>Meine Post</b><span>" +
+        (dateien.length + abr.length ? "Schreiben und Abrechnungen – zurzeit " + (dateien.length + abr.length) +
+          (dateien.length + abr.length === 1 ? " Eintrag." : " Einträge.")
+          : "Hier liegen künftig Ihre Schreiben und Abrechnungen.") + "</span></button>" +
+        "<button type='button' data-act='pt-tab' data-wert='haus'><b>Mein Haus</b><span>Notfallnummern, Aushänge" +
+        (sanFrei ? " und der Sanierungsfahrplan" : "") + ".</span></button>" +
+        "<button type='button' data-act='pt-tab' data-wert='ich'><b>Meine Daten</b>" +
+        "<span>Telefon, E-Mail, Anschrift und Kennwort ändern.</span></button>" + "</div>";
+      h += "<section class='gruppe'><h2>Aktuelles</h2>";
+      if (!au.length && !offen.length) h += "<p class='pt-leer'>Zurzeit gibt es nichts Neues. Alles, was wir Ihnen schicken, finden Sie unter „Post“.</p>";
+      if (au.length) h += "<h3 style='margin:0 0 10px'>Neuester Aushang</h3>" + aushangKarte(au[0]) +
+        (au.length > 1 ? mehr("haus", "Alle " + au.length + " Aushänge") : "");
+      if (offen.length) h += "<h3 style='margin:22px 0 4px'>Ihre offenen Vorgänge <span class='fuer'>" + offen.length + "</span></h3>" +
+        offen.slice(0, 3).map(vorgangZeile).join("") + mehr("melden", "Alle Vorgänge");
+      h += "</section>";
+    }
 
-    h += "<section class='gruppe'><h2>Aushänge <span class='fuer'>" + au.length + "</span></h2>" +
-      (au.length ? au.map(x => "<article class='pt-aushang'><h3>" + esc(x.titel || "Mitteilung") + "</h3>" +
-        "<p class='fuer'>" + esc(Objekte.datum(String(x.erstellt || "").slice(0, 10))) + "</p>" +
-        "<p>" + esc(x.text || "").replace(/\n/g, "<br>") + "</p></article>").join("")
-        : "<p class='unter'>Zurzeit gibt es keine Mitteilungen.</p>") + "</section>";
+    if (tab === "post") {
+      h += "<section class='gruppe'><h2>Ihre Schreiben" + (dateien.length ? " <span class='fuer'>" + dateien.length + "</span>" : "") + "</h2>" +
+        "<p class='unter'>Schreiben, die wir für Sie freigegeben haben. Zum Aufheben einfach herunterladen.</p>" +
+        (dateien.length ? "<div class='abl-liste'>" + dateien.map(dateiZeile).join("") + "</div>"
+          : "<p class='pt-leer'>Hier erscheinen Schreiben, die wir für Sie freigeben.</p>") + "</section>";
+      h += portalAbrechnungHtml(p);
+    }
 
-    h += "<section class='gruppe'><h2>Ihre Schreiben <span class='fuer'>" + dateien.length + "</span></h2>" +
-      (dateien.length ? "<div class='abl-liste'>" + dateien.map(d => "<a class='pt-datei' href='/_blob/" + esc(d.id) + "' target='_blank' rel='noopener'>" +
-        "<span><strong>" + esc(d.name || "Schreiben") + "</strong><br><span class='fuer'>" +
-        esc([d.art, zeitstempel(d.hochgeladen)].filter(Boolean).join(" · ")) + "</span></span><span class='fuer'>öffnen</span></a>").join("") + "</div>"
-        : "<p class='unter'>Hier erscheinen Schreiben, die wir für Sie freigeben.</p>") + "</section>";
+    if (tab === "melden") {
+      h += portalMeldungHtml(p, vorschau);
+      h += portalUnterlagenHtml(p, vorschau);
+    }
 
-    h += portalBeiratHtml(p, vorschau);
-    h += portalAbrechnungHtml(p);
-    h += portalMeldungHtml(p, vorschau);
-    h += portalUnterlagenHtml(p, vorschau);
+    if (tab === "haus") {
+      h += notVoll;
+      h += "<section class='gruppe'><h2>Aushänge" + (au.length ? " <span class='fuer'>" + au.length + "</span>" : "") + "</h2>" +
+        (au.length ? au.map(aushangKarte).join("")
+          : "<p class='pt-leer'>Zurzeit gibt es keine Mitteilungen.</p>") + "</section>";
+      h += portalSanierungHtml(p, o);
+      h += portalVerwaltungHtml();
+    }
+
+    if (tab === "pruefung") h += portalBeiratHtml(p, vorschau);
 
     const kf = (n, l, typ, hilfe) => "<div class='feld'><label for='ptk-" + n + "'>" + l + "</label>" +
       "<input type='" + (typ || "text") + "' id='ptk-" + n + "' data-ptk='" + n + "' value='" + esc(p[n] || "") + "'" + (vorschau ? " disabled" : "") + ">" +
       (hilfe ? "<small>" + hilfe + "</small>" : "") + "</div>";
-    h += "<section class='gruppe'><h2>Ihre Kontaktdaten</h2>" +
+    if (tab === "ich") h += "<section class='gruppe'><h2>Ihre Kontaktdaten</h2>" +
       "<p class='unter'>Bitte halten Sie Ihre Angaben aktuell, damit wir Sie im Bedarfsfall erreichen. Name und Wohnung ändert nur die Verwaltung.</p>" +
       (S.ptMeldung ? "<ul class='meldungen'><li class='" + (S.ptOk ? "m-ok" : "m-fehler") + "'>" + esc(S.ptMeldung) + "</li></ul>" : "") +
       "<div class='felder'>" + kf("telefon", "Telefon", "tel") + kf("email", "E-Mail", "email", "Damit melden Sie sich an.") + "</div>" +
@@ -6823,7 +7249,7 @@ const Objekte = (() => {
         esc(Objekte.datum(String(p.kontaktGeaendert).slice(0, 10))) + ".</span>" : "") +
       "</div></div></section>";
 
-    h += "<section class='gruppe'><h2>Ihr Zugang</h2>" +
+    if (tab === "ich") h += "<section class='gruppe'><h2>Ihr Zugang</h2>" +
       "<p class='unter'>" + (vorschau ? "Benutzername" : "Angemeldet als") + " <strong>" + esc(p.email || "noch keine E-Mail-Adresse") + "</strong>. " +
       (vorschau
         ? (portalZugang(p) ? "Der Zugang ist eingeschaltet." : "Der Zugang ist noch nicht eingeschaltet.") +
@@ -9988,7 +10414,7 @@ const Objekte = (() => {
     return h;
   }
   const rundReiter = () => S.rundTab === "erhoehung" ? "erhoehung" : "rund";
-  const gbReiter = () => ["instand", "schluessel", "gewaehr"].includes(S.gbTab) ? S.gbTab : "modell";
+  const gbReiter = () => ["instand", "schluessel", "gewaehr", "sanierung"].includes(S.gbTab) ? S.gbTab : "modell";
   /* ===================== Forderungen: Mahnwesen und Ratenzahlung =====================
      Gemahnt wird immer im Objekt – die Auswertung zeigt nur, wo etwas offen ist.
      Verzug tritt bei Miete und Hausgeld schon mit dem Fälligkeitstag ein (§ 286 Abs. 2 Nr. 1 BGB);
@@ -11616,6 +12042,34 @@ const Objekte = (() => {
       "</ul></section>";
     return h;
   }
+  /* ---------- Fördersätze pflegen ---------- */
+  function foerderungHtml() {
+    const f = foerdWerte();
+    const g = (n, l, ein, hilfe) => "<div class='feld'><label for='foe-" + n + "'>" + l + "</label><div class='einheit'>" +
+      "<input type='text' inputmode='decimal' id='foe-" + n + "' data-foe='" + n + "' value='" + esc(f[n]) + "'><span>" + ein + "</span></div>" +
+      (hilfe ? "<small>" + hilfe + "</small>" : "") + "</div>";
+    return "<section class='gruppe'><h2>Förderung und Pflichten <span class='fuer'>für den Sanierungsfahrplan</span></h2>" +
+      "<p class='unter'>Diese Sätze ändern sich regelmäßig – zuletzt zum 21. Juli 2026. Damit der Sanierungsfahrplan " +
+      "nicht veraltet, stehen sie hier und nicht im Programm fest. Verbindlich sind allein die Richtlinien von BAFA " +
+      "und KfW; prüfen Sie sie, bevor Sie einem Eigentümer eine Zahl nennen.</p>" +
+      "<div class='felder'>" +
+      "<div class='feld'><label for='foe-stand'>Stand der Angaben</label>" +
+      "<input type='date' id='foe-stand' data-foe='stand' value='" + esc(f.stand) + "'></div>" +
+      g("huelle", "Gebäudehülle: Grundförderung", "%", "Dämmung, Fenster, Anlagentechnik.") +
+      g("isfp", "Bonus mit Sanierungsfahrplan", "%", "Nur mit einem iSFP der Energieberatung.") +
+      g("isfpAb", "Bonus erst ab", "€", "Mindestvolumen für den Bonus.") +
+      g("heizGrund", "Heizung: Grundförderung", "%") +
+      g("heizTempo", "Heizung: Klimageschwindigkeit", "%", "Sinkt halbjährlich.") +
+      g("heizMax", "Heizung: Höchstbetrag je Wohnung", "€") +
+      g("maxWe1", "Höchstbetrag 1. Wohnung", "€") +
+      g("maxWe2", "Höchstbetrag 2. bis 6. Wohnung", "€") +
+      g("maxWe7", "Höchstbetrag ab 7. Wohnung", "€") + "</div>" +
+      "<div class='feld' style='margin-top:14px'><label for='foe-hinweis'>Hinweis zur Rechtslage</label>" +
+      "<textarea id='foe-hinweis' data-foe='hinweis' rows='3'>" + esc(f.hinweis) + "</textarea>" +
+      "<small>Erscheint nicht im Portal, sondern hilft Ihren Mitarbeitern am Telefon.</small></div>" +
+      "<ul class='meldungen' style='margin-top:12px'><li class='m-hinweis'>" + esc(f.hinweis) + "</li>" +
+      "<li class='m-hinweis'>Den Fahrplan selbst öffnen Sie im Objekt unter „Gebäude“.</li></ul></section>";
+  }
   function einstellungenHtml() {
     const ich = angemeldet();
     if (S.gobd && istVerwalter()) return "<div class='seite'>" + gobdHtml() + "</div>";
@@ -11660,7 +12114,7 @@ const Objekte = (() => {
       "<li><strong>Dateien:</strong> In Outlook ausgewählte Mails als .eml oder .txt speichern und im selben Fenster auswählen.</li>" +
       "<li><strong>Automatische Zuordnung:</strong> Steht die Ticketnummer im Betreff, zum Beispiel [#2026-001], landet die Mail sofort beim richtigen Ticket.</li></ol>" +
       "<p class='unter'>Eine dauerhafte Verbindung, die Ihr Postfach von selbst abruft, ist aus dem Browser heraus nicht möglich. Dafür braucht es einen Server, der sich per Microsoft 365 anmeldet – das gehört zum selben Schritt wie die Zugangsdaten für Mitarbeiter.</p></section>" +
-      (istVerwalter() ? bankzugangHtml() + bankverzeichnisHtml(true) + indexTabelleHtml() + gobdBlockHtml() + kontenrahmenHtml() : "") +
+      (istVerwalter() ? bankzugangHtml() + bankverzeichnisHtml(true) + indexTabelleHtml() + foerderungHtml() + gobdBlockHtml() + kontenrahmenHtml() : "") +
       "<div class='hero' style='padding-bottom:4px'><h1 style='font-size:28px'>Dokumente</h1><p>Briefkopf und Fußzeile für Verträge und Schreiben. Diese Angaben gelten für das ganze Unternehmen, nicht nur für Sie.</p></div></div>";
   }
   /* Alle Vorgänge, in denen dieser Handwerker beauftragt oder angefragt wurde. */
@@ -12415,6 +12869,26 @@ const Objekte = (() => {
       render(true); return;
     }
     if (t.dataset.uf) { const [oid, idx, feld] = t.dataset.uf.split("|"); const o = objFuer(oid); if (o) o.einheitenListe[Number(idx)][feld] = t.value; return; }
+    if (t.dataset.san !== undefined && S.entwurf) {
+      sanVon(S.entwurf)[t.dataset.san] = t.value; objektSichern(S.entwurf); spaeterZeichnen("san", 900); return;
+    }
+    if (t.dataset.sanz !== undefined && S.entwurf) {
+      const [k, feld] = t.dataset.sanz.split("|");
+      const x = sanVon(S.entwurf);
+      x.zustand[k] = { ...(x.zustand[k] || {}), [feld]: t.value };
+      objektSichern(S.entwurf);
+      if (feld === "stand") render(true); else spaeterZeichnen("san", 900);
+      return;
+    }
+    if (t.dataset.sans !== undefined && S.entwurf) {
+      const [i, feld] = t.dataset.sans.split("|");
+      const x = sanVon(S.entwurf);
+      if (x.schritte[Number(i)]) { x.schritte[Number(i)][feld] = t.value; objektSichern(S.entwurf); spaeterZeichnen("san", 900); }
+      return;
+    }
+    if (t.dataset.foe !== undefined) {
+      const d = foerdWerte(); d[t.dataset.foe] = t.value; foerdSichern(d); spaeterZeichnen("foe", 900); return;
+    }
     if (t.dataset.m3e !== undefined && S.entwurf) {
       const [i, feld] = t.dataset.m3e.split("|");
       const e = (S.entwurf.einheitenListe || [])[Number(i)];
@@ -13147,7 +13621,7 @@ const Objekte = (() => {
     if (!["loeschen", "hw-loeschen", "p-loeschen", "m-loeschen", "td-loeschen", "v-weg", "mail-weg", "dok-weg", "mail-loeschen", "abl-weg",
       "bh-fest", "za-weg", "kk-weg", "kr-weg", "kr-klasse-weg", "kr-leeren",
       "nf-weg", "au-weg", "dienst-weg", "lv-weg", "org-weg", "hon-weg", "bs-weg", "ko-weg", "zl-weg",
-      "mv-weg", "mvbs-weg", "mvst-weg", "mvs-weg", "abr-frei-alle-zu", "rl-weg", "mh-weg", "rz-weg", "gw-weg", "gw-m-weg", "ih-weg", "schl-weg", "lf-weg", "zl-zust", "se-weg", "kau-weg", "kau-abrechnen", "pmd-weg", "um-weg", "ev-weg", "pst-weg", "vpi-weg", "bon-weg", "vk-raus", "ug-punkt-weg"].includes(act)) S.loeschen = false;
+      "mv-weg", "mvbs-weg", "mvst-weg", "mvs-weg", "abr-frei-alle-zu", "rl-weg", "mh-weg", "rz-weg", "gw-weg", "gw-m-weg", "ih-weg", "schl-weg", "lf-weg", "zl-zust", "se-weg", "kau-weg", "kau-abrechnen", "pmd-weg", "um-weg", "ev-weg", "pst-weg", "vpi-weg", "bon-weg", "vk-raus", "ug-punkt-weg", "san-schritt-weg"].includes(act)) S.loeschen = false;
     switch (act) {
       case "tab": S.tab = b.dataset.tab; S.ansicht = "liste"; S.entwurf = null; S.hwEntwurf = null; S.pEntwurf = null; S.tEntwurf = null; S.tEntwurfTicket = null; S.ticketOffen = null;
         S.vermOffen = null; S.mailOffenId = null; S.mailImport = null; render(); break;
@@ -13964,6 +14438,34 @@ const Objekte = (() => {
         }
         S.pObjekte = {}; S.pEntwurf = null; render(); toast("Gespeichert"); break;
       }
+      /* ---------- Sanierungsfahrplan ---------- */
+      case "san-weg": { const o = S.entwurf; if (!o) return;
+        const x = sanVon(o); const k = b.dataset.k;
+        x.zustand[k] = { ...(x.zustand[k] || {}), weg: !(x.zustand[k] || {}).weg };
+        await objektSichern(o); render(true); break; }
+      case "san-vorschlag": { const o = S.entwurf; if (!o) return;
+        const x = sanVon(o);
+        const bb = sanBasis(o);
+        if (!bb.flaeche) { toast("Ohne Wohnfläche lässt sich nichts rechnen."); return; }
+        x.schritte = sanVorschlag(o).map(r => ({ id: r.mm.k, was: r.mm.name, jahr: String(r.jahr),
+          von: String(r.kosten.von), bis: String(r.kosten.bis), sparVon: String(r.mm.sparVon),
+          sparBis: String(r.mm.sparBis), foerder: String(sanFoerderung(r, bb)), hinweis: r.mm.hinweis,
+          dringend: r.dringend, status: "offen" }));
+        await objektSichern(o); render(true);
+        toast(x.schritte.length + " Schritte übernommen – jetzt anpassbar"); break; }
+      case "san-schritt-neu": { const o = S.entwurf; if (!o) return;
+        sanVon(o).schritte.push({ id: Objekte.neueId(), was: "", jahr: String(new Date().getFullYear() + 1),
+          von: "", bis: "", foerder: "", sparVon: "", sparBis: "", hinweis: "", status: "offen" });
+        await objektSichern(o); render(true); break; }
+      case "san-schritt-weg": { const o = S.entwurf; if (!o) return; const i = Number(b.dataset.i);
+        if (S.loeschen !== "san" + i) { S.loeschen = "san" + i; render(true); return; }
+        sanVon(o).schritte.splice(i, 1); S.loeschen = false;
+        await objektSichern(o); render(true); break; }
+      case "san-frei": { const o = S.entwurf; if (!o) return;
+        const x = sanVon(o); x.frei = !x.frei;
+        if (x.frei && !x.schritte.length) { toast("Bitte zuerst den Vorschlag übernehmen."); x.frei = false; render(true); return; }
+        await objektSichern(o); render(true);
+        toast(x.frei ? "Im Eigentümerportal sichtbar" : "Aus dem Portal genommen"); break; }
       /* ---------- Gebäudemodell ---------- */
       case "m3-zeigen": { const m = m3Stand();
         m.einheit = b.dataset.e || ""; m.etage = null; S.eTab = "stamm";
@@ -15131,8 +15633,11 @@ const Objekte = (() => {
         S.mandatFuer = ""; S.mdMeldung = ""; S.pEntwurf = { ...leerePerson(), ...JSON.parse(JSON.stringify(pn)) };
         S.pTab = "dok"; S.pBearbeiten = false; S.tab = "personen"; S.ansicht = "liste"; render(); break;
       }
-      case "pt-ansehen": { if (!S.personen.some(x => x.id === id)) return; S.portalVorschau = id; render(); break; }
-      case "pt-vorschau-zurueck": { S.portalVorschau = ""; S.pTab = "portal"; S.ptmNr = ""; S.ptmMeldung = ""; render(); break; }
+      case "pt-tab": { S.ptTab = b.dataset.wert || "start";
+        S.ptMeldung = ""; S.pwMeldung = ""; S.ptmNr = ""; S.ptmMeldung = ""; S.ptuNr = ""; S.ptuMeldung = "";
+        render(); window.scrollTo({ top: 0, behavior: "smooth" }); break; }
+      case "pt-ansehen": { if (!S.personen.some(x => x.id === id)) return; S.portalVorschau = id; S.ptTab = "start"; render(); break; }
+      case "pt-vorschau-zurueck": { S.portalVorschau = ""; S.pTab = "portal"; S.ptmNr = ""; S.ptmMeldung = ""; S.ptTab = "start"; render(); break; }
       /* Mieter und Eigentümer pflegen ihre Kontaktdaten selbst. */
       case "pt-mein-speichern": {
         const pn = portalNutzer(); if (!pn) return;
@@ -15295,6 +15800,7 @@ const Objekte = (() => {
     S.lieferanten = Speicher.lokal("lieferanten");
     S.mahnEinst = (Speicher.lokal("mahnwesen") || [])[0] || null;
     S.vpi = (Speicher.lokal("indizes") || [])[0] || null;
+    S.foerd = (Speicher.lokal("foerderung") || [])[0] || null;
     S.rahmen = Speicher.lokal("kontenrahmen").filter(r => r && Array.isArray(r.konten));
     if (!S.rahmen.length) { rahmenListe(); rahmenAlleSichern(); }
     try { S.sitzung = localStorage.getItem("ov_sitzung") || sessionStorage.getItem("ov_sitzung") || ""; } catch (e) { S.sitzung = ""; }
@@ -15333,6 +15839,8 @@ const Objekte = (() => {
     Speicher.beobachten("mahnwesen", l => { S.mahnEinst = (l || [])[0] || null; Speicher.lokalSetzen("mahnwesen", l || []); });
     Speicher.beobachten("indizes", l => { S.vpi = (l || [])[0] || null; Speicher.lokalSetzen("indizes", l || []);
       if (S.tab === "einstellungen" || S.pEntwurf) render(true); });
+    Speicher.beobachten("foerderung", l => { S.foerd = (l || [])[0] || null; Speicher.lokalSetzen("foerderung", l || []);
+      if (S.tab === "einstellungen") render(true); });
     Speicher.beobachten("lieferanten", l => { S.lieferanten = l || []; Speicher.lokalSetzen("lieferanten", S.lieferanten); });
     Speicher.beobachten("kontenrahmen", l => { const gut = (l || []).filter(r => r && Array.isArray(r.konten));
       if (gut.length) { S.rahmen = gut; Speicher.lokalSetzen("kontenrahmen", gut); if (S.tab === "einstellungen") render(true); } });
