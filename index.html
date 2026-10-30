@@ -160,12 +160,28 @@ main{padding:8px clamp(16px,4vw,40px) 64px}
 .m3-welt{position:absolute;left:50%;top:58%;width:0;height:0;transform-style:preserve-3d;transition:transform .25s ease-out}
 .m3-welt.sofort{transition:none}
 .m3-box{position:absolute;left:0;top:0;width:0;height:0;transform-style:preserve-3d}
-.m3-f{position:absolute;left:0;top:0;border:1px solid rgba(15,23,42,.18);box-sizing:border-box;
+.m3-f{position:absolute;left:0;top:0;border:1px solid rgba(15,23,42,.14);box-sizing:border-box;
   display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;
   text-shadow:0 1px 2px rgba(0,0,0,.35);overflow:hidden}
+.m3-fenster{position:absolute;border-radius:2px;background:linear-gradient(158deg,#e4f0f8 0%,#a8c7de 46%,#6f8fae 100%);
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.8),0 1px 2px rgba(15,23,42,.3)}
+.m3-fenster::after{content:"";position:absolute;inset:2px;
+  background:linear-gradient(to right,transparent calc(50% - 1px),rgba(255,255,255,.78) calc(50% - 1px),rgba(255,255,255,.78) calc(50% + 1px),transparent calc(50% + 1px)),
+             linear-gradient(to bottom,transparent calc(50% - 1px),rgba(255,255,255,.78) calc(50% - 1px),rgba(255,255,255,.78) calc(50% + 1px),transparent calc(50% + 1px))}
+.m3-bank{position:absolute;border-radius:1px;background:rgba(255,255,255,.72);box-shadow:0 1px 1px rgba(15,23,42,.22)}
+.m3-tuer{position:absolute;border-radius:3px 3px 0 0;background:linear-gradient(168deg,#7a5543 0%,#4e3527 100%);
+  box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.3),0 1px 2px rgba(15,23,42,.3)}
+.m3-schild{position:absolute;left:4px;bottom:3px;font-size:8.5px;font-weight:700;letter-spacing:.02em;
+  color:#2b3440;background:rgba(255,255,255,.7);border-radius:5px;padding:0 4px;text-shadow:none;line-height:1.5}
+.m3-ziegel{background-image:repeating-linear-gradient(to right,rgba(0,0,0,.14) 0 1px,transparent 1px 13px),
+  repeating-linear-gradient(to bottom,rgba(0,0,0,.1) 0 1px,transparent 1px 9px)}
+.m3-rasen{background:linear-gradient(170deg,#8fbf7a 0%,#6fa45e 100%)}
+.m3-schatten{position:absolute;border-radius:50%;background:radial-gradient(ellipse at center,rgba(15,23,42,.3),transparent 70%);
+  filter:blur(5px)}
 .m3-klick{cursor:pointer}
 .m3-klick:hover .m3-f{filter:brightness(1.18)}
-.m3-an .m3-f{box-shadow:inset 0 0 0 2px #fff;filter:brightness(1.22)}
+.m3-an .m3-f{box-shadow:inset 0 0 0 3px var(--accent),0 0 16px rgba(79,70,229,.45);filter:brightness(1.12)}
+.m3-an .m3-schild{background:var(--accent);color:#fff}
 .m3-blass{opacity:.14;pointer-events:none}
 .m3-etikett{position:absolute;left:0;top:0;transform-style:preserve-3d;white-space:nowrap;font-size:12px;
   font-weight:700;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:999px;
@@ -1765,21 +1781,44 @@ const Objekte = (() => {
     if (istWeg(o) || e.eigentuemerId) return M3_FARBEN.selbst.f;
     return M3_FARBEN.leer.f;
   }
-  /* Einen Quader aus sechs Flächen bauen. */
+  /* Einen Quader aus sechs Flächen bauen. Jede Seite bekommt ihr eigenes Licht –
+     vorne hell, hinten dunkel – sonst sieht der Kasten flach aus. */
   function m3Quader(x, y, z, w, hh, d, farbe, text, extra) {
-    const f = (fw, fh, tr, deck) => "<div class='m3-f' style='width:" + fw + "px;height:" + fh + "px;margin-left:" +
-      (-fw / 2) + "px;margin-top:" + (-fh / 2) + "px;background:" + farbe + ";" +
-      (deck ? "filter:brightness(1.14);" : "") + "transform:" + tr + "'>" + (deck === 2 ? esc(text || "") : "") + "</div>";
-    return "<div class='m3-box" + (extra && extra.klasse ? " " + extra.klasse : "") + "'" +
-      (extra && extra.attr ? " " + extra.attr : "") +
+    const o = extra || {};
+    const f = (fw, fh, tr, hell, inhalt, klasse) => "<div class='m3-f" + (klasse ? " " + klasse : "") +
+      "' style='width:" + fw + "px;height:" + fh + "px;margin-left:" + (-fw / 2) + "px;margin-top:" + (-fh / 2) +
+      "px;background:" + farbe + ";filter:brightness(" + hell + ");transform:" + tr + "'>" + (inhalt || "") + "</div>";
+    return "<div class='m3-box" + (o.klasse ? " " + o.klasse : "") + "'" + (o.attr ? " " + o.attr : "") +
       " style='transform:translate3d(" + x + "px," + y + "px," + z + "px)'>" +
-      f(w, hh, "translateZ(" + (d / 2) + "px)", 2) +
-      f(w, hh, "rotateY(180deg) translateZ(" + (d / 2) + "px)") +
-      f(d, hh, "rotateY(-90deg) translateZ(" + (w / 2) + "px)") +
-      f(d, hh, "rotateY(90deg) translateZ(" + (w / 2) + "px)") +
-      f(w, d, "rotateX(90deg) translateZ(" + (hh / 2) + "px)", 1) +
-      f(w, d, "rotateX(-90deg) translateZ(" + (hh / 2) + "px)") + "</div>";
+      f(w, hh, "translateZ(" + (d / 2) + "px)", 1.03, o.vorn !== undefined ? o.vorn :
+        (text ? "<span class='m3-schild'>" + esc(text) + "</span>" : ""), o.ziegel) +
+      f(w, hh, "rotateY(180deg) translateZ(" + (d / 2) + "px)", 0.72, "", o.ziegel) +
+      f(d, hh, "rotateY(-90deg) translateZ(" + (w / 2) + "px)", 0.84, "", o.ziegel) +
+      f(d, hh, "rotateY(90deg) translateZ(" + (w / 2) + "px)", 0.92, "", o.ziegel) +
+      f(w, d, "rotateX(90deg) translateZ(" + (hh / 2) + "px)", 1.16, "", o.ziegel) +
+      f(w, d, "rotateX(-90deg) translateZ(" + (hh / 2) + "px)", 0.66) + "</div>";
   }
+  /* Fenster, Fensterbank und bei Bedarf eine Haustür auf die Vorderseite setzen. */
+  function m3Fassade(w, hh, text, tuer) {
+    const anzahl = w < 85 ? 1 : w < 170 ? 2 : 3;
+    const fb = Math.min(30, Math.round(w / (anzahl * 2.1)));
+    const fh = Math.max(16, Math.round(hh * 0.44));
+    const oben = Math.round(hh * 0.22);
+    let h = "";
+    for (let i = 0; i < anzahl; i++) {
+      const links = Math.round((w / (anzahl + 1)) * (i + 1) - fb / 2);
+      if (tuer && i === 0) {
+        const th = Math.round(hh * 0.62), tb = Math.round(fb * 0.86);
+        h += "<div class='m3-tuer' style='left:" + links + "px;bottom:0;width:" + tb + "px;height:" + th + "px'></div>";
+        continue;
+      }
+      h += "<div class='m3-fenster' style='left:" + links + "px;top:" + oben + "px;width:" + fb + "px;height:" + fh + "px'></div>" +
+        "<div class='m3-bank' style='left:" + (links - 2) + "px;top:" + (oben + fh) + "px;width:" + (fb + 4) + "px;height:2px'></div>";
+    }
+    return h + (text ? "<span class='m3-schild'>" + esc(text) + "</span>" : "");
+  }
+  /* Aus der Statusfarbe einen Putzton machen – das Haus soll nicht knallbunt sein. */
+  const m3Putz = farbe => "color-mix(in srgb, " + farbe + " 34%, #f0e8da)";
   const m3Stand = () => { if (!S.m3 || typeof S.m3 !== "object") S.m3 = { drehen: 32, neigen: 16, zoom: 1,
     etage: null, einheit: "", auf: false, farbe: "status", bearbeiten: false }; return S.m3; };
   /* Das Modell selbst. */
@@ -1799,23 +1838,31 @@ const Objekte = (() => {
        sauberes Haus statt einer Treppe, auch wenn oben weniger Wohnungen liegen. */
     const gesamtBreite = Math.max(2, bau.breiteste) * M3_BREITE;
     const hoehe = bau.etagen.length * (M3_HOEHE + spalt);
-    m.fit = Math.min(1, 430 / (hoehe + 110), 1000 / (gesamtBreite + 160));
-    const dachBasis = -hoehe;
+    m.fit = Math.min(1, 430 / (hoehe + 130), 1000 / (gesamtBreite + 180));
+    const dachBasis = -hoehe - ((md.stil || "haus") === "haus" ? 12 : 0);
+    const haus = (md.stil || "haus") === "haus";
     let welt = "";
-    /* Boden */
-    welt += m3Quader(0, 5, 0, gesamtBreite + 56, 10, M3_TIEFE + 56, "#cbd3de", "", {});
+    /* Grundstück mit Schatten */
+    welt += m3Quader(0, 5, 0, gesamtBreite + 104, 8, M3_TIEFE + 104, haus ? "#7fae6b" : "#cbd3de", "", {});
+    /* Sockel unter dem Haus */
+    if (haus) welt += m3Quader(0, -5, 0, gesamtBreite + 14, 14, M3_TIEFE + 14, "#9a9387", "", {});
     /* Etagen und Einheiten */
     bau.etagen.forEach((et, idx) => {
       const n = et.teile.length;
       const bw = gesamtBreite / n;
-      const y = -(M3_HOEHE / 2) - idx * (M3_HOEHE + spalt);
+      const y = -(M3_HOEHE / 2) - idx * (M3_HOEHE + spalt) - (haus ? 12 : 0);
       const blass = m.etage !== null && m.etage !== et.nr;
+      const unten = idx === 0 || (et.nr === 0 && !bau.etagen.some(z2 => z2.nr === 0 && z2 !== et));
       et.teile.forEach((x, j) => {
         const bx = (j - (n - 1) / 2) * bw;
-        const farbe = m3Farbe(o, x.e, m.farbe, rueck);
+        const roh = m3Farbe(o, x.e, m.farbe, rueck);
+        const farbe = haus ? m3Putz(roh) : roh;
         const an = m.einheit === x.e.id;
-        welt += m3Quader(bx, y, 0, bw - M3_LUECKE, M3_HOEHE - 2, M3_TIEFE, farbe,
-          (x.e.nr || x.e.art || ""), { klasse: "m3-klick" + (blass ? " m3-blass" : "") + (an ? " m3-an" : ""),
+        const bb = bw - M3_LUECKE, bh = M3_HOEHE - 2;
+        const schild = x.e.nr || x.e.art || "";
+        welt += m3Quader(bx, y, 0, bb, bh, M3_TIEFE, farbe, schild,
+          { klasse: "m3-klick" + (blass ? " m3-blass" : "") + (an ? " m3-an" : ""),
+            vorn: haus ? m3Fassade(bb, bh, schild, et.nr === 0 && j === 0) : undefined,
             attr: "data-act='m3-einheit' data-e='" + esc(x.e.id) + "' title='" +
               esc([x.e.nr || x.e.art, x.e.lage, x.e.flaeche ? x.e.flaeche + " m²" : ""].filter(Boolean).join(" · ")) + "'" });
       });
@@ -1828,18 +1875,19 @@ const Objekte = (() => {
       const lang = Math.round(Math.sqrt(ht * ht + rh * rh));
       const yc = dachBasis - rh / 2;
       /* Vorne heller, hinten dunkler – dadurch liest sich das Dach räumlich. */
-      const dachF = (tr, w2, h2, hell, clip) => "<div class='m3-f' style='width:" + w2 + "px;height:" + h2 + "px;margin-left:" +
-        (-w2 / 2) + "px;margin-top:" + (-h2 / 2) + "px;background:#8d5a4a;filter:brightness(" + hell + ");transform:" + tr + ";" +
+      const dachF = (tr, w2, h2, hell, clip, ziegel) => "<div class='m3-f" + (ziegel ? " m3-ziegel" : "") +
+        "' style='width:" + w2 + "px;height:" + h2 + "px;margin-left:" +
+        (-w2 / 2) + "px;margin-top:" + (-h2 / 2) + "px;background:#9c5f49;filter:brightness(" + hell + ");transform:" + tr + ";" +
         (clip ? "clip-path:polygon(0 100%,50% 0,100% 100%);border:0;" : "") + "'></div>";
       const db = gesamtBreite + 16, dt = M3_TIEFE + 16;
       welt += "<div class='m3-box' style='transform:translate3d(0," + yc + "px,0)'>" +
-        dachF("translateZ(" + (dt / 4) + "px) rotateX(" + (90 - win) + "deg)", db, lang, 1.12) +
-        dachF("translateZ(" + (-dt / 4) + "px) rotateX(" + (90 + win) + "deg)", db, lang, 0.74) +
+        dachF("translateZ(" + (dt / 4) + "px) rotateX(" + (90 - win) + "deg)", db, lang, 1.12, false, haus) +
+        dachF("translateZ(" + (-dt / 4) + "px) rotateX(" + (90 + win) + "deg)", db, lang, 0.74, false, haus) +
         dachF("rotateY(-90deg) translateZ(" + (db / 2) + "px)", dt, rh, 0.9, true) +
         dachF("rotateY(90deg) translateZ(" + (db / 2) + "px)", dt, rh, 0.9, true) +
         "</div>";
     } else {
-      welt += m3Quader(0, dachBasis - 7, 0, gesamtBreite + 16, 14, M3_TIEFE + 16, "#8d5a4a", "", {});
+      welt += m3Quader(0, dachBasis - 7, 0, gesamtBreite + 16, 14, M3_TIEFE + 16, haus ? "#6d7380" : "#8d5a4a", "", {});
     }
     /* Bedienung */
     const pille = (act, wert, text, an) => "<button type='button' class='pille" + (an ? " an" : "") +
@@ -1882,7 +1930,11 @@ const Objekte = (() => {
     h += "<div class='leiste'><div>" +
       "<button class='btn klein" + (m.bearbeiten ? " haupt" : "") + "' data-act='m3-bearbeiten'>" +
         (m.bearbeiten ? "Zuordnung schließen" : "Etagen zuordnen") + "</button>" +
-      "<div class='feld' style='display:inline-grid;min-width:170px'><label for='m3-dach'>Dachform</label>" +
+      "<div class='feld' style='display:inline-grid;min-width:150px'><label for='m3-stil'>Darstellung</label>" +
+      "<select id='m3-stil' data-m3d='stil'>" +
+      [["haus", "Wie ein Haus"], ["schema", "Schlichte Kästen"]].map(([w, l]) => "<option value='" + w + "'" +
+        ((md.stil || "haus") === w ? " selected" : "") + ">" + l + "</option>").join("") + "</select></div>" +
+      "<div class='feld' style='display:inline-grid;min-width:150px'><label for='m3-dach'>Dachform</label>" +
       "<select id='m3-dach' data-m3d='dach'>" +
       [["sattel", "Satteldach"], ["flach", "Flachdach"]].map(([w, l]) => "<option value='" + w + "'" +
         ((md.dach || "sattel") === w ? " selected" : "") + ">" + l + "</option>").join("") + "</select></div>" +
