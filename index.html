@@ -153,6 +153,33 @@ main{padding:8px clamp(16px,4vw,40px) 64px}
 .klapp-kopf h2{margin:0;font-size:17px}
 .klapp-pfeil{color:var(--muted);font-size:12px;line-height:1.6}
 .klapp-inhalt{padding:0 clamp(18px,4vw,32px) 24px}
+/* ---------- Gebäudemodell in 3D ---------- */
+.m3-buehne{position:relative;height:clamp(380px,56vh,620px);border-radius:18px;overflow:hidden;cursor:grab;
+  background:linear-gradient(180deg,var(--field) 0%,var(--surface) 70%);touch-action:none;user-select:none}
+.m3-buehne.zieht{cursor:grabbing}
+.m3-welt{position:absolute;left:50%;top:58%;width:0;height:0;transform-style:preserve-3d;transition:transform .25s ease-out}
+.m3-welt.sofort{transition:none}
+.m3-box{position:absolute;left:0;top:0;width:0;height:0;transform-style:preserve-3d}
+.m3-f{position:absolute;left:0;top:0;border:1px solid rgba(15,23,42,.18);box-sizing:border-box;
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;
+  text-shadow:0 1px 2px rgba(0,0,0,.35);overflow:hidden}
+.m3-klick{cursor:pointer}
+.m3-klick:hover .m3-f{filter:brightness(1.18)}
+.m3-an .m3-f{box-shadow:inset 0 0 0 2px #fff;filter:brightness(1.22)}
+.m3-blass{opacity:.14;pointer-events:none}
+.m3-etikett{position:absolute;left:0;top:0;transform-style:preserve-3d;white-space:nowrap;font-size:12px;
+  font-weight:700;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:999px;
+  padding:3px 10px;cursor:pointer}
+.m3-etikett:hover{border-color:var(--accent);color:var(--accent)}
+.m3-leiste{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:12px 0}
+.m3-leiste .pille{padding:6px 12px;font-size:13px}
+.m3-legende{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px;font-size:13px;color:var(--muted)}
+.m3-legende span{display:flex;align-items:center;gap:6px}
+.m3-punkt{width:12px;height:12px;border-radius:4px;display:inline-block}
+.m3-hinweis{position:absolute;left:14px;bottom:12px;font-size:12.5px;color:var(--muted);background:var(--surface);
+  border-radius:10px;padding:6px 10px;opacity:.9;pointer-events:none}
+.m3-gitter{display:grid;grid-template-columns:1.2fr 90px 90px 1fr;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+@media(max-width:820px){.m3-gitter{grid-template-columns:1fr 1fr}}
 .ug-row{display:grid;grid-template-columns:38px 1.6fr 80px 130px 1.4fr;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
 .ug-haken{width:26px;height:26px;border-radius:8px;border:1.5px solid var(--line);background:var(--field);cursor:pointer;font-size:15px;line-height:1;color:var(--ok)}
 .ug-haken.an{border-color:var(--ok);background:var(--ok-soft)}
@@ -1431,8 +1458,9 @@ const Objekte = (() => {
   const S = { hwTab: "stamm", rgStapel: [], rgEntwurf: null, rgZu: {}, rahmen: [], rahmenOffen: "", kkAuf: {}, kkDetail: false, krProtAuf: false, krVorher: null, bank: null, lsMonat: "", lsDatum: "", sitzung: "", anFehler: "", anMail: "", pwWechsel: false, pwMeldung: "", pwMeldungOk: false, wpJahr: "", wpDatum: "", wpTop: "",
     sollOffen: "", zaNeu: "", zaEntwurf: null, bhFrei: "", bhGrund: "", infoAlle: false, vmtTab: "miete", vkOffen: null, vkWahl: false, vkSuche: "", bonOffen: null, bonHinweis: "", tObjSuche: "", anruferTreffer: null, tdTab: "vorgang", briefAnzeige: null, datFilter: { suche: "", quelle: "" }, eTab: "stamm", pTab: "stamm", pBearbeiten: false, eaHinweis: "", vermTab: "frei", vermOffen: null, vermFeedback: null, kiLaeuft: false, kiHinweis: "", kiStop: null, mails: [], mailTab: "eingang", mailFilter: { suche: "" }, mailImport: null, mailOffenId: null, mailRichtung: "ein",
     objTab: "stammdaten", bhTab: "konten", rundTab: "rund", ueEinheit: null, mvBausteine: [], mvOffen: "", mvDruck: null, mvbsEntwurf: null, ptAbr: null, rlDruck: null,
-    mahnEinst: null, vpi: null, ixDruck: null, zuNeu: null, objAuf: [], ugDruck: false, pStaffel: { ab: "", anzahl: "3", schritt: "", art: "eur" }, mhDruck: null, mhVerzug: null, mhEinstAuf: false, rzEntwurf: null, rzOffen: "", rzDruck: null,
-    gbTab: "gewaehr", gwOffen: "", gwRuege: "", ihJahre: 15, brJahr: "", brBericht: null, tickets: [], tAnsicht: "liste", kalDatum: "", kalModus: "monat", kalWer: [], tEntwurfTicket: null, ticketOffen: null, ticketBearbeiten: false, ticketVorher: null, mailNeuFuer: null, mailOffen: null, mailVerschieben: null, mailRichtung: "ein", ichBin: "", einst: { ichBin: "", zeitraum: "woche", nurMeine: true, ansicht: "liste", kalModus: "monat" }, tFilter: { status: "", suche: "", nurMeine: true, zeitraum: "woche" }, bearbeiten: false, uOffen: null, anlageOffen: null, team: [], tEntwurf: null, eigNeuFuer: null, mieterNeuFuer: null, pObjekte: {}, pDirty: new Set(), tab: "vertraege", liste: [], handwerker: [], personen: [], pEntwurf: null, pFilter: { rolle: "", suche: "", ehemalige: false }, ansicht: "liste", entwurf: null, istNeu: false, hwEntwurf: null, hwNeuFuer: null,
+    mahnEinst: null, vpi: null, ixDruck: null, zuNeu: null, objAuf: [], ugDruck: false,
+    m3: { drehen: 32, neigen: 16, zoom: 1, etage: null, einheit: "", auf: false, farbe: "status", bearbeiten: false }, pStaffel: { ab: "", anzahl: "3", schritt: "", art: "eur" }, mhDruck: null, mhVerzug: null, mhEinstAuf: false, rzEntwurf: null, rzOffen: "", rzDruck: null,
+    gbTab: "modell", gwOffen: "", gwRuege: "", ihJahre: 15, brJahr: "", brBericht: null, tickets: [], tAnsicht: "liste", kalDatum: "", kalModus: "monat", kalWer: [], tEntwurfTicket: null, ticketOffen: null, ticketBearbeiten: false, ticketVorher: null, mailNeuFuer: null, mailOffen: null, mailVerschieben: null, mailRichtung: "ein", ichBin: "", einst: { ichBin: "", zeitraum: "woche", nurMeine: true, ansicht: "liste", kalModus: "monat" }, tFilter: { status: "", suche: "", nurMeine: true, zeitraum: "woche" }, bearbeiten: false, uOffen: null, anlageOffen: null, team: [], tEntwurf: null, eigNeuFuer: null, mieterNeuFuer: null, pObjekte: {}, pDirty: new Set(), tab: "vertraege", liste: [], handwerker: [], personen: [], pEntwurf: null, pFilter: { rolle: "", suche: "", ehemalige: false }, ansicht: "liste", entwurf: null, istNeu: false, hwEntwurf: null, hwNeuFuer: null,
     filter: { art: "", suche: "", beendete: false }, loeschen: false };
   const app = $("#app");
   $("#anlagenarten").innerHTML = Object.keys(Objekte.ANLAGEN).map(a => "<option value='" + esc(a) + "'>").join("");
@@ -1652,6 +1680,273 @@ const Objekte = (() => {
       "<div>" + zeile("Eigentümer", kontakt(eig)) + zeile("Mieter", mie ? kontakt(mie) + (mie.mietbeginn ? "<br><span class='fuer'>seit " + Objekte.datum(mie.mietbeginn) + (mie.kaltmiete ? " · " + esc(mie.kaltmiete) + " € kalt" : "") + "</span>" : "") : "selbst genutzt") +
       zeile("Umlageschlüssel", esc(schluessel)) + zeile("Zähler", esc(zaehler)) + "</div></div></div>";
   }
+  /* ================= Gebäudemodell in 3D =================
+     Das Modell wird aus den Einheiten gebaut, nicht aus einer Zeichnung: jede Etage ist eine
+     Reihe von Kästen, jeder Kasten eine Einheit. Welche Einheit in welcher Etage liegt, errät
+     das Programm aus der Lage („2. OG links“) und lässt sich von Hand korrigieren.
+     Gezeichnet wird mit den 3D-Mitteln des Browsers – ohne Zusatzprogramm und ohne Internet. */
+  const M3_BREITE = 118, M3_HOEHE = 54, M3_TIEFE = 92, M3_LUECKE = 2;
+  const M3_FARBEN = {
+    frei:   { f: "#e8833a", t: "frei / in Vermarktung" },
+    miet:   { f: "#3f8f5f", t: "vermietet" },
+    selbst: { f: "#4a73c4", t: "selbst genutzt" },
+    rueck:  { f: "#c0392b", t: "Rückstand" },
+    kauf:   { f: "#7b52c9", t: "im Verkauf" },
+    leer:   { f: "#8a95a6", t: "ohne Zuordnung" }
+  };
+  const M3_ARTFARBEN = ["#3f8f5f", "#4a73c4", "#e8833a", "#7b52c9", "#2f9e9e", "#b4793a", "#8a95a6"];
+  /* Aus der Lage oder der Nummer die Etage lesen. Dachgeschoss zählt als oberste Ebene. */
+  function m3EtageRaten(e) {
+    const t = String((e.lage || "") + " " + (e.nr || "") + " " + (e.art || "")).toLowerCase();
+    let m = t.match(/(\d+)\s*\.?\s*(og|obergeschoss|stock|etage)/);
+    if (m) return Number(m[1]);
+    if (/\b(dg|dachgeschoss|mansarde|spitzboden)\b/.test(t)) return 90;
+    if (/\b(eg|erdgeschoss|parterre|hochparterre)\b/.test(t)) return 0;
+    if (/\b(kg|ug|keller|untergeschoss|souterrain|tiefgarage|tg)\b/.test(t)) return -1;
+    if (/garage|stellplatz|carport/.test(t)) return -1;
+    return null;
+  }
+  function m3PosRaten(e) {
+    const t = String(e.lage || "").toLowerCase();
+    if (/links|vorne links|hinten links/.test(t)) return 1;
+    if (/mitte|mittig/.test(t)) return 2;
+    if (/rechts/.test(t)) return 3;
+    return null;
+  }
+  const m3Modell = o => { if (!o.modell || typeof o.modell !== "object") o.modell = {}; return o.modell; };
+  /* Die Etagen mit ihren Einheiten, von unten nach oben. */
+  function m3Bau(o) {
+    const liste = (o.einheitenListe || []);
+    const mitEtage = liste.map((e, i) => {
+      const eig = e.etage === "" || e.etage === undefined || e.etage === null ? m3EtageRaten(e) : Number(e.etage);
+      return { e, i, etage: eig === null || isNaN(eig) ? null : eig,
+        pos: Number(e.pos) || m3PosRaten(e) || null };
+    });
+    /* Einheiten ohne Etage werden gleichmäßig verteilt, damit trotzdem ein Haus entsteht. */
+    const ohne = mitEtage.filter(x => x.etage === null);
+    if (ohne.length) {
+      const proEtage = Math.max(1, Math.ceil(Math.sqrt(mitEtage.length)));
+      ohne.forEach((x, k) => { x.etage = Math.floor(k / proEtage); x.geraten = true; });
+    }
+    const dg = mitEtage.filter(x => x.etage === 90);
+    if (dg.length) {
+      const hoechste = mitEtage.filter(x => x.etage !== 90).reduce((m, x) => Math.max(m, x.etage), 0);
+      dg.forEach(x => { x.etage = hoechste + 1; x.dach = true; });
+    }
+    const stufen = [...new Set(mitEtage.map(x => x.etage))].sort((a, b) => a - b);
+    const etagen = stufen.map(nr => {
+      const teil = mitEtage.filter(x => x.etage === nr)
+        .sort((a, b) => (a.pos || 99) - (b.pos || 99) || a.i - b.i);
+      return { nr, teile: teil };
+    });
+    const breiteste = etagen.reduce((m, et) => Math.max(m, et.teile.length), 1);
+    return { etagen, breiteste, gesamt: mitEtage.length };
+  }
+  const m3EtageName = nr => nr === 0 ? "Erdgeschoss" : nr < 0 ? (nr === -1 ? "Keller" : Math.abs(nr) + ". Untergeschoss") : nr + ". OG";
+  /* Welche Farbe bekommt eine Einheit? */
+  function m3Farbe(o, e, modus, rueck) {
+    if (modus === "art") {
+      const arten = [...new Set((o.einheitenListe || []).map(x => x.art || "Wohnung"))];
+      return M3_ARTFARBEN[Math.max(0, arten.indexOf(e.art || "Wohnung")) % M3_ARTFARBEN.length];
+    }
+    if (modus === "flaeche") {
+      const werte = (o.einheitenListe || []).map(x => betragZahl(x.flaeche)).filter(x => x > 0);
+      const max = werte.length ? Math.max.apply(null, werte) : 0;
+      const w = betragZahl(e.flaeche);
+      if (!max || !w) return M3_FARBEN.leer.f;
+      const p = Math.round(30 + 45 * (1 - w / max));
+      return "hsl(205 42% " + p + "%)";
+    }
+    if ((rueck[e.id] || 0) > 0.005) return M3_FARBEN.rueck.f;
+    if (vkVon(e).aktiv) return M3_FARBEN.kauf.f;
+    const vm = vermVon(e, o);
+    if (vm.status !== "vermietet") return M3_FARBEN.frei.f;
+    if (mieterVon(e.id, o)) return M3_FARBEN.miet.f;
+    if (istWeg(o) || e.eigentuemerId) return M3_FARBEN.selbst.f;
+    return M3_FARBEN.leer.f;
+  }
+  /* Einen Quader aus sechs Flächen bauen. */
+  function m3Quader(x, y, z, w, hh, d, farbe, text, extra) {
+    const f = (fw, fh, tr, deck) => "<div class='m3-f' style='width:" + fw + "px;height:" + fh + "px;margin-left:" +
+      (-fw / 2) + "px;margin-top:" + (-fh / 2) + "px;background:" + farbe + ";" +
+      (deck ? "filter:brightness(1.14);" : "") + "transform:" + tr + "'>" + (deck === 2 ? esc(text || "") : "") + "</div>";
+    return "<div class='m3-box" + (extra && extra.klasse ? " " + extra.klasse : "") + "'" +
+      (extra && extra.attr ? " " + extra.attr : "") +
+      " style='transform:translate3d(" + x + "px," + y + "px," + z + "px)'>" +
+      f(w, hh, "translateZ(" + (d / 2) + "px)", 2) +
+      f(w, hh, "rotateY(180deg) translateZ(" + (d / 2) + "px)") +
+      f(d, hh, "rotateY(-90deg) translateZ(" + (w / 2) + "px)") +
+      f(d, hh, "rotateY(90deg) translateZ(" + (w / 2) + "px)") +
+      f(w, d, "rotateX(90deg) translateZ(" + (hh / 2) + "px)", 1) +
+      f(w, d, "rotateX(-90deg) translateZ(" + (hh / 2) + "px)") + "</div>";
+  }
+  const m3Stand = () => { if (!S.m3 || typeof S.m3 !== "object") S.m3 = { drehen: 32, neigen: 16, zoom: 1,
+    etage: null, einheit: "", auf: false, farbe: "status", bearbeiten: false }; return S.m3; };
+  /* Das Modell selbst. */
+  function modellHtml(o) {
+    const m = m3Stand();
+    const bau = m3Bau(o);
+    const md = m3Modell(o);
+    const rueck = {};
+    try { forderungen(o).forEach(x => { rueck[x.e.id] = x.offen; }); } catch (e) {}
+    if (!bau.gesamt) return "<section class='gruppe voll'><h2>Gebäudemodell</h2>" +
+      "<p class='unter'>Für dieses Objekt sind noch keine Einheiten angelegt. Sobald Wohnungen erfasst sind, " +
+      "baut das Programm daraus das Modell.</p></section>";
+    const spalt = m.auf ? 46 : 0;
+    /* Damit immer das ganze Haus zu sehen ist, wird es passend verkleinert. */
+    m.fit = 1;
+    /* Jede Etage ist gleich breit – die Wohnungen teilen sich die Breite. So entsteht ein
+       sauberes Haus statt einer Treppe, auch wenn oben weniger Wohnungen liegen. */
+    const gesamtBreite = Math.max(2, bau.breiteste) * M3_BREITE;
+    const hoehe = bau.etagen.length * (M3_HOEHE + spalt);
+    m.fit = Math.min(1, 430 / (hoehe + 110), 1000 / (gesamtBreite + 160));
+    const dachBasis = -hoehe;
+    let welt = "";
+    /* Boden */
+    welt += m3Quader(0, 5, 0, gesamtBreite + 56, 10, M3_TIEFE + 56, "#cbd3de", "", {});
+    /* Etagen und Einheiten */
+    bau.etagen.forEach((et, idx) => {
+      const n = et.teile.length;
+      const bw = gesamtBreite / n;
+      const y = -(M3_HOEHE / 2) - idx * (M3_HOEHE + spalt);
+      const blass = m.etage !== null && m.etage !== et.nr;
+      et.teile.forEach((x, j) => {
+        const bx = (j - (n - 1) / 2) * bw;
+        const farbe = m3Farbe(o, x.e, m.farbe, rueck);
+        const an = m.einheit === x.e.id;
+        welt += m3Quader(bx, y, 0, bw - M3_LUECKE, M3_HOEHE - 2, M3_TIEFE, farbe,
+          (x.e.nr || x.e.art || ""), { klasse: "m3-klick" + (blass ? " m3-blass" : "") + (an ? " m3-an" : ""),
+            attr: "data-act='m3-einheit' data-e='" + esc(x.e.id) + "' title='" +
+              esc([x.e.nr || x.e.art, x.e.lage, x.e.flaeche ? x.e.flaeche + " m²" : ""].filter(Boolean).join(" · ")) + "'" });
+      });
+    });
+    /* Dach */
+    if ((md.dach || "sattel") === "sattel") {
+      const rh = 66, halb = M3_TIEFE / 2;
+      const ht = (M3_TIEFE + 16) / 2;
+      const win = Math.round(Math.atan2(rh, ht) * 180 / Math.PI);
+      const lang = Math.round(Math.sqrt(ht * ht + rh * rh));
+      const yc = dachBasis - rh / 2;
+      /* Vorne heller, hinten dunkler – dadurch liest sich das Dach räumlich. */
+      const dachF = (tr, w2, h2, hell, clip) => "<div class='m3-f' style='width:" + w2 + "px;height:" + h2 + "px;margin-left:" +
+        (-w2 / 2) + "px;margin-top:" + (-h2 / 2) + "px;background:#8d5a4a;filter:brightness(" + hell + ");transform:" + tr + ";" +
+        (clip ? "clip-path:polygon(0 100%,50% 0,100% 100%);border:0;" : "") + "'></div>";
+      const db = gesamtBreite + 16, dt = M3_TIEFE + 16;
+      welt += "<div class='m3-box' style='transform:translate3d(0," + yc + "px,0)'>" +
+        dachF("translateZ(" + (dt / 4) + "px) rotateX(" + (90 - win) + "deg)", db, lang, 1.12) +
+        dachF("translateZ(" + (-dt / 4) + "px) rotateX(" + (90 + win) + "deg)", db, lang, 0.74) +
+        dachF("rotateY(-90deg) translateZ(" + (db / 2) + "px)", dt, rh, 0.9, true) +
+        dachF("rotateY(90deg) translateZ(" + (db / 2) + "px)", dt, rh, 0.9, true) +
+        "</div>";
+    } else {
+      welt += m3Quader(0, dachBasis - 7, 0, gesamtBreite + 16, 14, M3_TIEFE + 16, "#8d5a4a", "", {});
+    }
+    /* Bedienung */
+    const pille = (act, wert, text, an) => "<button type='button' class='pille" + (an ? " an" : "") +
+      "' data-act='" + act + "' data-wert='" + esc(String(wert)) + "'>" + esc(text) + "</button>";
+    let h = "<section class='gruppe voll'><h2>Gebäudemodell <span class='fuer'>" + bau.gesamt + " Einheiten · " +
+      bau.etagen.length + (bau.etagen.length === 1 ? " Etage" : " Etagen") + "</span></h2>" +
+      "<p class='unter'>Ziehen Sie mit der Maus, um das Haus zu drehen. Eine Etage wählen Sie oben aus, " +
+      "eine Wohnung mit einem Klick auf den Kasten – darunter öffnen sich ihre Daten.</p>";
+    h += "<div class='m3-leiste'>" +
+      pille("m3-etage", "", "Alle Etagen", m.etage === null) +
+      bau.etagen.slice().reverse().map(et => pille("m3-etage", et.nr, m3EtageName(et.nr), m.etage === et.nr)).join("") +
+      "</div>";
+    h += "<div class='m3-leiste'>" +
+      "<span class='fuer'>Ansicht</span>" +
+      pille("m3-sicht", "32", "schräg", Math.round(m.drehen) === 32) +
+      pille("m3-sicht", "0", "vorne", Math.round(m.drehen) === 0) +
+      pille("m3-sicht", "90", "seitlich", Math.round(m.drehen) === 90) +
+      pille("m3-sicht", "180", "hinten", Math.round(m.drehen) === 180) +
+      "<button class='btn klein' data-act='m3-zoom' data-wert='+'>größer</button>" +
+      "<button class='btn klein' data-act='m3-zoom' data-wert='-'>kleiner</button>" +
+      "<button class='btn klein" + (m.auf ? " haupt" : "") + "' data-act='m3-auf'>" +
+        (m.auf ? "Etagen zusammenschieben" : "Etagen auffächern") + "</button>" +
+      "<span class='fuer'>Farbe</span>" +
+      pille("m3-farbe", "status", "Belegung", m.farbe === "status") +
+      pille("m3-farbe", "art", "Art", m.farbe === "art") +
+      pille("m3-farbe", "flaeche", "Fläche", m.farbe === "flaeche") +
+      "</div>";
+    h += "<div class='m3-buehne' id='m3-buehne' style='perspective:1500px'>" +
+      "<div class='m3-welt' id='m3-welt' style='transform:rotateX(" + m.neigen + "deg) rotateY(" + m.drehen +
+      "deg) scale(" + cent(m.zoom * m.fit) + ")'><div class='m3-box' style='transform:translate3d(0," +
+      Math.round(hoehe / 2 + 20) + "px,0)'>" + welt + "</div></div>" +
+      "<div class='m3-hinweis'>Ziehen zum Drehen · Mausrad zum Zoomen</div></div>";
+    if (m.farbe === "status") h += "<div class='m3-legende'>" + Object.keys(M3_FARBEN).map(k =>
+      "<span><i class='m3-punkt' style='background:" + M3_FARBEN[k].f + "'></i>" + esc(M3_FARBEN[k].t) + "</span>").join("") + "</div>";
+    if (bau.etagen.some(et => et.teile.some(x => x.geraten)))
+      h += "<ul class='meldungen'><li class='m-hinweis'>Bei einigen Einheiten steht keine Etage in der Lage. " +
+        "Das Programm hat sie verteilt – tragen Sie sie unten unter „Etagen zuordnen“ richtig ein.</li></ul>";
+    /* Die gewählte Einheit mit allen Daten. */
+    const gew = m.einheit ? (o.einheitenListe || []).find(x => x.id === m.einheit) : null;
+    h += "<div class='leiste'><div>" +
+      "<button class='btn klein" + (m.bearbeiten ? " haupt" : "") + "' data-act='m3-bearbeiten'>" +
+        (m.bearbeiten ? "Zuordnung schließen" : "Etagen zuordnen") + "</button>" +
+      "<div class='feld' style='display:inline-grid;min-width:170px'><label for='m3-dach'>Dachform</label>" +
+      "<select id='m3-dach' data-m3d='dach'>" +
+      [["sattel", "Satteldach"], ["flach", "Flachdach"]].map(([w, l]) => "<option value='" + w + "'" +
+        ((md.dach || "sattel") === w ? " selected" : "") + ">" + l + "</option>").join("") + "</select></div>" +
+      "</div></div>";
+    if (m.bearbeiten) {
+      h += "<h3 style='margin-top:14px'>Etagen zuordnen</h3>" +
+        "<p class='unter'>Etage: 0 ist das Erdgeschoss, −1 der Keller, 1 das erste Obergeschoss. " +
+        "Die Reihenfolge bestimmt, wo die Wohnung in der Etage steht.</p>" +
+        "<div class='leiste' style='padding:0 0 8px'><div><button class='btn klein' data-act='m3-raten'>Aus der Lage erkennen</button></div></div>" +
+        "<div class='ue-tab'><div class='m3-gitter'><span>Einheit</span><span>Etage</span><span>Platz</span><span>Lage</span></div>" +
+        (o.einheitenListe || []).map((e, i) => "<div class='m3-gitter'>" +
+          "<span><strong>" + esc(e.nr || e.art) + "</strong></span>" +
+          "<span><input type='text' inputmode='numeric' aria-label='Etage' data-m3e='" + i + "|etage' value='" + esc(e.etage || "") + "' placeholder='" +
+            (m3EtageRaten(e) === null ? "?" : String(m3EtageRaten(e))) + "'></span>" +
+          "<span><input type='text' inputmode='numeric' aria-label='Platz' data-m3e='" + i + "|pos' value='" + esc(e.pos || "") + "' placeholder='1'></span>" +
+          "<span class='fuer'>" + esc(e.lage || "–") + "</span></div>").join("") + "</div>";
+    }
+    if (gew) h += "<h3 style='margin-top:20px'>" + esc(gew.nr || gew.art) +
+      (gew.lage ? " <span class='fuer'>" + esc(gew.lage) + "</span>" : "") + "</h3>" + einheitAnsichtHtml(o, gew);
+    else h += "<p class='unter' style='margin-top:16px'>Noch keine Wohnung gewählt – klicken Sie im Modell auf einen Kasten.</p>";
+    return h + "</section>";
+  }
+  /* Die Drehung wird direkt am Element gesetzt – ein Neuzeichnen bei jeder Mausbewegung
+     wäre zu langsam und würde die Auswahl stören. */
+  function m3Anwenden(sofort) {
+    const el = document.getElementById("m3-welt"); if (!el) return;
+    const m = m3Stand();
+    el.classList.toggle("sofort", !!sofort);
+    el.style.transform = "rotateX(" + m.neigen + "deg) rotateY(" + m.drehen + "deg) scale(" +
+      cent(m.zoom * (m.fit || 1)) + ")";
+  }
+  (() => {
+    let zieht = null;
+    document.addEventListener("pointerdown", e => {
+      const b = e.target.closest("#m3-buehne"); if (!b) return;
+      zieht = { x: e.clientX, y: e.clientY, d: m3Stand().drehen, n: m3Stand().neigen, bewegt: 0 };
+      b.classList.add("zieht");
+      try { b.setPointerCapture(e.pointerId); } catch (x) {}
+    });
+    document.addEventListener("pointermove", e => {
+      if (!zieht) return;
+      const dx = e.clientX - zieht.x, dy = e.clientY - zieht.y;
+      zieht.bewegt = Math.max(zieht.bewegt, Math.abs(dx) + Math.abs(dy));
+      const m = m3Stand();
+      m.drehen = zieht.d + dx * 0.45;
+      m.neigen = Math.max(-12, Math.min(72, zieht.n + dy * 0.3));
+      m3Anwenden(true);
+    });
+    document.addEventListener("pointerup", e => {
+      const b = document.getElementById("m3-buehne");
+      if (b) b.classList.remove("zieht");
+      /* Wer gedreht hat, wollte keine Wohnung öffnen. */
+      if (zieht && zieht.bewegt > 6) { e.stopPropagation(); const sperre = ev => ev.stopPropagation();
+        document.addEventListener("click", sperre, { capture: true, once: true }); }
+      zieht = null;
+    }, true);
+    document.addEventListener("wheel", e => {
+      const b = e.target.closest("#m3-buehne"); if (!b) return;
+      e.preventDefault();
+      const m = m3Stand();
+      m.zoom = Math.max(0.35, Math.min(2.4, m.zoom * (e.deltaY < 0 ? 1.08 : 1 / 1.08)));
+      m3Anwenden(true);
+    }, { passive: false });
+  })();
   /* ---------- Portal: was Mieter und Eigentümer dieses Objekts sehen ---------- */
   const notfallListe = o => Array.isArray(o.notfall) ? o.notfall : (o.notfall = []);
   const aushangListe = o => Array.isArray(o.aushaenge) ? o.aushaenge : (o.aushaenge = []);
@@ -4039,9 +4334,10 @@ const Objekte = (() => {
     if (S.objTab === "gebaeude") {
       const gt = gbReiter();
       return h + "<nav class='reiter e-reiter' style='margin-top:14px'>" +
-        [["gewaehr", "Gewährleistung"], ["instand", "Instandhaltung"], ["schluessel", "Schlüssel"]].map(([w, l]) =>
+        [["modell", "Gebäudemodell"], ["gewaehr", "Gewährleistung"], ["instand", "Instandhaltung"], ["schluessel", "Schlüssel"]].map(([w, l]) =>
           "<button data-act='gb-tab' data-wert='" + w + "'" + (gt === w ? " aria-current='page'" : "") + ">" + l + "</button>").join("") + "</nav>" +
-        (gt === "gewaehr" ? gewaehrleistungHtml(o) : gt === "instand" ? instandhaltungHtml(o) : schluesselHtml(o)) +
+        (gt === "modell" ? modellHtml(o) : gt === "gewaehr" ? gewaehrleistungHtml(o)
+          : gt === "instand" ? instandhaltungHtml(o) : schluesselHtml(o)) +
         "<div class='leiste'><div><button class='btn' data-act='abbrechen'>Zurück zur Übersicht</button></div></div></div>";
     }
     if (S.objTab === "dienste") return h + objektDiensteHtml(o) +
@@ -4083,6 +4379,9 @@ const Objekte = (() => {
       const offenE = liste.find(e => e.id === S.ueEinheit);
       h += klapp("einheiten", "Einheiten <span class='fuer'>" + liste.length + "</span>",
         "<div class='we-chips'>" + liste.map(e => "<button type='button' class='we-chip" + (offenE && e.id === offenE.id ? " an" : "") + "' data-act='ue-einheit' data-id='" + esc(e.id) + "'>" + esc(e.nr || e.art) + "</button>").join("") + "</div>" +
+        "<div class='leiste' style='padding:8px 0 0'><div><button class='btn klein' data-act='m3-zeigen'" +
+        (offenE ? " data-e='" + esc(offenE.id) + "'" : "") + ">Im Gebäudemodell ansehen</button></div>" +
+        "<span class='fuer'>Das Haus in 3D – Etage für Etage begehbar.</span></div>" +
         (offenE ? einheitAnsichtHtml(o, offenE) : "<p class='unter' style='margin:10px 0 0'>Einheit antippen, um alle Angaben zu sehen.</p>"), true);
     }
     h += klappAus("notfall", notfallAnsichtHtml(o));
@@ -9637,7 +9936,7 @@ const Objekte = (() => {
     return h;
   }
   const rundReiter = () => S.rundTab === "erhoehung" ? "erhoehung" : "rund";
-  const gbReiter = () => ["instand", "schluessel"].includes(S.gbTab) ? S.gbTab : "gewaehr";
+  const gbReiter = () => ["instand", "schluessel", "gewaehr"].includes(S.gbTab) ? S.gbTab : "modell";
   /* ===================== Forderungen: Mahnwesen und Ratenzahlung =====================
      Gemahnt wird immer im Objekt – die Auswertung zeigt nur, wo etwas offen ist.
      Verzug tritt bei Miete und Hausgeld schon mit dem Fälligkeitstag ein (§ 286 Abs. 2 Nr. 1 BGB);
@@ -12064,6 +12363,15 @@ const Objekte = (() => {
       render(true); return;
     }
     if (t.dataset.uf) { const [oid, idx, feld] = t.dataset.uf.split("|"); const o = objFuer(oid); if (o) o.einheitenListe[Number(idx)][feld] = t.value; return; }
+    if (t.dataset.m3e !== undefined && S.entwurf) {
+      const [i, feld] = t.dataset.m3e.split("|");
+      const e = (S.entwurf.einheitenListe || [])[Number(i)];
+      if (e) { e[feld] = t.value.replace(/[^0-9-]/g, ""); objektSichern(S.entwurf); spaeterZeichnen("m3", 900); }
+      return;
+    }
+    if (t.dataset.m3d !== undefined && S.entwurf) {
+      m3Modell(S.entwurf)[t.dataset.m3d] = t.value; objektSichern(S.entwurf); render(true); return;
+    }
     if (t.dataset.ug !== undefined && S.entwurf) {
       const u = uebergabeVon(S.entwurf); u[t.dataset.ug] = t.value; objektSichern(S.entwurf);
       if (t.dataset.ug === "art") render(true); else spaeterZeichnen("ug", 900);
@@ -13604,6 +13912,34 @@ const Objekte = (() => {
         }
         S.pObjekte = {}; S.pEntwurf = null; render(); toast("Gespeichert"); break;
       }
+      /* ---------- Gebäudemodell ---------- */
+      case "m3-zeigen": { const m = m3Stand();
+        m.einheit = b.dataset.e || ""; m.etage = null; S.eTab = "stamm";
+        S.objTab = "gebaeude"; S.gbTab = "modell"; render(); break; }
+      case "m3-einheit": { const m = m3Stand();
+        m.einheit = m.einheit === b.dataset.e ? "" : b.dataset.e; S.eTab = "stamm"; render(true); break; }
+      case "m3-etage": { const m = m3Stand();
+        m.etage = b.dataset.wert === "" ? null : Number(b.dataset.wert); render(true); break; }
+      case "m3-sicht": { const m = m3Stand();
+        m.drehen = Number(b.dataset.wert); m.neigen = 16; render(true); break; }
+      case "m3-zoom": { const m = m3Stand();
+        m.zoom = Math.max(0.35, Math.min(2.4, m.zoom * (b.dataset.wert === "+" ? 1.2 : 1 / 1.2)));
+        m3Anwenden(); break; }
+      case "m3-auf": { const m = m3Stand(); m.auf = !m.auf; render(true); break; }
+      case "m3-farbe": { const m = m3Stand(); m.farbe = b.dataset.wert; render(true); break; }
+      case "m3-bearbeiten": { const m = m3Stand(); m.bearbeiten = !m.bearbeiten; render(true); break; }
+      case "m3-raten": { const o = S.entwurf; if (!o) return;
+        let n = 0;
+        const geraten = (o.einheitenListe || []).map(e => m3EtageRaten(e));
+        /* Das Dachgeschoss liegt eine Ebene über der höchsten erkannten Etage. */
+        const hoechste = geraten.filter(x => x !== null && x !== 90).reduce((m2, x) => Math.max(m2, x), 0);
+        (o.einheitenListe || []).forEach((e, i) => {
+          const et = geraten[i]; const po = m3PosRaten(e);
+          if (et !== null) { e.etage = String(et === 90 ? hoechste + 1 : et); n++; }
+          if (po !== null) e.pos = String(po);
+        });
+        await objektSichern(o); render(true);
+        toast(n ? n + " Einheiten zugeordnet" : "In den Lagebezeichnungen steht keine Etage."); break; }
       /* ---------- Übergabeprotokoll ---------- */
       case "ug-ok": { const o = S.entwurf; if (!o) return;
         const u = uebergabeVon(o); const k = b.dataset.k;
