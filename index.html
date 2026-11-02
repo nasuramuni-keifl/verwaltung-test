@@ -1960,6 +1960,8 @@ const Objekte = (() => {
         dachF("translateZ(" + Math.round(-dt / 4) + "px) rotateX(" + (90 + win) + "deg)", db, lang, 0.74, false, haus) +
         dachF("rotateY(-90deg) translateZ(" + Math.round(db / 2) + "px)", dt, rh, 0.9, true) +
         dachF("rotateY(90deg) translateZ(" + Math.round(db / 2) + "px)", dt, rh, 0.9, true) +
+        /* Untersicht: ohne sie schaut man von unten in ein offenes Dach hinein. */
+        dachF("rotateX(-90deg) translateZ(" + Math.round(rh / 2) + "px)", db, dt, 0.6, false) +
         "</div>";
     } else {
       dach += m3Quader(0, yOff + dachBasis - q(7), 0, gesamtBreite + q(16), q(14), tiefe + q(16),
@@ -1993,10 +1995,11 @@ const Objekte = (() => {
       "</div>";
     /* Minus, damit ein größerer Wert heißt: weiter von oben draufschauen. */
     const dreh = "rotateX(" + (-m.neigen) + "deg) rotateY(" + m.drehen + "deg)";
-    const ebene = (id, inhalt) => "<div class='m3-welt sofort' data-m3welt='1'" + (id ? " id='" + id + "'" : "") +
-      " style='--m3s:" + sk + ";transform:" + dreh + "'>" + inhalt + "</div>";
+    const ebene = (art, id, inhalt) => "<div class='m3-welt sofort' data-m3welt='" + art + "'" +
+      (id ? " id='" + id + "'" : "") + " style='--m3s:" + sk + ";transform:" + dreh +
+      ";z-index:" + m3Stapel(art, m.neigen) + "'>" + inhalt + "</div>";
     h += "<div class='m3-buehne' id='m3-buehne' style='perspective:1500px'>" +
-      ebene("", boden) + ebene("m3-welt", welt) + ebene("", dach) +
+      ebene("boden", "", boden) + ebene("haus", "m3-welt", welt) + ebene("dach", "", dach) +
       "<div class='m3-hinweis'>Ziehen zum Drehen · Mausrad zum Zoomen</div></div>";
     if (m.farbe === "status") h += "<div class='m3-legende'>" + Object.keys(M3_FARBEN).map(k =>
       "<span><i class='m3-punkt' style='background:" + M3_FARBEN[k].f + "'></i>" + esc(M3_FARBEN[k].t) + "</span>").join("") + "</div>";
@@ -2037,12 +2040,18 @@ const Objekte = (() => {
   }
   /* Die Drehung wird direkt am Element gesetzt – ein Neuzeichnen bei jeder Mausbewegung
      wäre zu langsam und würde die Auswahl stören. */
+  /* Boden, Haus und Dach liegen in getrennten Ebenen. Von oben gehört der Boden nach
+     hinten und das Dach nach vorn – von unten genau umgekehrt. */
+  const m3Stapel = (art, neigen) => neigen < 0
+    ? (art === "dach" ? 1 : art === "haus" ? 2 : 3)
+    : (art === "boden" ? 1 : art === "haus" ? 2 : 3);
   function m3Anwenden(sofort) {
     const ebenen = document.querySelectorAll("[data-m3welt]"); if (!ebenen.length) return;
     const m = m3Stand();
     const v = cent(m.vorschau || 1);
     const tr = "rotateX(" + (-m.neigen) + "deg) rotateY(" + m.drehen + "deg)" + (v !== 1 ? " scale(" + v + ")" : "");
-    ebenen.forEach(el => { el.classList.toggle("sofort", !!sofort); el.style.transform = tr; });
+    ebenen.forEach(el => { el.classList.toggle("sofort", !!sofort); el.style.transform = tr;
+      el.style.zIndex = m3Stapel(el.dataset.m3welt, m.neigen); });
   }
   /* Beim Zoomen wird zuerst nur gestreckt, damit es sofort reagiert – gleich danach
      zeichnet das Programm das Haus in der neuen Größe sauber neu. */
